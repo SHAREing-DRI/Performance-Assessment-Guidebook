@@ -1,0 +1,64 @@
+\chapter{Introduction}
+
+\index{Requirements!Non-functional}
+Performance and efficiency, i.e.~the speed of a code, are critical non-functional properties of scientific codes.
+Assessing and interpreting them---and to decide if performance is good or not---is challenging.
+Most annoyingly, there is no standardised way how to analyse and assess performance.
+There is no vanilla workflow.
+Every team, every project, every scientist create their own analysis workflow or
+process, and this processes often changes from paper to paper or experiment to experiment.
+Despite the vagueness in the metrics and the process, it is common to task research software developers to assess a code's performance as kind of a prep activity, i.e.~an exercise feeding into
+the definition of a potential project, its goals and its requirements.
+
+
+\subsection*{What we do}
+
+From hereon, we rely on a few key assumptions:
+
+\begin{enumerate}
+  \item We assume that the software engineer studying the code has \emph{limited knowledge} of the code's interns, the application domain and the used algorithms. 
+  \item We evaluate \emph{how} a code performs and if there are certain characteristics of a code which deserve a closer look.
+  \item Whenever we argue \emph{why} a code performs the way it does, it is solely explanatory, i.e.~provides reasons why the machine performs for this particular realisation the way it does.
+  \item We are interested in the code behaviour on \emph{one particular machine} for \emph{one particular experimental setup} or closely defined set of experiments.
+\end{enumerate}
+
+
+\noindent
+The most advanced papers in scientific computing, and in particular within the regime of high-performance computing, deliver a performance model, i.e.~kind of a pen-n-paper assessment what a code should be able to deliver.
+This is clearly beyond scope here and actually impossible if we stick to the principles above having limited knowledge and only explaining behaviour observed but not why this relates to the anything else (such as input data or algorithmic choices).
+We treat the code (initially) as a black box.
+We commit to a data-driven approach.
+Obviously, such an approach might complement an analytic, theoretical assessment of a code, but I strongly recommend to think about this as a completely different cup of tea.
+
+
+% , but we think that, for almost all codes, an assessment is doomed to fail should we expect an ``external'' performance assessor to know the code of interest inside-out.
+% In line with this black-box approach, we abstain from a discussion of a code's behaviour over a vast set of architectures or
+% a discussion of a code's scalability over many experimental settings.
+
+
+For all the reasons above, I often prefer to use the term \emph{performance assessment} over benchmarking or performance analysis.
+Focusing solely on \emph{how} a code performs is a step towards but certainly short of a proper analysis.
+The latter typically reasons why a code performs the way it does going beyond a mere explanation of the observation by means of computer characteristics, relates behaviour to the state-of-the-art in field, generalises over many settings and machines, involves algorithmic details, or even---in the best-case---delivers a predictive and explanatory performance model.
+In contrast, \emph{benchmarking} usually is a data collection exercise covering multiple setups and calibrating these data against some metrics such as the state-of-the-art, other machines, alternative software stacks, value for money, and so forth.
+
+
+Humans inevitably make assumptions on reasons for a behaviour of code when they assess its behaviour.
+Nevertheless, we try to rule this out as much as possible and stick purely to the observational side.
+It is important to highlight that this is not due to a lack of skills or knowledge of the assessor.
+We are rather driven by two observations:
+On the one hand, it is unrealistic to expect that the person conducting a performance assessment knows a code inside out which has grown potentially over decades.
+This is due to the  nature of scientific codes and teams, which are interdisciplinary, grow over decades and are driven by heterogeneous teams with many members joining only for a short time.
+The other way round, we know from experience that it is unrealistic to expect that PIs or very senior developers engage in-depth with a performance analysis and can contribute all this in-depth knowledge about a code; if they have it themselves.
+It is just a matter of fact that they wish to delegate assessments and hence cannot hold hands all the time.
+
+In fact, such a contribution would be detrimental to the quality of an
+assessment.
+(Senior) Developers tend to ``defend'' their code, i.e.~to explain any flaws as a natural
+consequence of the challenging nature of their domain, their awareness of future
+requirements, or their in-depth knowledge of other setups which are not covered
+by the present setup.
+This list is now comprehensive.
+Having emotionally involved developers on board for an early day assessment is
+counterproductive as they are biased.
+For a high quality assessment, it helps to lean back and to (pretend to) know nothing.
+This way, we avoid that we enter the performance analysis with a bias. 

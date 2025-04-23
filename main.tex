@@ -5,18 +5,36 @@
 
 \input{titlepage}
 
+\usepackage{makeidx}         % allows index generation
+\makeindex
+
 \begin{document}
 \maketitle
 
+\input{preface}
+
 \tableofcontents
+
+\part{Scoping, terminology and preparation}
+\input{introduction/introduction}
+\input{introduction/related-work}
+
+\input{reproducibility-analysis}
 
 \input{intro}
 
 \input{service-interface}
 
-\input{reproducibility-analysis}
 
-\input{performance-assessment}
+\part{Performance Assessment}
+
+\input{high-level/high-level}
+\input{high-level/rubrics}
+
+
+
+
+\part{Case studies}
 
 \input{case-study-june}
 

@@ -1,126 +1,63 @@
-\chapter{Performance assessment---kickstart workflow}
-% \setcounter{section}{0}
-\label{chapter:performance-assessment}
-
-\index{Requirements!Non-functional}
-Performance and efficiency, i.e.~the speed of a code, are critical non-functional properties of scientific codes.
-Assessing and interpreting them---and to decide if performance is good or not---is challenging.
-Most annoyingly, there is no standardised way how to analyse and assess performance.
-There is no vanilla workflow.
-Every team, every project, every scientist create their own analysis workflow or
-process, and this processes often changes from paper to paper or experiment to experiment.
-Despite the vagueness in the metrics and the process, it is common to task research software developers to assess a code's performance as kind of a prep activity, i.e.~an exercise feeding into
-the definition of a potential project, its goals and its requirements.
+\section{The assessment rubrics}
 
 
-
-\subsection*{What we do}
-
-From hereon, we rely on a few key assumptions:
+We classify codes along five different metrics:
 
 \begin{enumerate}
-  \item We assume that the software engineer studying the code has \emph{limited knowledge} of the code's interns, the application domain and the used algorithms. 
-  \item We evaluate \emph{how} a code performs and if there are certain characteristics of a code which deserve a closer look.
-  \item Whenever we argue \emph{why} a code performs the way it does, it is solely explanatory, i.e.~provides reasons why the machine performs for this particular realisation the way it does.
-  \item We are interested in the code behaviour on \emph{one particular machine} for \emph{one particular experimental setup} or closely defined set of experiments.
+  \item Inter node,
+  \item intra node,
+  \item core performance,
+  \item GPUs, and
+  \item input/output.
 \end{enumerate}
-
 
 \noindent
-The most advanced papers in scientific computing, and in particular within the regime of high-performance computing, deliver a performance model, i.e.~kind of a pen-n-paper assessment what a code should be able to deliver.
-This is clearly beyond scope here and actually impossible if we stick to the principles above having limited knowledge and only explaining behaviour observed but not why this relates to the anything else (such as input data or algorithmic choices).
-We treat the code (initially) as a black box.
-We commit to a data-driven approach.
-Obviously, such an approach might complement an analytic, theoretical assessment of a code, but I strongly recommend to think about this as a completely different cup of tea.
+For each of these rubrics, we initially aim for a single three-valued:
+All is fine (green), there might be issues (yellow) or there are obvious flaws (red).
+In line with our overall presentation approach, we use thresholds of 60\% and 80\% to distinguish these classes.
+That is, if the GPU performance is somewhere close to 100\%, all is fine.
+However, it is drops below 80\%, we flag it as yellow.
+Once the metrics we define for GPUs underrun 60\%, we claim that there are definitely major issues.
 
-
-% , but we think that, for almost all codes, an assessment is doomed to fail should we expect an ``external'' performance assessor to know the code of interest inside-out.
-% In line with this black-box approach, we abstain from a discussion of a code's behaviour over a vast set of architectures or
-% a discussion of a code's scalability over many experimental settings.
-
-
-For all the reasons above, I often prefer to use the term \emph{performance assessment} over benchmarking or performance analysis.
-Focusing solely on \emph{how} a code performs is a step towards but certainly short of a proper analysis.
-The latter typically reasons why a code performs the way it does going beyond a mere explanation of the observation by means of computer characteristics, relates behaviour to the state-of-the-art in field, generalises over many settings and machines, involves algorithmic details, or even---in the best-case---delivers a predictive and explanatory performance model.
-In contrast, \emph{benchmarking} usually is a data collection exercise covering multiple setups and calibrating these data against some metrics such as the state-of-the-art, other machines, alternative software stacks, value for money, and so forth.
-
-
-Humans inevitably make assumptions on reasons for a behaviour of code when they assess its behaviour.
-Nevertheless, we try to rule this out as much as possible and stick purely to the observational side.
-It is important to highlight that this is not due to a lack of skills or knowledge of the assessor.
-We are rather driven by two observations:
-On the one hand, it is unrealistic to expect that the person conducting a performance assessment knows a code inside out which has grown potentially over decades.
-This is due to the  nature of scientific codes and teams, which are interdisciplinary, grow over decades and are driven by heterogeneous teams with many members joining only for a short time.
-The other way round, we know from experience that it is unrealistic to expect that PIs or very senior developers engage in-depth with a performance analysis and can contribute all this in-depth knowledge about a code; if they have it themselves.
-It is just a matter of fact that they wish to delegate assessments and hence cannot hold hands all the time.
-
-In fact, such a contribution would be detrimental to the quality of an
-assessment.
-(Senior) Developers tend to ``defend'' their code, i.e.~to explain any flaws as a natural
-consequence of the challenging nature of their domain, their awareness of future
-requirements, or their in-depth knowledge of other setups which are not covered
-by the present setup.
-This list is now comprehensive.
-Having emotionally involved developers on board for an early day assessment is
-counterproductive as they are biased.
-For a high quality assessment, it helps to lean back and to (pretend to) know nothing.
-This way, we avoid that we enter the performance analysis with a bias. 
-
-
-
-\subsection*{Approach}
-
-There are various ways or strategies to obtain a first high-level overview and how to get started if we want to understand a code's performance better.
-We employ few very simple principles:
-
-\begin{enumerate}
-  \item We study the performance characteristics for \emph{different machine part/aspects separately}. 
-    It is natural to distinguish inter-node, intra-node, core and GPU performance (Figure~\ref{figure:performance-assessment:machine-parts}). 
-  \item We use a simple \emph{blackbox performance metric} per dimension to find out first if there are issues or not.
-  \item Per dimension, we then \emph{break down performance recursively into subrubrics} and dig deeper and deeper into the code.
-\end{enumerate}
-
-
-\begin{figure}[htb]
  \begin{center}
-  %\includegraphics[width=0.55\textwidth]{performance-assessment-overview.pdf}
-  \includegraphics[width=0.55\textwidth]{images/performance_diag.pdf}
+  \includegraphics[width=0.55\textwidth]{high-level/performance_diag.pdf}
  \end{center}
- \caption{
-  The five machine dimensions along which performance measurements can be
-  discriminated.
-  \label{figure:performance-assessment:machine-parts}
- }
-\end{figure}
 
 
 \noindent
-The approach is natural yet does not come along without shortcomings.
-If there is a performance issue with a code that affects multiple dimensions (e.g.~a poor GPU utilisation that materialises in bad load balancing as well), it might be blurred, lost or make us study unneccessary metrics.
-When we dig down recursively into finer and finer metrics along a metric tree, we have to rely on the fact that each step of the process tracks the right quantities of interest which flag the next finer detail to look at.
+The idea to look at the five different performance dimensions separatedly is natural yet does not come along without shortcomings.
+Many performance issues within a code affect multiple dimensions.
+Think about a poor GPU utilisation that materialises in bad load balancing as well.
+When we dig down recursively into finer and finer metrics later on, we have to take such cross-influence into account.
+Eventually, we might have to return to our highest level of assessment again and again.
 
-As we analyse the four dimensions of performance characteristics independently, the order does not really make a difference.
+
+As we analyse the dimensions of performance characteristics independently, the order does not really make a difference.
 In theory.
 In practice, we have to start somewhere.
-I personally made the impression that it is usually favourable to start with the node-level analysis (intra-node): 
-If the individual cores are not used properly, MPI often does not make that much of a difference and we struggle to keep GPUs busy.
-Often, the next dimension is naturally identified once we look at the node-level performance, i.e.~it tells us what to analyse next.
+I personally made the experience that \ldots
+
+%  that it is usually favourable to start with the node-level analysis (intra-node): 
+% If the individual cores are not used properly, MPI often does not make that much of a difference and we struggle to keep GPUs busy.
+% Often, the next dimension is naturally identified once we look at the node-level performance, i.e.~it tells us what to analyse next.
 
 
-\section{Related work}
-
-There are two very important pieces of related work:
-The first one is tools like Intel's Application Performance Snapshot\footnote{See for example \url{https://www.intel.com/content/www/us/en/docs/vtune-profiler/user-guide-application-snapshot-linux}} (APS) or the ClusterCockpit\footnote{\url{https://clustercockpit.org}} that \emph{monitor} the code's behaviour and deliver a high-level overview how a machine uses the underlying system.
-Rather than piping a code through a set of assessment steps, these tools give us a live fingerprint of a code's behaviour.
-These tools still fail to uncover correlations between the different performance dimensions, but we might argue that they yield more realistic insights under ``working conditions'', whereas we follow more of a lab-based procedure.
 
 
-The second idea to dig into the root of all evil by successively focusing on refined metrics, ruling out factors that are not relevant for the quantities of interest, is not ours.
-The Performance Optimisation and Productivity (POP) consortium\footnote{\url{https://pop-coe.eu}}---a EU Centre of Excellence in HPC---has published some very detailed guidelines for this already, and the members of this consortium have also worked on tools that help us to assess code.
-Several ideas in the present chapter are heavily inspired by these POP metrics.
-The collection here is my braindump.
-It certainly is highly recommended to study the material and metrics of POP.
-I'll indeed frequently refer to their procedures, tools and recommendations.
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Pair debugging is great if people from different disciplines sit together and study the same code.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Pair debugging is not good if it transitions into pair programming (``just let me briefly fix this in the code'').
+  \item[$\boxminus$] Pair debugging is dangerous if it replaces good architecture and documentation and becomes a knowledge transfer mechanism.
+\end{itemize}
+
 
 
 \section{Preparation}

@@ -1,0 +1,21 @@
+\chapter{Performance at a first glance: High-level, top-down analysis}
+% \setcounter{section}{0}
+\label{chapter:high-level}
+
+
+There are various ways or strategies to obtain a first high-level overview and how to get started if we want to understand a code's performance better.
+Every team, every project, every scientist have their own approach, and it often changes from project to project.
+In this chapter, we propose a workflow running along few very simple principles:
+
+\begin{enumerate}
+  \item We study the performance characteristics for \emph{different machine part/aspects separately}. 
+  \item We use a simple \emph{blackbox performance metric} per dimension to find out first if there are issues or not.
+  \item We \emph{do not use any tools} (yet).
+  \item We are not interested in explanations \emph{why} we see any performance flaws. We simple document \emph{what flaws} we observe.
+\end{enumerate}
+
+\noindent
+Per dimension, we later break all performance flaws found down into subrubrics, and dig deeper and deeper into the code.
+Along this way, we construct working hypotheses why the code performs poorly.
+But this comes later.
+
