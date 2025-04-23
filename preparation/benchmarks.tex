@@ -1,0 +1,51 @@
+\section{Set up the benchmarks}
+\label{section:preparation:benchmarks}
+
+Before we start a performance assessment, we need to agree on what type of measurements to perform:
+
+\begin{itemize}
+  \item There has to be one well-defined benchmark. If we are given a set of
+    setups and try to compare them, this will make our task complicated. We run
+    risk to compare different characteristics produced by different code parts.
+  \item This one benchmark has to run without any user interaction. In the
+    normal case, the sponsor has to provide a script which builds and runs the
+    whole benchmark ``as a black-box''.
+  \item It has to be very easy to scale that benchmark up and down, i.e.~to make the problem solved slightly bigger or smaller. 
+  \item The benchmark has to be a simulation run which is representative of a real-world run.
+  \item The benchmark does not run for too long, and it does not terminate too early. ``Good'' runs are often 3--5 minutes
+    long, so we get a good coverage of performance characteristics, but we do not wait for ages. 
+  \item The benchmark has to represent performance characteristics.
+\end{itemize}
+
+\noindent
+None of the properties are surprising:
+We need a well-defined toy setup, and we have to be able to modify its size to make statements on its scalability.
+In this context, it is important that we know exactly how changes of input sizes affect the compute workload:
+We have to know or have to be told the computational complexity of the underlying algorithms. 
+If we have a pure Monte Carlo setup, then doing 100 times more trials should last around 100 times longer.
+If we have a parabolic PDE solver with explicit time stepping and a regular grid, we have to know that the problem sizes increases by a factor of $2^d$ if we half the mesh spacing. 
+However, these algorithms also have to reduce the time step size, so if we measure over a fixed time span, we actually will have four times more time steps and therefore increase the workload by a factor of $2^{d+2}$ once we half the mesh size.
+Finally, if we run an adaptive AMR code for a hyperbolic setup with explicit time stepping or an SPH code, we need some kind of output that tells us exactly how many particles or mesh cells we have and what time step sizes we have picked. In this case, time step sizes go down linearly with mesh spacing.
+At the end of the day, we are interested in the \emph{throughput} of the system, i.e.~the time we need to update one quantity of interest.
+It is this metric that we will start from in the next steps. 
+
+
+However, if domain experts tell us afterwards, i.e.~after we have completed our assessment---they will always do that afterwards
+    when they are unhappy with the outcome---that this particular run is not
+    characteristic for larger runs, as it leaks a feature or does not really use a particular routine
+    heavily, our whole assessment exercise if corrupted.
+And it the whole assessment will be a big disappointment. 
+It is their job to pick a setup that represents what we are interested in and is nevertheless reasonably small.
+
+
+Having a ``small'' setup that completes in reasonable time is important since some performance analysis
+    tools induce significant overheads, i.e.~make the code significantly slower.
+    If our vanilla run already needs more than an hour, we will never get an
+    answer on time. Furthermore, a lot of tools gather significant amounts of
+    data per second. Long-running simulations thus run risk that our analysis
+    tools fail to handle the amount of data collected.
+
+
+No matter how we create this setup, we have to be able to run all experiments with absolutely minimal user interaction (cmp.~Section~\ref{section:behaviour:automate}).
+If we have to run through a complex pipeline for each individual experiment, we will not be able to measure anything productively.
+
