@@ -1,0 +1,36 @@
+\section{Performance dimension: Inter-node}
+
+Inter-node behaviour means codes that run with MPI, i.e.~employ multiple ranks.
+Before we start, we need a setup where we can alter the problem size easily (cmp.~Section~\ref{section:performance-assessment:preparation}) and understand the arising complexity exactly.
+From hereon, we refer exclusively to a normalised runtime $t^{\text{norm}}(p)_{s}$ which is the time that we need for a scenario $s$ to compute one subresult.
+This could be an update of a cell or a particle or any other reasonable quantity.
+
+
+I personally prefer to argue over inter-node efficiency through weak scaling.
+Our goal is to assess to which degree we could employ twice as many compute nodes and have twice the throughput.
+Many books refer to ``twice the problem size'', but this is misleading as twice as big problems might, on a fixed number of ranks, needs more than twice the time.
+So we stick to this normalised time from hereon.
+
+
+\begin{assessmentcrime}
+ A sequence $s_0, s_1, s_2, \ldots$ of scenarios with increasing problem sizes is used, but all of them would fit on one or few nodes. 
+\end{assessmentcrime}
+
+
+\noindent
+Indeed, the normalised timings for the problems however should stem from setups which really need the number of nodes.
+If you split up a problem which could easily fit on one single node into more and more subparts, you will only measure subpartitioning overhead. 
+If people suffer from such overhead, I would argue that this is a user error (although we use exactly this idea below to assess this propery).
+
+
+\subsection{Is there a problem?}
+
+The underlying Gustafson's law~\cite{xxx} reads
+
+\[
+ t(1) = p \cdot f \cdot t(p)  + (1-f) t(p),
+\]
+
+\noindent
+but that's not that useful here.
+

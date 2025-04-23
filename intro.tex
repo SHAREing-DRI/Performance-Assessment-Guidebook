@@ -1,0 +1,45 @@
+\chapter{Introduction}
+% \setcounter{section}{0}
+\label{chapter:intro}
+
+\textbf{VERY ROUGH, JUST INFORMATION DUMP}
+
+
+% Begin with an overview of performance analysis
+
+This chapter seeks to justify a performance analysis service at Durham University operated by Advanced Research Computing (ARC), the centralised department of Research Software Engineers (RSEs) and Research Computing Platforms (RCP). The three dominant questions of this chapter are: Why set up such a service? Who is the audience? Who could benefit from this? By first discussing the motivation of this service, this chapter then describes how an internal performance analysis service may sit within the broader HPC and scientific computing landscape. Finally, this chapter sets out the initial aims of this service, with an outlook to how it could develop further.
+
+\section{Motivation}
+% what is the motivation for this service...? It can build a network of communication between HPC users, RSEs and Computer Science researchers
+Modern research software engineering has been dominated by the notion of increasing awareness of `good' software practice. As has been repeatedly noted, optimisation and usability can often conflict for software developers.
+
+The primary motivation for this work is increase the awareness of performance and optimisation in software developed in Durham. Durham has a rich history of software development in the Physical sciences. However, drawing on it's traditions of Humanities and Arts research, Durham is now a growing centre for the Digital Humanities, bringing new users and communities to HPC systems. Hence, this main motivation can be broken into two contribution factors
+\begin{enumerate}
+    \item Optimisation the scalability and performance of software can allow researchers to push for better use of HPC systems and may open doors to using larger Tier-2 and Tier-1 systems, potentially aiding Durham's impact on national and international HPC systems.
+    \item Producing performance analysis reports naturally leads to discussions of software engineering, i.e., hiring a software expert to work on optimisations that are based in the results of the performance report. 
+\end{enumerate}
+These points are both centred around benefiting both the researchers and research impact of Durham as an institutions, but also increasing the work and notoriety of RSEs at Durham. The goal stated simply: \emph{develop the HPC culture of Durham, by rooting this culture in good software practice and a continuous cycle of analysis and optimisation}. 
+%% i.e., improved research and more software work for ARC
+
+\section{A single institution}
+% aim of this section is to establish the relevancy of a 'good performance report' in submitting grants to HPC systems, i.e., for Durham this could be added a certification of performance to potentially an ARCHER2 eCSE grant or even a EuroHPC grant
+
+As implied above, a performance analysis service at Durham is in part motivated by the notion that HPC software developers and users at Durham could go on to get an informal `badge of approval'. For example, Tier-1 systems typical require the researcher to describe the performance of their software. Hence, the Durham performance analysis service could be for many researchers the first time they have had software analysed. This gives a great opportunity for researchers to build from their current HPC use, to potentially larger use of national and international machines.  
+
+To gauge the usability of these national and international machines it is useful to review the interfaces to accessing these systems. Below is a list of several HPC Centres and Centres of Excellence and how access to the service is granted:
+\begin{itemize}
+  \item \textbf{Tier-2} \href{https://n8cir.org.uk/bede/accessing-bede/}{Bede N8 CIR access} - ... % probably the lightest touch but still requires users to roughly know job requirements
+  \item \textbf{Tier-1} \href{https://www.archer2.ac.uk/support-access/access.html}{ARCHER2 access} - ... % relatively light touch
+  \item \textbf{Tier-1} \href{https://dirac.ac.uk/getting-access/}{DiRAC access} - ... % relatively light touch: going to contact Alastair Basden
+  \item \textbf{Tier-0} \href{https://eurohpc-ju.europa.eu/access-our-supercomputers_en}{EuroHPC access, e.g., Leonardo, MareNostrum, LUMI, etc.} - ... % depending on the scale of the project the requirements for performance can be quite substantial
+\end{itemize}
+
+\section{Aims}
+
+A key aim of a performance analysis service at Durham University is to expand the large-scale HPC usage at Durham. As noted above, several national and international HPC systems rely on their users having a reasonable knowledge in the performance, be that: necessary resources, scalability, etc. A university performance analysis service, this workbook suggests, should aim to give an overview of
+\begin{itemize}
+    \item the user interface to the service
+    \item the methodology of the initial reproducibility analysis
+    \item the methodology of the performance analysis
+    \item the outcomes of these analyses, i.e, the final reports
+\end{itemize}
