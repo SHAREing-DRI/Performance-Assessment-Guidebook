@@ -1,62 +1,135 @@
-\section{Performance dimension: Intra-node (node-level performance)}
+\section{Intra-node (node-level) performance}
 
-\marginpar{20\% memory ist ok anscheinend.
-
-Bei MPI aich net so strikt schliesslich braucht Tool selber auch was}
 
 On an individual node, our first goal has to be that we use all the hardware threads efficiently.
+Some people prefer the term cores of threads.
 The term intra-node hence means all those cores sharing one memory.
-Without employing a tool, my method of choice to argue about node-level performance is strong scaling.
-On a chip with 128 cores, it makes sense to understand how much we gained by switching from 1 to 2 to 4 to \ldots cores.
-It tells us if we have made optimal use of the whole chip.
+Hereby it does not matter if we have a code using MPI or a genuine multithreading language:
+We assess the runtime characteristics for a code physically sharing its memory.
+It might be written logically in a distributed memory fashion.
+
+
+Our method of choice to argue about node-level performance is strong scaling.
+We apply a slight variation of Amdahl's law \cite{xxx}:
+We assume that the runtime of a code is given by
+
+\begin{equation}
+ \label{equation:intra-node:performance-model}
+ t(p_{\text{threads}}) = \frac{t_{\text{serial}}}{C_{\text{intra}}}\left( f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right).
+\end{equation}
+
+
+\noindent
+In this model, we assume that the time $t(p_{\text{threads}})$ for a code to finish the calculation of one fixed setup on $p_{\text{threads}}$ threads depends only only on a few variables that are specific to our code:
+First, there is a penalty variable $0 < C_{\text{intra}} \leq 1$.
+It quantifies how much slower the code runs as we enable our multithreading implementation:
+\[
+ t(1) = \frac{t_{\text{serial}}}{C_{\text{intra}}}.
+\]
+
+\noindent
+Beyond that, we have a part $0 \leq f_{\text{intra}} \leq 1$ of the code that benefit as we add more and more hardware threads.
+The other code fraction $1- f_{\text{intra}}$ however runs serially---representing non-parallelised code sections or the serialisation arising from atomics, critical sections and semaphores---and hence does not benefit from additional cores.
+The whole model is a variation of the vanilla strong scaling law due to Amdahl \cite{xxxx} which corresponds to the special case $C_{\text{intra}}=1$.
+
+
+\paragraph{Benchmark preparation}
+
+Throughout this assessment, we use one fixed problem setup.
+The setup has to be chosen such that we can compute it on a single core if necessary.
+However, it also has to be reasonably big such that it makes sense to exploit all threads of a node.
 
 
 \begin{assessmentcrime}
- We start an intra-node assessment with a code which does not use most of the memory.
+ We start an intra-node assessment with a code which only uses a tiny fraction of the main memory.
 \end{assessmentcrime}
 
 \noindent
 We may assume that a node and its memory are somehow balanced.
 If we don't use a reasonable amount of this memory for a test run, then there is simply not enough work to do to utilise all cores.
 We can barely blame the code.
+As a rule of thumb, we should have a memory footprint which is at least 20\% of the total RAM available on the whole node.
 
 
-\subsection{Is there a problem?}
+\paragraph{Data collection}
 
-To make an initial assessment how well we utilise the cores, we rely on strong scaling.
-Amdahl's law reads
+Computing the $C_{\text{intra-node}}$ should be relatively straightforward:
+We simply run the two code versions and compare the timings against each other to compute the constant.
 
-\begin{equation}
- \label{equation:performance-assessment-intra-node}
- t(p_{\text{core}}) = (1-f_{\text{intra-node}}) \cdot t(1)  + f_{\text{intra-node}} t(1)/p_{\text{core}},
-\end{equation}
- 
-\noindent
-where $t(p_{\text{core}})$ is the time used on $p_{\text{core}}$ compute units (cores), and $f_{\text{intra-node}}$ is the serial fraction within a code.
 
-\begin{performancemetric}
- If $f_{\text{intra-node}}$ in (\ref{equation:performance-assessment-intra-node}) falls below 80\%, our code suffers from insufficient strong scaling.
- It fails to utilise all cores on the system.
-\end{performancemetric}
-
-\noindent
-Computing the $f_{\text{intra-node}}$ should be relatively straightforward.
+Computing the $f_{\text{intra-node}}$ should be relatively straightforward, too, once we have $C_{\text{intra-node}}$.
 We gradually reduce the core count from $p_{\text{intra-node}}$ to $p_{\text{intra-node}}/2,p_{\text{intra-node}}/4,\ldots$ and plot the timings. 
 In OpenMP, we can simply reduce \texttt{OMP\_NUM\_THREADS} to achieve this.
 Other tasking frameworks might require us to change the thread count in the Slurm script, or to set some other OS parameters. 
+If that does not work, you can always use
+
+\begin{verbatim}
+taskset -c 0-3 ./myexec
+\end{verbatim}
+
+\noindent
+to use the first four cores only, e.g.
+After that, determine $f_{\text{intra-node}}$ by regression.
 
 
-There are two unknowns of interest in (\ref{equation:performance-assessment-intra-node}):
-$f_{\text{intra-node}}$ and $t(1)$.
-The latter is not really of interest to use for the metric, but we need a reference timing (we could have picked an arbitrary other value).
-High school maths tells us that we therefore need only two measurements to determine the two quantities:
-Measure twice, insert the results into each other and you have $f_{\text{intra-node}}$ and $t(1)$.
-As we want to get our results as quickly as possible, it makes sense to start with the biggest core count and then to assess half the core count.
 
 
-In practice, I recommend to start with at least three values and hence to determine two $f_{\text{intra-node}}$.
-If they differ by magnitudes or are both way below 80\%, I continue reducing the core count and measuring.
-In cases where $f_{\text{intra-node}}$ drops suddenly over $p_{\text{intra-node}}$, i.e.~is really depending on the core count, the particular setups around the drop deserve further attention.
+\paragraph{Evaluation}
+
+We use the two quantities $C_{\text{intra}}$ and $f_{\text{intra}}$ to determine if we consider the code to have an intra-node flaw:
+
+\begin{center}
+ \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
+  & $C_{\text{intra}}\geq 0.8$ & $0.8 > C_{\text{intra}}\geq 0.6$ & $0.6 > C_{\text{intra}}$ \\
+  \hline
+  $f_{\text{intra}} \geq 0.8$
+   & \cellcolor{green!25}
+   & \cellcolor{orange!25}
+   & \cellcolor{red!25}
+  \\
+  $0.8 > f_{\text{intra}} \geq 0.6$
+   & \cellcolor{orange!25}
+   & \cellcolor{orange!25} flaw
+   & \cellcolor{red!25}
+  \\
+  $0.6 > f_{\text{intra}}$
+   & \cellcolor{red!25}
+   & \cellcolor{red!25}
+   & \cellcolor{red!25} severe flaw
+ \end{tabular}
+\end{center}
+
+%{equation:intra-node:performance-model}
+
+\begin{performancemetric}
+ If $C_{\text{intra}}< 0.8$, the implementation introduces a significant overhead for the multithreading.
+ If $C_{\text{intra}}< 0.6$, the overhead is severe.
+\end{performancemetric}
 
 
-If we have a performance flaw, we continue investigating.
+\begin{performancemetric}
+ If $f_{\text{intra}}< 0.8$, the code does not scale particularly well over the threads.
+ If $f_{\text{intra}}< 0.6$, the scaling is severely poor.
+\end{performancemetric}
+
+
+\noindent
+A massive overhead requires us to look into profiles next.
+Poor scaling implies that we should look into a trace over the node.
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Compile your code without multithreading/parallel support and compare its performance to a code without any parallelisation to determine the overhead of the parallel implementation.
+  \item[$\boxplus$] Run a strong scaling study and calibrate the constants of an extended Amdahl model against these measurements. 
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Skip intra-node scalability studies, as the code is ``only'' MPI.
+  \item[$\boxminus$] Perform a sole strong scalability study without taking the implementation penalty into account.
+\end{itemize}
+
+
