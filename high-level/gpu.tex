@@ -1,5 +1,23 @@
 \section{Performance dimension: GPU}
 
 Metric: Speed of light
+\\
+
+\subsection{Draft ideas:}
+GPU performance issues broadly fit into two main areas: 1) significant wait times for data transfers from host to device; 2) inefficient occupation of the GPU.
+
+Inefficient data transfers between host and device can lead to significant waiting times, similar in principle to communication inefficiencies with MPI codes. The worst offending codes rely on frequent data transfers back-and-forth between host and device.
+Therefore, we would like to categories the ratio of GPU compute time to data transfer time. Frequent data transfers can in some cases be a product of naive porting to GPU. Many GPU ported codes rely on some form of `data transfer minimisation', i.e., the simulation is configured on the CPU until the code hits a the computationally intensive kernel for which the data is transferred onto the GPU allowing for effective use of the GPU's comptational advantages. Then, the data is transferred back to the CPU to finalise the simulation or deal with some level of I/O. In practice this model is a simplification, and indeed some algorithms may not fit well into this design pattern. In which case the developer may not have considered how their algorithm will rely on considerable data transfers and therefore the outcome of a performance assessment could imply an algorithmic redesign to move more of the processing onto the GPU.
+
+Data transfers are only part of the potential performance problem. Running compute kernels on a GPU does not by definition mean that the compute kernels are running effectively. Poor utilisation of the GPU, e.g., low occupation of the (using the language of NVIDIA) Streaming Multiprocessors can result in poor performance. CONTINUE...
+
+Arguably performance analysis of GPUs is the performance dimension most directly connected to tools. Inter- and intra-node performance can to some degree be investigated using scaling laws. However, GPUs can in many cases behave as `black boxes' and, are these tools are much more tied to an industry vendor than other performance dimensions. This tight connection to industry can make tools variable in maturity which then impacts further the degree that a rigorous performance analysis can probe.
+
+Take the case of NVIDIA --- often regarded as having the most mature toolset of the major GPU vendors --- the above cases of studying data transfers and GPU occupation/usage largely fit within two main tools:
+\begin{itemize}
+    \item Data transfers - NVIDIA Nsight Systems
+    \item GPU usage - NVIDIA Nsight Compute
+\end{itemize}
+CONTINUE...
 
 \subsection{Is there a problem?}
