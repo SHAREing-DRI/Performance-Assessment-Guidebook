@@ -1,11 +1,12 @@
 \section{Performance dimension: Core architecture}
 
-For the core level analysis, we ask to which degree the code exploits the particular microarchitecture of the chip efficiently:
-Does it make use of the most advanced instruction set, and does it exploit the characteristics of the caches?
-The instruction set usage is something we can indeed evaluate per core.
+For the core-level analysis, we ask to which degree the code exploits the particular microarchitecture of the chip efficiently:
+Does it make use of the (most) advanced instruction set, and does it exploit the memory interconnect properly?
+The instruction set usage is something we can evaluate per core.
 Caches on chips however are designed to serve all hardware threads on their chips.
 We will not be able to assess if we use them efficiently if we use only one core.
-Therefore, this section is no called ``core'', but we call it ``core architecture''.
+We have to run the benchmark over the whole node.
+Therefore, this section is not called ``core'', but we call it ``core architecture''.
 
 
 
@@ -14,24 +15,25 @@ Therefore, this section is no called ``core'', but we call it ``core architectur
   \includegraphics[width=0.7\textwidth]{high-level/core-architecture.pdf}
  \end{center}
  \caption{
-  Schematic illustration of a roofline analysis of a code, where individual loops or functions are represented by the green, red and yellow dots.
-  We illustrate the peak performance threshold (horizontal line) with two further lines of a factor of $C_{\text{peak}} \in \{80\%, 60\%\}$ below that maximum threshold.
-  The maximum bandwidth is a diagonal threshold, again subject to two scalings.
-  The high-level analysis should look at the average code behaviour rather than individual functions or loops.
+  Schematic illustration of a roofline analysis of a code.
+  We illustrate the peak performance threshold (dark dotted horizontal line) and the maximum bandwidth (diagonal).
+  The code's actual compute performance delivered and memory bandwidth used is by a factor of $C_{\text{peak}}$ or $C_{\text{bw}}$ respectively lower than these maximum thresholds.
   \label{figure:core-architecture}
  }
 \end{figure}
 
 
-Our method of choice to argue about the core architecture usage is the roofline model with some minor modifications (Figure~\ref{figure:core-architecture}).
-We know the maximum memory bandwidth of the system over the arithmetic intensity over the arithmetic intensity (AI).
+Our method of choice to argue about the core architecture usage is a very simple variant of the roofline model (Figure~\ref{figure:core-architecture}).
+We know the maximum memory bandwidth of the system over the arithmetic intensity (AI).
 This gives us the roofline's diagonal line that serves as a natural threshold: 
-we cannot get more data through the system unless we use the caches intensifely.
-Once we know the throughput, we can draw a second line by a factor of $C_{\text{bw}} \in \{60\%, 80\%\}$ lower.
-It illustrates that we are fine as long as our throughput ends up in this corridor.
-A similar arguent can be made for the peak performance of the chip. 
-This time, it serves as a hard upper bound for our performance, and once again we can draw additional lines. 
-The idea is that we are fine as long as we remain 80\% or 60\% respectively within the maximum bandwidth throughput and peak (blue empty circle region).
+We cannot get more data through the system besides temporary outliers if we make really good use of caches.
+The peak performance of the chip serves as a further, this time hard upper bound for our performance.
+It yields the horizontal line. 
+
+
+Once we know the throughput and performance delivered by our code, we can draw parallel lines to these two thresholds that match our observations:
+As long as they are ``only'' by a factor of $C_{\text{bw}} \geq 80\%$ or $C_{\text{bw}} \geq 60\%$ lower than the maximum lines, i.e.~as long as we we stay within a 60\% or 80\% corridor, all is fine.
+
 
 
 \paragraph{Benchmark preparation}
@@ -62,19 +64,19 @@ We use the two quantities $C_{\text{bw}}$ and $f_{\text{peak}}$ to determine if 
 
 \begin{center}
  \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
-  & $C_{\text{intra}}\geq 0.8$ & $0.8 > C_{\text{intra}}\geq 0.6$ & $0.6 > C_{\text{intra}}$ \\
+  & $C_{\text{bw}}\geq 0.8$ & $0.8 > C_{\text{bw}}\geq 0.6$ & $0.6 > C_{\text{bw}}$ \\
   \hline
-  $f_{\text{intra}} \geq 0.8$
+  $f_{\text{peak}} \geq 0.8$
    & \cellcolor{green!25}
    & \cellcolor{orange!25}
    & \cellcolor{red!25}
   \\
-  $0.8 > f_{\text{intra}} \geq 0.6$
+  $0.8 > f_{\text{peak}} \geq 0.6$
    & \cellcolor{orange!25}
    & \cellcolor{orange!25} flaw
    & \cellcolor{red!25}
   \\
-  $0.6 > f_{\text{intra}}$
+  $0.6 > f_{\text{peak}}$
    & \cellcolor{red!25}
    & \cellcolor{red!25}
    & \cellcolor{red!25} severe flaw
