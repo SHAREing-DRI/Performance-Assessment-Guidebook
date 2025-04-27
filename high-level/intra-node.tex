@@ -53,13 +53,9 @@ As a rule of thumb, we should have a memory footprint which is at least 20\% of 
 
 \paragraph{Data collection}
 
-Computing the $C_{\text{intra-node}}$ should be relatively straightforward:
-We simply run the two code versions and compare the timings against each other to compute the constant.
-
-
-Computing the $f_{\text{intra-node}}$ should be relatively straightforward, too, once we have $C_{\text{intra-node}}$.
-We gradually reduce the core count from $p_{\text{intra-node}}$ to $p_{\text{intra-node}}/2,p_{\text{intra-node}}/4,\ldots$ and plot the timings. 
-In OpenMP, we can simply reduce \texttt{OMP\_NUM\_THREADS} to achieve this.
+For the data collection, we first time the simulation without any parallelisation, which is, trivially, a single-core run.  
+We then switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
+In OpenMP, we can simply set \texttt{OMP\_NUM\_THREADS} to achieve this.
 Other tasking frameworks might require us to change the thread count in the Slurm script, or to set some other OS parameters. 
 If that does not work, you can always use
 
@@ -69,9 +65,37 @@ taskset -c 0-3 ./myexec
 
 \noindent
 to use the first four cores only, e.g.
-After that, determine $f_{\text{intra-node}}$ by regression.
+If we have a code base which employs MPI only, we set the number of ranks per node accordingly.
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{high-level/intra-node.pdf}
+  \end{center}
+  \caption{
+   A scatter plot tracking the (strong) scaling data feeding into our intra-node analysis.
+   The red node is the code's runtime without any parallelisation enabled, while the green and yellow measurements stem from the parallelised code over various cores.
+   \label{figure:intra-node}
+  }
+\end{figure}
+
+From the set of measurements (Figure~\ref{figure:intra-node}), we first compare the two timing for a single core (the red dot vs.~the green dot above it) and compute the $C_{\text{intra}}$.
+After that, we can determine $f_{\text{intra}}$ for each and every measurement due to \eqref{equation:intra-node:performance-model}
+or simply use regression over all data points.
 
 
+Many codes will yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
+This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ in \eqref{equation:intra-node:performance-model}.
+However, in many cases that's too much of an effort: 
+Before the penalty kicks in, the parallel efficiency $f_{\text{intra}}$ will already cause the scaling to deteriorate.
+For the analysis, it hence might be perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into the ``problematic'' range of threads and to neglect the measurements further on.
+The performance flaws will already be documented in this case.
+
+
+For hybrid MPI+X codes, we have a certain freedom:
+We can use an arbitrary number of MPI ranks---indeed our analysis also works for pure MPI codes as long as we stick to one node---and use threads on top such that we exploit all $p_{\text{threads}}$ hardware threads of interest.
+This means, we have a certain degree of freedom.
+Picking one rank and four threads is, logically, equivalent to picking two ranks and two threads each.
+It is part of the assessment to play around with these degrees of freedom.
 
 
 \paragraph{Evaluation}
