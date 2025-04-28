@@ -1,13 +1,10 @@
 \section{Performance dimension: Core architecture}
 
-For the core-level analysis, we ask to which degree the code exploits the particular microarchitecture of the chip efficiently:
-Does it make use of the (most) advanced instruction set, and does it exploit the memory interconnect properly?
-The instruction set usage is something we can evaluate per core.
-Caches on chips however are designed to serve all hardware threads on their chips.
-We will not be able to assess if we use them efficiently if we use only one core.
-We have to run the benchmark over the whole node.
-Therefore, this section is not called ``core'', but we call it ``core architecture''.
-
+For the core-level analysis, we examine how efficiently your code harnesses the chip's microarchitecture. 
+Does your code leverage the most advanced instruction sets available? 
+Does it properly utilise the memory interconnect? 
+Today's chips come equipped with powerful vector computing capabilities and sophisticated cache and streaming features designed to move data smoothly between memory and compute registers. 
+Our analysis evaluates how effectively your implementation takes advantage of these capabilities.
 
 
 \begin{figure}
@@ -23,16 +20,22 @@ Therefore, this section is not called ``core'', but we call it ``core architectu
 \end{figure}
 
 
-Our method of choice to argue about the core architecture usage is a very simple variant of the roofline model (Figure~\ref{figure:core-architecture}).
-We know the maximum memory bandwidth of the system over the arithmetic intensity (AI).
-This gives us the roofline's diagonal line that serves as a natural threshold: 
-We cannot get more data through the system besides temporary outliers if we make really good use of caches.
-The peak performance of the chip serves as a further, this time hard upper bound for our performance.
-It yields the horizontal line. 
+
+Our method for evaluating core architecture usage is a simplified variant of the roofline model \cite{xxxxx}. 
+We start with two key boundaries: 
+On the one hand, the maximum memory bandwidth of the system across various arithmetic intensities (AI) creates the diagonal ``roofline''. 
+While temporary performance spikes might occur with optimal cache usage, this diagonal represents our realistic bandwidth limit. 
+On the other hand, the chip's peak computational performance establishes a firm upper boundary, represented by the horizontal line (Figure~\ref{figure:core-architecture}).
+
+Once we measure our code's throughput and performance, we can draw lines parallel to these two thresholds matching our observations. 
+The implementation is considered efficient as long as it performs within $C_{\text{bw}} \geq 80\%$ or reasonably efficient as long as it remains within $C_{\text{bw}} \geq 60\%$ of these maximum values.
 
 
-Once we know the throughput and performance delivered by our code, we can draw parallel lines to these two thresholds that match our observations:
-As long as they are ``only'' by a factor of $C_{\text{bw}} \geq 80\%$ or $C_{\text{bw}} \geq 60\%$ lower than the maximum lines, i.e.~as long as we we stay within a 60\% or 80\% corridor, all is fine.
+Visually, our thresholds create 60\% and 80\% corridors beneath the maximum thresholds. 
+The ideal zone is where these corridors intersect (Figure~\ref{figure:core-architecture}). 
+A performance within the corridor under the peak if fine, too.
+However, we will rarely find such a code in practice.
+Being close to the peak bandwidth is might also fine, as we might have an intrinsically memory-bound algorithm.
 
 
 
@@ -50,12 +53,50 @@ It has to be reasonably demanding such that it makes sense to exploit all thread
  We study a code that is not translated with the most aggressive compiler optimisation for the particular architecture that we study. 
 \end{assessmentcrime}
 
+\noindent
+Both properties are easy to check: 
+Measure the total memory footprint of your code and ensure that the working set exceeds the largest cache you find on your system (cmp.~remarks on caches below).
+Further to that, check your compiler's manual and ensure you use a bespoke code version for your target system---something the \texttt{-march} or \texttt{-xarch} as well as the highest compiler optimisations (\texttt{-O3}) for example give you. 
+
 
 \paragraph{Data collection}
 
-Nobody will be able to exploit all caches with only one core!
+Realistic bounds for the roofline are easy to obtain through a number of tools.
+Our favourite is the Likwid benchmark tool
+
+\begin{verbatim}
+likwid-bench -t triad -W S0:2GB:1
+likwid-bench -t triad -W N:2GB:128
+likwid-bench -t peakflops -w S0:10000MB:1
+\end{verbatim}
+   
+   
+\noindent
+The Stream Triad \cite{xxxx} benchmark is a brilliant starting point to obtain realistic throughput bounds.
+As we are not (yet) interested in explanations how well caches are used, it is important to pick a reasonably big setup that exceeds all caches.
+2GByte should be plenty.
+Caches on chips are designed to serve all hardware threads on their chips.
+We will not be able to assess if we use them efficiently if we use only one core.
+Therefore, I typically run the benchmark over the whole node (128 cores in the second line above) and then divide the throughput by the number of cores to obtain a realistic threshold for a single core.
+Alternatively, we might want to run the benchmark only on one core (first line above) and take that value instead.
+ 
+ 
+The instruction set usage is something we can evaluate per core.
+Depending on the character of the code, we might want to pick a more avanced instruction set (e.g.~\texttt{peakflops\_sse} or \texttt{peakflops\_avx\_fma}).
+As long as we argue about the overall code performance, I find the plain peak performance to be absolutely sufficient. 
+Being within 80\% of that one for the total program execution is typically a good sign.
 
 
+Once we have the thresholds, the code's performance itself can again be used by multiple tools.
+Again, likwid is our personal favourite:
+
+\begin{verbatim}
+likwid-perfctr -f -C 0 -g MEM ./mycode
+likwid-perfctr -f -C 0 -g FLOPS_DP ./mycode
+\end{verbatim}
+
+\noindent
+provides you with the information relevant, although the exact names of the groups might differ from system to system.
 
  
 \paragraph{Evaluation}
@@ -68,39 +109,46 @@ We use the two quantities $C_{\text{bw}}$ and $f_{\text{peak}}$ to determine if 
   \hline
   $f_{\text{peak}} \geq 0.8$
    & \cellcolor{green!25}
+   & \cellcolor{green!25} perfect
    & \cellcolor{orange!25}
-   & \cellcolor{red!25}
   \\
   $0.8 > f_{\text{peak}} \geq 0.6$
-   & \cellcolor{orange!25}
+   & \cellcolor{green!25}
+   & \cellcolor{orange!25} 
    & \cellcolor{orange!25} flaw
-   & \cellcolor{red!25}
   \\
   $0.6 > f_{\text{peak}}$
    & \cellcolor{red!25}
-   & \cellcolor{red!25}
    & \cellcolor{red!25} severe flaw
+   & \cellcolor{red!25} 
  \end{tabular}
 \end{center}
 
 %{equation:intra-node:performance-model}
 
 \begin{performancemetric}
- If $C_{\text{bw}}< 0.8$, the implementation does not use the memory subsystem sufficiently, i.e.~we fail to bring enough data into the chip.
- If $C_{\text{bw}}< 0.6$, this problem is severe.
+ If $f_{\text{peak}} \geq 0.8$, the code does uses the compute capabilities (very) efficiently.
+ However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional space to improve the throughput and to speed up the code. 
 \end{performancemetric}
 
 
 \begin{performancemetric}
- If $f_{\text{peak}}< 0.8$, the code does not use the compute units properly.
- If $f_{\text{peak}}< 0.6$, the problem is significant.
+ If $0.6 \leq f_{\text{peak}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
+ However, if $f_{\text{bw}} \geq 0.8$, the problem might be inherently memory-bound (to be checked), in which case there might be limited potential to optimise further.
 \end{performancemetric}
+
+
+\noindent
+It is very clear that these rules as well as the measurements themselves are a little vague and misleading:
+Code might appear to be memory-bound if we just sum up the individual bandwidth needs, but once we get a mix of memory access patterns, it might not be that bad.
+Complex algorithms might also change their character from time to time, and this might not be captured by a single benchmark.
+Finally, even bandwidth-bound code in this case might provide plenty of space to optimise further, if we manage to exploit caches properly. 
 
 
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] Run a standard benchmark to determine a realistic maximum throughput (bandwidth) and peak performance.
+  \item[$\boxplus$] Run a standard benchmark to determine a realistic maximum throughput (bandwidth) and peak performance for a single core.
   \item[$\boxplus$] Assess your code to find out if it makes sufficient use of the available bandwidth and compute units.
 \end{itemize}
 
