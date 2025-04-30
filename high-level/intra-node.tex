@@ -84,10 +84,10 @@ or simply use regression over all data points.
 
 
 Many codes will yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
-This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ in \eqref{equation:intra-node:performance-model}.
+This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ added to \eqref{equation:intra-node:performance-model}.
 However, in many cases that's too much of an effort: 
-Before the penalty kicks in, the parallel efficiency $f_{\text{intra}}$ will already cause the scaling to deteriorate.
-For the analysis, it hence might be perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into the ``problematic'' range of threads and to neglect the measurements further on.
+In many cases, the parallel efficiency $f_{\text{intra}}$ will already cause the scaling to deteriorate way before this penalty kicks in, i.e.~before we see it visually.
+In this case, it is perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into the ``problematic'' range of threads and to neglect the measurements further on.
 The performance flaws will already be documented in this case.
 
 
@@ -96,6 +96,8 @@ We can use an arbitrary number of MPI ranks---indeed our analysis also works for
 This means, we have a certain degree of freedom.
 Picking one rank and four threads is, logically, equivalent to picking two ranks and two threads each.
 It is part of the assessment to play around with these degrees of freedom.
+Once again: If we spot sudden runtime jumps (yellow dots in example sketch) and if these jumps coincide with a NUMA domain or socket, then this might be a strong indicator that we should use MPI instead of threading.
+However, one might argue that this is already part of an in-depth analysis rather than a high-level overview.
 
 
 \paragraph{Evaluation}
