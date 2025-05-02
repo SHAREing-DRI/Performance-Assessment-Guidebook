@@ -2,11 +2,11 @@
 \label{section:preparation:benchmarks}
 
 Before we start a performance assessment, we need to agree on what type of measurements to perform:
-
-\begin{itemize}
-  \item There has to be one well-defined benchmark. If we are given a set of
+There has to be one well-defined benchmark. If we are given a set of
     setups and try to compare them, this will make our task complicated. We run
     risk to compare different characteristics produced by different code parts.
+
+\begin{itemize}
   \item This one benchmark has to run without any user interaction. In the
     normal case, the sponsor has to provide a script which builds and runs the
     whole benchmark ``as a black-box''.
@@ -14,7 +14,7 @@ Before we start a performance assessment, we need to agree on what type of measu
   \item The benchmark has to be a simulation run which is representative of a real-world run.
   \item The benchmark does not run for too long, and it does not terminate too early. ``Good'' runs are often 3--5 minutes
     long, so we get a good coverage of performance characteristics, but we do not wait for ages. 
-  \item The benchmark has to represent performance characteristics.
+%  \item The benchmark has to represent performance characteristics.
 \end{itemize}
 
 \noindent

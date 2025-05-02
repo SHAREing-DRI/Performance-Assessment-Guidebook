@@ -1,8 +1,10 @@
 \section{Performance dimension: Core architecture}
 
 For the core-level analysis, we examine how efficiently your code harnesses the chip's microarchitecture. 
-Does your code leverage the most advanced instruction sets available? 
+Does your code leverage the most advanced instruction sets available?
+Are we maybe even compute-bound? 
 Does it properly utilise the memory interconnect? 
+Are we memory-bound?
 Today's chips come equipped with powerful vector computing capabilities and sophisticated cache and streaming features designed to move data smoothly between memory and compute registers. 
 Our analysis evaluates how effectively your implementation takes advantage of these capabilities.
 
@@ -158,6 +160,7 @@ Finally, even bandwidth-bound code in this case might provide plenty of space to
 \begin{itemize}[noitemsep]
   \item[$\boxminus$] Apply some performance counters as a black box without a roofline model.
   \item[$\boxminus$] Run the roofline model for individual functions or loops and make statements on the overall code.
+  \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
 \end{itemize}
 
 

@@ -1,16 +1,80 @@
 \section{Performance dimension: Inter-node}
 
-% Inter-node behaviour means codes that run with MPI, i.e.~employ multiple ranks.
-% Before we start, we need a setup where we can alter the problem size easily (cmp.~Section~\ref{section:performance-assessment:preparation}) and understand the arising complexity exactly.
-% From hereon, we refer exclusively to a normalised runtime $t^{\text{norm}}(p)_{s}$ which is the time that we need for a scenario $s$ to compute one subresult.
-% This could be an update of a cell or a particle or any other reasonable quantity.
-% 
-% 
-% I personally prefer to argue over inter-node efficiency through weak scaling.
-% Our goal is to assess to which degree we could employ twice as many compute nodes and have twice the throughput.
-% Many books refer to ``twice the problem size'', but this is misleading as twice as big problems might, on a fixed number of ranks, needs more than twice the time.
-% So we stick to this normalised time from hereon.
-% 
+Inter-node behaviour means that code runs over multiple physically separated nodes. 
+In our case, this implies that it uses MPI.
+We work with a programming model which treats memory physically and logically as separate.
+There are software solutions that pretend to the code to have one large shared memory.
+Such virtually shared memory solutions would fall into this assessment category as well, as long as we use more than one physical processor.
+
+
+Our method of choice to argue about inter-node performance is weak scaling.
+We apply basically the vanilla version of Gustafson's law \cite{xxx}, where we assume 
+that the runtime of the code is determined by
+
+\begin{equation}
+ \label{equation:inter-node:performance-model}
+ t(1) = t(p_{\text{ranks}}) \left( f_{\text{inter}} p_{\text{ranks}} + (1-f_{\text{inter}}) \right).
+\end{equation}
+
+
+\noindent
+In this model, we reconstruct the time $t(1)$ for a code that we would need to run an experiment on one rank only.
+Implicitly, we assume that $f_{\text{inter}}$ stays constant for all setups.
+This deserves a brief excursus: 
+If we took one setup and distributed it among multiple nodes, we typically would introduce more and more overhead as we use more ranks.
+That is, we increase $f_{\text{inter}}$.
+To keep it constant, we have to increase the problem size appropriately, such that the $f_{\text{inter}}$ remains roughly the same for all setups, i.e.~no matter how many ranks we use.
+
+
+Given this ``we alter the problem size to keep $f$ roughly constant'' discussion, it is formally better to write $t(1, p_{\text{ranks}})$ rather than only $t(1)$---even though almost no write-up does so.
+When we compare our model to \eqref{equation:intra-node:performance-model}, we observe that \eqref{equation:inter-node:performance-model} lacks a penalty parameter.
+Indeed, we introduce another parameter of interest here:
+We assume that each data point in \eqref{equation:inter-node:performance-model} contains two types 
+
+\begin{eqnarray}
+t(p_{\text{ranks}}) & = & t_{\text{useful}}(p_{\text{ranks}}) + t_{\text{overhead}}(p_{\text{ranks}}) 
+  \nonumber
+  \\
+  & = & \left( C_{\text{useful}} + (1-C_{\text{useful}}) \right) \ t(p_{\text{ranks}})
+\end{eqnarray}
+
+\noindent
+of runtime.
+
+
+\paragraph{Benchmark preparation}
+
+For weak scaling, we increase the problem size as we add additional nodes.
+Therefore, it is important that we understand the cost function $T^{(0)}$. 
+
+
+\begin{assessmentcrime}
+ We scale up the problem such that the individual work per nodes becomes very small.
+\end{assessmentcrime}
+
+\noindent
+As a rule of thumb, we can simply track the memory footprint per rank and ensure that it stays within a certain regime such as 60\% of the available memory per node.
+
+
+\paragraph{Data collection}
+
+The data collection is very similar to the strong scaling studies in Section~\ref{section:high-level:intra-node}:
+We track the cost of the computation (time-to-solution) over multiple nodes for each problem size.
+For the bigger setups, we won't be able to evaluate the problem on only one node, but that's, in general, not necessary.
+If we have a problem of size $N$ on one node, a problem of size $2N$ does only have to be evaluated on two nodes.
+There is no need to run this one on two nodes as well.
+
+
+While we collect these data, it makes sense to immediately calibrate them with $T^{(0)}$.
+
+
+Overhead
+
+
+The regime where problems become too small is easy to identify:
+This is where the strong scaling curves (Section~\ref{section:high-level:intra-node}) plateau or even start to rise again over the core count.
+
+
 % 
 % \begin{assessmentcrime}
 %  A sequence $s_0, s_1, s_2, \ldots$ of scenarios with increasing problem sizes is used, but all of them would fit on one or few nodes. 

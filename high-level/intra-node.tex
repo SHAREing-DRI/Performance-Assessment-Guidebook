@@ -1,4 +1,5 @@
 \section{Intra-node (node-level) performance}
+\label{section:high-level:intra-node}
 
 
 On an individual node, our first goal has to be that we use all the hardware threads efficiently.
@@ -10,8 +11,8 @@ It might be written logically in a distributed memory fashion.
 
 
 Our method of choice to argue about node-level performance is strong scaling.
-We apply a slight variation of Amdahl's law \cite{xxx}:
-We assume that the runtime of a code is given by
+We apply a slight variation of Amdahl's law \cite{xxx}, that 
+assumes that the runtime of a code is given by
 
 \begin{equation}
  \label{equation:intra-node:performance-model}
@@ -136,6 +137,7 @@ We use the two quantities $C_{\text{intra}}$ and $f_{\text{intra}}$ to determine
 \begin{performancemetric}
  If $f_{\text{intra}}< 0.8$, the code does not scale particularly well over the threads.
  If $f_{\text{intra}}< 0.6$, the scaling is severely poor.
+  \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
 \end{performancemetric}
 
 
