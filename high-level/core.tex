@@ -9,20 +9,6 @@ Today's chips come equipped with powerful vector computing capabilities and soph
 Our analysis evaluates how effectively your implementation takes advantage of these capabilities.
 
 
-\begin{figure}
- \begin{center}
-  \includegraphics[width=0.7\textwidth]{high-level/core-architecture.pdf}
- \end{center}
- \caption{
-  Schematic illustration of a roofline analysis of a code.
-  We illustrate the peak performance threshold (dark dotted horizontal line) and the maximum bandwidth (diagonal).
-  The code's actual compute performance delivered and memory bandwidth used is by a factor of $C_{\text{peak}}$ or $C_{\text{bw}}$ respectively lower than these maximum thresholds.
-  \label{figure:core-architecture}
- }
-\end{figure}
-
-
-
 Our method for evaluating core architecture usage is a simplified variant of the roofline model \cite{xxxxx}. 
 We start with two key boundaries: 
 On the one hand, the maximum memory bandwidth of the system across various arithmetic intensities (AI) creates the diagonal ``roofline''. 
@@ -63,8 +49,22 @@ Further to that, check your compiler's manual and ensure you use a bespoke code 
 
 \paragraph{Data collection}
 
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[width=0.7\textwidth]{high-level/core-architecture.pdf}
+ \end{center}
+ \caption{
+  Schematic illustration of a roofline analysis of a code.
+  We illustrate the peak performance threshold (dark dotted horizontal line) and the maximum bandwidth (diagonal).
+  The code's actual compute performance delivered and memory bandwidth used is by a factor of $C_{\text{peak}}$ or $C_{\text{bw}}$ respectively lower than these maximum thresholds.
+  \label{figure:core-architecture}
+ }
+\end{figure}
+
 Realistic bounds for the roofline are easy to obtain through a number of tools.
-Our favourite is the Likwid benchmark tool
+
+\begin{instructions}{\likwid}
+With \likwid\, it is only a few lines
 
 \begin{verbatim}
 likwid-bench -t triad -W S0:2GB:1
@@ -99,11 +99,30 @@ likwid-perfctr -f -C 0 -g FLOPS_DP ./mycode
 
 \noindent
 provides you with the information relevant, although the exact names of the groups might differ from system to system.
+\end{instructions}
+
+
+\begin{instructions}{\amplifier}
+ t.b.d.
+\end{instructions}
+
+
+\begin{instructions}{\map}
+ t.b.d.
+\end{instructions}
+
 
  
 \paragraph{Evaluation}
 
-We use the two quantities $C_{\text{bw}}$ and $f_{\text{peak}}$ to determine if we consider the code to have a core architecture flaw:
+We use the two quantities $C_{\text{bw}}$ and $f_{\text{peak}}$ to determine if
+we consider the code to have a core architecture flaw.
+Following Section~\ref{section:related-work:bottom-up}, we might introduce a
+multiplicative or additive metric over the two quantities.
+As a matter of simplicity (and as we use both quantities later on), we use a
+third variant here:  
+an and-based correlation of the two metrics.
+
 
 \begin{center}
  \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}

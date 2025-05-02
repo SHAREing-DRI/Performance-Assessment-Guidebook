@@ -1,14 +1,30 @@
 \newcommand{\xp} {eXtreme Programming}
+\newcommand{\likwid}    {Likwid}
+\newcommand{\maqao}     {MAQAO}
+\newcommand{\amplifier} {Amplifier}
+\newcommand{\vtune}     {VTune}
+\newcommand{\map}       {Linaro MAP}
+\newcommand{\gdb}       {GDB}
+\newcommand{\scorep}    {scorep}
+\newcommand{\scalasca}  {scalasca}
+\newcommand{\extrae}    {extrae}
+\newcommand{\linux}     {Linux command line}
+\newcommand{\slurm}     {Slurm}
+\newcommand{\openmp}    {OpenMP}
 
-\newenvironment{interview}
+\newenvironment{instructions}[1]
   {\begin{framed}
+   \begin{flushright}
+    \begin{framed}
+      {\bf #1}
+    \end{framed}
+   \end{flushright}
    \noindent
+   \index{#1}
   }
   { 
     \end{framed} 
   }
-  
-\newcommand{\interviewee}[1]{\begin{flushright}\bf{#1}\end{flushright}}  
   
 \newtheorem{doctrine}{Doctrine}
 \newtheorem{flaw}{Flaw}

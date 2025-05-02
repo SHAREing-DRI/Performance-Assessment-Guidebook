@@ -1,0 +1,38 @@
+\section{Compiler setup}
+\label{section:preparation:compiler-settings}
+
+Before we start, it is important to doublecheck whether we have used the correct
+compiler settings. It makes no sense to benchmark a code which is not producing
+tailored code for our particularly machinery (therefore it is important to
+benchmark on the right system), and it makes no sense to benchmark a code that
+is not using the latest compiler features.
+
+
+First of all, we work with the the most aggressive optimisation that our
+compiler can offer. The minimum setup is to compile with 
+
+\begin{verbatim}
+ -O3
+\end{verbatim}
+
+
+%  CFLAGS="-g" CXXFLAGS="-g" --with-multithreading=tbb_extension
+% --enable-blockstructured --enable-particles --enable-loadbalancing --enable-finiteelements --enable-mghype --enable-swift --enable-exahype CXXFLAGS="-std=c++20 -O3 -g3 -DTBBExtensionAddRanges -fno-exceptions -fiopenmp -Wno-unknown-attributes" LDFLAGS="-fiopenmp" LIBS="-ltbb_debug" CXX=icpx CC=icpx
+
+Second, we create code that is tailored towards our particular machinery.
+The correct setting for this depends on 
+
+
+
+Finally, we might want to add debug symbols.
+These instruct the compiler to insert additional information into the source
+code which tools can then later use to \marginpar{Rueckschluss ziehen} 
+from which source code line a certain instruction stems from.
+Usually, you cannot know from a single instruction in a machine code, where this
+comes from in the original code.
+With the debug systems, we inject exactly this information into the executable.
+Therefore, we should add \texttt{-g}.
+Some compilers support more detailed information (e.g.~using \texttt{-g3}).
+It requires studying the compiler's feedback whether these flags disable
+optimisations, in which case we might have to balance insight vs.~best-case
+speed.

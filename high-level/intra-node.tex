@@ -56,17 +56,52 @@ As a rule of thumb, we should have a memory footprint which is at least 20\% of 
 
 For the data collection, we first time the simulation without any parallelisation, which is, trivially, a single-core run.  
 We then switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
-In OpenMP, we can simply set \texttt{OMP\_NUM\_THREADS} to achieve this.
-Other tasking frameworks might require us to change the thread count in the Slurm script, or to set some other OS parameters. 
-If that does not work, you can always use
+
+\begin{instructions}{\openmp}
+ In OpenMP, we can simply set \texttt{OMP\_NUM\_THREADS} to achieve this.
+ After that, we run our code and should automatically get the correct core
+ count.
+ Depending on your system's configuration, you might want to set some additional
+ command line variables such as 
+ \begin{verbatim}
+export OMP_PROC_BIND=close 
+ \end{verbatim}
+ or similar to ensure that the operating system does not swap your threads
+ around, i.e.~decide at one point to migrate a thread to a different core.
+ This never gives good performance.
+ Be careful as well with setting the \openmp\ threads manually while using
+ another core specification technique such as Slurm's configs or tasksets (both
+ below):
+ If you do so, you might force all the \openmp\ threads onto a few cores only,
+ i.e.~accidentiall over- or undersubscribe the testbed.
+\end{instructions}
+
+
+\begin{instructions}{\slurm}
+
+\end{instructions}
+
+
+\begin{instructions}{\linux}
+The one thing that works always is using 
 
 \begin{verbatim}
 taskset -c 0-3 ./myexec
 \end{verbatim}
 
 \noindent
-to use the first four cores only, e.g.
-If we have a code base which employs MPI only, we set the number of ranks per node accordingly.
+to emply the first four cores only, e.g.
+However, you should be careful when you use this in combination with \slurm~or
+\openmp~which also make choices on cores.
+You might end up with competing or contradictory settings and end up with a
+suboptimal system usage.
+\end{instructions}
+
+
+\noindent
+If we have a code base which employs MPI only, we set the number of ranks per
+node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
+
 
 \begin{figure}
   \begin{center}
