@@ -1,0 +1,100 @@
+\chapter{Node-level (intra-node) analysis}
+\label{chapter:node-level}
+
+
+We apply Amdahl's law \cite{xxx}, which assumes that the runtime of a code is given by
+
+\begin{equation}
+ \label{equation:intra-node:performance-model}
+ t(p_{\text{threads}}) =
+ \underbrace{ 
+  t(1)
+ }_{
+  =: \frac{t_{\text{serial}}}{C_{\text{intra}}}
+ }
+ \left(
+ f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right).
+\end{equation}
+
+
+\noindent
+and then argue over the obtained speedup or efficiency, respectively
+
+\begin{eqnarray}
+  S(p_{\text{threads}}) & = & \frac{t(1)}{t(p_{\text{threads}})} 
+    \nonumber
+    \\
+  E(p_{\text{threads}}) & = & \frac{S(p_{\text{threads}})}{ p_{\text{threads}} }
+  \label{equation:intra-node:speedup}
+\end{eqnarray}
+
+\noindent
+In this model, we assume that the time $t(p_{\text{threads}})$ for a code to finish the calculation of one fixed setup on $p_{\text{threads}}$ threads depends only only on a few variables that are specific to our code:
+First, there is a penalty variable $0 < C_{\text{intra}} \leq 1$.
+It quantifies how much slower the code runs as we enable our multithreading
+implementation. Beyond that, we have a part $0 \leq f_{\text{intra}} \leq 1$ of the code that benefit as we add more and more hardware threads.
+The other code fraction $1- f_{\text{intra}}$ however runs serially---representing non-parallelised code sections or the serialisation arising from atomics, critical sections and semaphores---and hence does not benefit from additional cores.
+The whole model is a variation of the vanilla strong scaling law due to Amdahl \cite{xxxx} which corresponds to the special case $C_{\text{intra}}=1$.
+
+
+
+
+Many codes will yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
+This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ added to \eqref{equation:intra-node:performance-model}.
+However, in many cases that's too much of an effort: 
+In many cases, the parallel efficiency $f_{\text{intra}}$ will already cause the scaling to deteriorate way before this penalty kicks in, i.e.~before we see it visually.
+In this case, it is perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into the ``problematic'' range of threads and to neglect the measurements further on.
+The performance flaws will already be documented in this case.
+
+
+
+This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ added to \eqref{equation:intra-node:performance-model}.
+However, in many cases that's too much of an effort: 
+In many cases, the parallel efficiency $f_{\text{intra}}$ will already cause the scaling to deteriorate way before this penalty kicks in, i.e.~before we see it visually.
+
+
+
+Once we know $C_{\text{intra}} = t_{\text{serial}}/t(1)$, we can compute  	
+
+\begin{eqnarray*}
+ t(p_{\text{threads}}) & = & \frac{t_{\text{serial}}}{C_{\text{intra}}}\left(
+ f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right), \quad
+ \text{i.e.}
+ \\
+ f_{\text{intra}} \left( 1/p_{\text{threads}}-1 \right) & = & 
+ C_{\text{intra}}\frac{t(p_{\text{threads}})}{t_{\text{serial}}} - 1 \\
+ & =  &
+ \frac{t(p_{\text{threads}})}{t(1)} - 1 \\
+ \Rightarrow
+ f_{\text{intra}} & = & \frac{
+   \frac{t(p_{\text{threads}})}{t(1)} - 1
+ }{
+   1/p_{\text{threads}}-1
+ },
+\end{eqnarray*}
+
+
+\noindent
+and either argue of individual values of this quantity for large choices
+of $p_{\text{threads}}$ (all the cores of the node for example) or run a
+regression model for a calibrated value of $f$.
+
+
+%{equation:intra-node:performance-model}
+
+\begin{performancemetric}
+ If $C_{\text{intra}}< 0.8$, the implementation introduces a significant overhead for the multithreading.
+ If $C_{\text{intra}}< 0.6$, the overhead is severe.
+\end{performancemetric}
+
+
+\begin{performancemetric}
+ If $f_{\text{intra}}< 0.8$, the code does not scale particularly well over the threads.
+ If $f_{\text{intra}}< 0.6$, the scaling is severely poor.
+  \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
+\end{performancemetric}
+
+
+\noindent
+A massive overhead requires us to look into profiles next.
+Poor scaling implies that we should look into a trace over the node.

@@ -1,0 +1,82 @@
+\section{The most fundamental HPC terms and where to find more information}
+\label{section:terminology:hpc-terms}
+
+
+We try to keep the HPC jargon in this write-up to a minimum.
+You might argue that this is a bad idea as we want to run scientifically sound
+assessments.
+However, we have to acknowledge that most scientific code today is written by
+people without a computer science background, and that most scientists do not
+have an extensive HPC training.
+It is therefore not only a matter of accessibility of the performance analysis
+and assessment itself to try to avoid too much jargon---if we use too much of
+it, we run risk that our outputs, i.e.~the assessments themselves, cannot be
+read and interpreted appropriatedly by our target audience.
+After all, most of the assessments are not done for ourselves, but for other
+scientists.
+
+
+At the same time, performance analysis tools are written by computer scientists,
+software stacks are written by computer scientists, and computer hardware is
+built by computer scientists.
+It is hence clear that there's a lot of jargon buried in any conversation around
+performance. 
+We have to find a healthy middle ground to make precise, in-depth assessments
+and analyses, without immersing ourselves in technical fuzz.
+
+
+
+\paragraph{Performance assessment vs.~analysis}
+
+\paragraph{Profiling, sampling and tracing}
+
+\paragraph{Hardware jargon}
+
+\index{Node}
+Supercomputers consist of many different individual computers linked through a
+high-performance interconnect (network).
+These computers are called \emph{nodes}.
+
+
+\index{Core}
+\index{Hardware thread}
+Each node is a full-grown computer and hence hosts many individual \emph{cores}.
+All the cores on a node share their memory (but cores from different nodes do
+typically not share memory).
+Technically, many vendors call their cores \emph{hardware threads}, as a core
+is a technical building block and might host multiple threads. 
+We use hardware thread and core as synonym.
+
+
+
+\paragraph{Core performance quantities}
+\label{section:terminology:hpc-terms:core-terms}
+
+\index{Speedup}
+The runtime of a code is written here as $t(p)$ where the $p$ is either the
+number of nodes or number of cores.
+It depends on the context.
+The \emph{speedup} of a program is defined as 
+
+\begin{equation}
+  \label{equation:hpc-terms:speedup}
+  S(p) = \frac{t(1)}{t(p)},
+\end{equation}
+
+\noindent
+which is typically smaller or equal to one and tells us how much faster we made
+an application by using $p$ compute units (cores or nodes) rather than only one.
+
+\index{Parallel efficiency}
+The \emph{parallel efficiency} is given by 
+
+\begin{equation}
+  \label{equation:hpc-terms:efficiency}
+  E(p) = \frac{S(p)}{p}.
+\end{equation}
+
+\noindent
+It quantifies to which degree adding further compute resources was worth it.
+
+
+\paragraph{Further material}

@@ -11,27 +11,28 @@ It might be written logically in a distributed memory fashion.
 
 
 Our method of choice to argue about node-level performance is strong scaling.
-We apply a slight variation of Amdahl's law \cite{xxx}, that 
-assumes that the runtime of a code is given by
+In principle, we ask ourselves ``what what happen if we had only one core on our
+node'' (we use the term core and hardware thread as synonyms from hereon).
+If our code needs 80s on one core, then we would expect that it only needs 40s
+on two, and 20s on four.
+This is obviously an artificial question to ask:
+Why would be not use all the core? 
+Despite the fact that we have the cores anyway and therefore might want to use
+them, finding an answer to the ``what if'' questions helps us to uncover
+inefficiencies.
+How much performance do we leave on the way as we use more and more cores?
+How much more computation should we be able to squeeze out of the machine?
 
-\begin{equation}
- \label{equation:intra-node:performance-model}
- t(p_{\text{threads}}) = \frac{t_{\text{serial}}}{C_{\text{intra}}}\left( f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right).
-\end{equation}
 
+The underlying performance model is called Amdahl's law, and we will return to
+this law in Chapter~\ref{chapter:node-level}.
+For the time being, we can abstract from any performance model or law, and
+simply focus on the scaling behaviour over cores, as we have defined it in
+Section~\ref{section:terminology:hpc-terms:core-terms}:
+We alter the number of cores available to our code until we have reached all the
+cores available, i.e.~use the whole machine, and track the time to solution
+dependance on core counts.
 
-\noindent
-In this model, we assume that the time $t(p_{\text{threads}})$ for a code to finish the calculation of one fixed setup on $p_{\text{threads}}$ threads depends only only on a few variables that are specific to our code:
-First, there is a penalty variable $0 < C_{\text{intra}} \leq 1$.
-It quantifies how much slower the code runs as we enable our multithreading implementation:
-\[
- t(1) = \frac{t_{\text{serial}}}{C_{\text{intra}}}.
-\]
-
-\noindent
-Beyond that, we have a part $0 \leq f_{\text{intra}} \leq 1$ of the code that benefit as we add more and more hardware threads.
-The other code fraction $1- f_{\text{intra}}$ however runs serially---representing non-parallelised code sections or the serialisation arising from atomics, critical sections and semaphores---and hence does not benefit from additional cores.
-The whole model is a variation of the vanilla strong scaling law due to Amdahl \cite{xxxx} which corresponds to the special case $C_{\text{intra}}=1$.
 
 
 \paragraph{Benchmark preparation}
@@ -103,6 +104,14 @@ If we have a code base which employs MPI only, we set the number of ranks per
 node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
 
 
+\begin{assessmentcrime}
+ If you have the opportunity to mask out the initialisation time and to focus
+ only on the ``real'' runtime of your benchmark code, use it at this point.
+ Notably when you work with very short execution times, the initialisation
+ overhead might otherwise dominate your measurements.
+\end{assessmentcrime}
+
+
 \begin{figure}
   \begin{center}
     \includegraphics[width=0.7\textwidth]{high-level/intra-node.pdf}
@@ -114,17 +123,23 @@ node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
   }
 \end{figure}
 
-From the set of measurements (Figure~\ref{figure:intra-node}), we first compare the two timing for a single core (the red dot vs.~the green dot above it) and compute the $C_{\text{intra}}$.
-After that, we can determine $f_{\text{intra}}$ for each and every measurement due to \eqref{equation:intra-node:performance-model}
-or simply use regression over all data points.
+\noindent
+From the set of measurements (Figure~\ref{figure:intra-node}), we first compare
+the two timing for a single core (the red dot vs.~the green dot above it).
+This gives us a $t_{\text{serial}}$ and a $t_{\text{intra}}(1)$.
+As we use different executables---once compiled with support for shared memory
+and once without---these times will differ and we'd assume
+$t_{\text{serial}} \leq t_{\text{intra}}(1)$.
+If the code is not available without any parallelisation, assume 
+$t_{\text{serial}} = t_{\text{intra}}(1)$.
+After that, we collect the remaining $t(p_{\text{intra}})$.
 
 
-Many codes will yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
-This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ added to \eqref{equation:intra-node:performance-model}.
-However, in many cases that's too much of an effort: 
-In many cases, the parallel efficiency $f_{\text{intra}}$ will already cause the scaling to deteriorate way before this penalty kicks in, i.e.~before we see it visually.
+It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
+This means that the speedup deteriorates completely.
 In this case, it is perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into the ``problematic'' range of threads and to neglect the measurements further on.
-The performance flaws will already be documented in this case.
+The performance flaws will already be documented for the smaller core counts
+where we at least continued to see some speedup.
 
 
 For hybrid MPI+X codes, we have a certain freedom:
@@ -138,47 +153,46 @@ However, one might argue that this is already part of an in-depth analysis rathe
 
 \paragraph{Evaluation}
 
-We use the two quantities $C_{\text{intra}}$ and $f_{\text{intra}}$ to determine if we consider the code to have an intra-node flaw:
+\index{Speedup}
+With the speedups at hand, we can compute the code's parallel efficiency.
+We use a slightly modified version as compared to
+\eqref{equation:hpc-terms:speedup} and \eqref{equation:hpc-terms:efficiency},
+where we calibrate the runtimes against the serial code runtime:
+
+\begin{performancemetric}
+The modified parallel core efficiency
+\[
+E_{\text{intra}}(p_{\text{intra}}) =
+\frac{t_{\text{serial}}}{t(p_{\text{intra}}) \cdot p_{\text{intra}}}
+\]
+normalised against the serial runtime without any parallelism support is a good
+indicator for inter-node performance flaws.
+\end{performancemetric}
+
+\noindent
+We use this quantify to determine if we consider the code to have an intra-node
+flaw.
+Obviously, we will obtain a series of these quantities.
+The assessor might decide to compute an average, to argue over different regimes
+of values, or to study only the value for the maximum core count.
 
 \begin{center}
- \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
-  & $C_{\text{intra}}\geq 0.8$ & $0.8 > C_{\text{intra}}\geq 0.6$ & $0.6 > C_{\text{intra}}$ \\
+ \begin{tabular}{r|p{0.62\textwidth}}
+  Efficiency & Description \\
   \hline
-  $f_{\text{intra}} \geq 0.8$
-   & \cellcolor{green!25} perfect
-   & \cellcolor{orange!25}
-   & \cellcolor{red!25}
+  $E_{\text{intra}}(p_{\text{intra}}) \geq 0.8$
+   & \cellcolor{green!25} Shared memory scaling is good.
   \\
-  $0.8 > f_{\text{intra}} \geq 0.6$
-   & \cellcolor{orange!25}
-   & \cellcolor{orange!25} flaw
-   & \cellcolor{red!25}
+  $0.6 \leq E_{\text{intra}}(p_{\text{intra}}) < 0.8$
+   & \cellcolor{yellow!25} Shared memory scaling is not particularly good, and
+   we notably might run into problems with the next generation of chips where
+   the core count will increase.
   \\
-  $0.6 > f_{\text{intra}}$
-   & \cellcolor{red!25}
-   & \cellcolor{red!25}
-   & \cellcolor{red!25} severe flaw
+  $E_{\text{intra}}(p_{\text{intra}}) < 0.6$
+   & \cellcolor{red!25} Shared memory scaling is poor.
  \end{tabular}
 \end{center}
 
-%{equation:intra-node:performance-model}
-
-\begin{performancemetric}
- If $C_{\text{intra}}< 0.8$, the implementation introduces a significant overhead for the multithreading.
- If $C_{\text{intra}}< 0.6$, the overhead is severe.
-\end{performancemetric}
-
-
-\begin{performancemetric}
- If $f_{\text{intra}}< 0.8$, the code does not scale particularly well over the threads.
- If $f_{\text{intra}}< 0.6$, the scaling is severely poor.
-  \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
-\end{performancemetric}
-
-
-\noindent
-A massive overhead requires us to look into profiles next.
-Poor scaling implies that we should look into a trace over the node.
 
 \paragraph*{How it works}
 
@@ -193,6 +207,8 @@ Poor scaling implies that we should look into a trace over the node.
 \begin{itemize}[noitemsep]
   \item[$\boxminus$] Skip intra-node scalability studies, as the code is ``only'' MPI.
   \item[$\boxminus$] Perform a sole strong scalability study without taking the implementation penalty into account.
+  \item[$\boxminus$] Jump straight into a further ``in-depth'' analysis without
+  evaluating the other high-level metrics.
 \end{itemize}
 
 

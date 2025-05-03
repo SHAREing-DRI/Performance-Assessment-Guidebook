@@ -9,24 +9,42 @@ is not using the latest compiler features.
 
 
 First of all, we work with the the most aggressive optimisation that our
-compiler can offer. The minimum setup is to compile with 
+compiler can offer. The minimum choice is to compile with \texttt{-O3},
+although some other compilers might offer further granularity. Also consider
+using \texttt{-ffast-math} which enables aggressive floating-point optimisation.
 
-\begin{verbatim}
- -O3
-\end{verbatim}
-
-
-%  CFLAGS="-g" CXXFLAGS="-g" --with-multithreading=tbb_extension
-% --enable-blockstructured --enable-particles --enable-loadbalancing --enable-finiteelements --enable-mghype --enable-swift --enable-exahype CXXFLAGS="-std=c++20 -O3 -g3 -DTBBExtensionAddRanges -fno-exceptions -fiopenmp -Wno-unknown-attributes" LDFLAGS="-fiopenmp" LIBS="-ltbb_debug" CXX=icpx CC=icpx
 
 Second, we create code that is tailored towards our particular machinery.
-The correct setting for this depends on 
+The correct setting for this depends once again on your compiler. 
+With LLVM and GNU, you can use flags starting with \texttt{-mXXXX} to specify 
+machinery-specific optimisations, i.e.~you can exactly say for which processor
+generation, instruction set, \ldots~you want to compiler to create binary code.
+If your compile node is of the same type as your test node, then simply
+use \texttt{-xhost} and the compiler will pick the higest instruction set
+available.
+The flag is called \texttt{-mhost} with GNU.
 
 
+\begin{instructions}{\intelcompiler}
+ With the Intel compiler, you sometimes can pick between the generic
+ LLVM/community versions of a feature and one optimised by Intel itself (with
+ the latter obviously performing better on bespoke Intel architecture). For
+ example, \texttt{-fopenmp} enables the general OpenMP implementation whereas
+ \texttt{-fiopenmp} gives you an in-house version of the same. 
+ 
+ And while \texttt{-xhost} uses Intel-specific optimisations, \texttt{-mhost}
+ will use LLVM's optimisation stack, i.e.~Intel has replaced some optimisation
+ steps with bespoke variants, which are enabled if and only if you go down the
+ \texttt{-xhost} route. Be aware that Intel's optimisation passes typically will
+ be disabled if you use the Intel toolchain on other vendor's hardware,
+ i.e.~you'll get unoptimised code.
+\end{instructions}
 
+
+\noindent
 Finally, we might want to add debug symbols.
 These instruct the compiler to insert additional information into the source
-code which tools can then later use to \marginpar{Rueckschluss ziehen} 
+code which tools can then later use to draw inference
 from which source code line a certain instruction stems from.
 Usually, you cannot know from a single instruction in a machine code, where this
 comes from in the original code.

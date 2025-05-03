@@ -16,21 +16,19 @@
 \tableofcontents
 
 \part{Introduction}
+
 \input{terminology/terminology}
+\input{terminology/related-work}
+\input{terminology/hpc-terms}
+\input{terminology/bottom-up}
 
-\input{related-work/related-work}
-\input{related-work/bottom-up}
-
-\input{reproducibility-analysis}
 
 \input{preparation/preparation.tex}
 \input{preparation/benchmarks.tex}
 \input{preparation/compiler-settings}
 \input{preparation/complexity.tex}
 \input{preparation/io.tex}
-
-\input{intro}
-
+\input{preparation/machine.tex}
 
 
 \part{Performance Assessment}
@@ -49,6 +47,8 @@
 \input{localisation/where}
 
 
+\input{node-level/node-level}
+
 \part{Case studies}
 
 \input{case-study-june}
@@ -64,6 +64,7 @@
 \input{service/interface}
 
 \section{Old stuff---do not read}
+\input{reproducibility-analysis}
 
 \section{Performance crimes}
 
@@ -412,9 +413,18 @@ of ``their'' vendor.
 However, the analysis tools for parallel performance start to integrate more and
 more GPU-capabilities into their software stack.
 
+\input{intro}
 
-\section{Acknowledgements}
+\part{Appendix}
+\appendix
+
+\chapter{Acknowledgements}
  
  UKRI logo hier
+
+\bibliographystyle{unsrt}
+\bibliography{book}
+
+\printindex
 
 \end{document}

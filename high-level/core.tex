@@ -62,6 +62,24 @@ Further to that, check your compiler's manual and ensure you use a bespoke code 
 \end{figure}
 
 Realistic bounds for the roofline are easy to obtain through a number of tools.
+The ``only'' tricky bit is how we calibrate the memory bandwidth.
+Memory interconnects are designed to serve all hardware threads on their chips.
+We will not be able to assess if we use them efficiently if we use only one
+core, as we will simply not be able to saturate the theoretical bandwidth with
+only of of these.
+Therefore, we typically run the benchmark over the whole node
+and then divide the throughput by the number of cores to obtain a realistic threshold for a single core.
+
+
+To some degree, the argument holds the other way round for the cores:
+Modern chips are often not capable of cooling all of their cores if all of them
+run at full compute capacity.
+They therefore downclock the system when they encounter lots of compute-intense
+operations.
+As we only assess scalar peak performance in this first exercise, this
+effect should not arise or be negligible. 
+You might however want to doublecheck.
+
 
 \begin{instructions}{\likwid}
 With \likwid\, it is only a few lines
@@ -70,6 +88,7 @@ With \likwid\, it is only a few lines
 likwid-bench -t triad -W S0:2GB:1
 likwid-bench -t triad -W N:2GB:128
 likwid-bench -t peakflops -w S0:10000MB:1
+likwid-bench -t peakflops -w N:10000MB:128
 \end{verbatim}
    
    
@@ -77,11 +96,9 @@ likwid-bench -t peakflops -w S0:10000MB:1
 The Stream Triad \cite{xxxx} benchmark is a brilliant starting point to obtain realistic throughput bounds.
 As we are not (yet) interested in explanations how well caches are used, it is important to pick a reasonably big setup that exceeds all caches.
 2GByte should be plenty.
-Caches on chips are designed to serve all hardware threads on their chips.
-We will not be able to assess if we use them efficiently if we use only one core.
-Therefore, I typically run the benchmark over the whole node (128 cores in the second line above) and then divide the throughput by the number of cores to obtain a realistic threshold for a single core.
-Alternatively, we might want to run the benchmark only on one core (first line above) and take that value instead.
- 
+It depends on our measurement strategy if we assess the single core bandwidth or
+take the whole node's (here with 128 threads) throughput an re-calibrate it
+accordingly.
  
 The instruction set usage is something we can evaluate per core.
 Depending on the character of the code, we might want to pick a more avanced instruction set (e.g.~\texttt{peakflops\_sse} or \texttt{peakflops\_avx\_fma}).
@@ -115,10 +132,47 @@ provides you with the information relevant, although the exact names of the grou
  
 \paragraph{Evaluation}
 
-We use the two quantities $C_{\text{bw}}$ and $f_{\text{peak}}$ to determine if
-we consider the code to have a core architecture flaw.
-Following Section~\ref{section:related-work:bottom-up}, we might introduce a
-multiplicative or additive metric over the two quantities.
+Once we know the maximum bandwidth and the obtained bandwidth, we can compute
+the ratio (or normalised measured bandwith) $C_{\text{bw}}$.
+Along the same lines, we determine the normalised peak $C_{\text{peak}}$.
+The latter is a little bit weird (and we will revise it later), as we typically
+normalise against the scalar peak performance.
+This is suprising given that all mainstream CPUs support vectorisation and hence
+can deliver several times more than that.
+However, we empirically found that starting with a comparison against the
+baseline is a good starting point:
+Few codes spend all of their runtime exclusively in very compute-heavy routines.
+Therefore, there will always be code parts which do not exploit vectorisation.
+If those that are compute-heavy do so and hence lift the average total peak into
+the regime of the scalar peak, this is already an overall efficient code.
+
+
+\index{Peak performance}
+\index{MFlops/s}
+\begin{performancemetric}
+ The delivered MFlops/s normalised against the scalar peak is a good high-level
+ indicator for the compute efficiency.
+\end{performancemetric}
+
+
+\index{Memory bandwidth}
+\begin{performancemetric}
+ The used bandwidth normalised against the memory bandwidth is a
+ good high-level indicator for the compute efficiency.
+\end{performancemetric}
+
+\noindent
+It is not clear whether normalising against the memory bandwidth is
+reasonable given that modern CPUs feature vast caches.
+The comparison furthermore is biased as we measure a single core but compare it
+to a value taken from the whole system divided by the core count.
+We however think that this normalisation nevertheless delivers a good
+initial high-level metric for a code, even though it favours the real code.
+
+
+Following Section~\ref{section:related-work:bottom-up}, we might introduce
+a multiplicative or additive metric over the two quantities to come up with a
+first assessment.
 As a matter of simplicity (and as we use both quantities later on), we use a
 third variant here:  
 an and-based correlation of the two metrics.
@@ -128,42 +182,36 @@ an and-based correlation of the two metrics.
  \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
   & $C_{\text{bw}}\geq 0.8$ & $0.8 > C_{\text{bw}}\geq 0.6$ & $0.6 > C_{\text{bw}}$ \\
   \hline
-  $f_{\text{peak}} \geq 0.8$
+  $C_{\text{peak}} \geq 0.8$
    & \cellcolor{green!25}
    & \cellcolor{green!25} perfect
    & \cellcolor{orange!25}
   \\
-  $0.8 > f_{\text{peak}} \geq 0.6$
+  $0.8 > C_{\text{peak}} \geq 0.6$
    & \cellcolor{green!25}
    & \cellcolor{orange!25} 
    & \cellcolor{orange!25} flaw
   \\
-  $0.6 > f_{\text{peak}}$
+  $0.6 > C_{\text{peak}}$
    & \cellcolor{red!25}
    & \cellcolor{red!25} severe flaw
    & \cellcolor{red!25} 
  \end{tabular}
 \end{center}
 
-%{equation:intra-node:performance-model}
-
-\begin{performancemetric}
- If $f_{\text{peak}} \geq 0.8$, the code does uses the compute capabilities (very) efficiently.
- However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional space to improve the throughput and to speed up the code. 
-\end{performancemetric}
-
-
-\begin{performancemetric}
- If $0.6 \leq f_{\text{peak}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
- However, if $f_{\text{bw}} \geq 0.8$, the problem might be inherently memory-bound (to be checked), in which case there might be limited potential to optimise further.
-\end{performancemetric}
-
-
 \noindent
-It is very clear that these rules as well as the measurements themselves are a little vague and misleading:
-Code might appear to be memory-bound if we just sum up the individual bandwidth needs, but once we get a mix of memory access patterns, it might not be that bad.
-Complex algorithms might also change their character from time to time, and this might not be captured by a single benchmark.
-Finally, even bandwidth-bound code in this case might provide plenty of space to optimise further, if we manage to exploit caches properly. 
+If $C_{\text{peak}} \geq 0.8$, the code does uses the compute capabilities
+(very) efficiently.
+However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional space to improve the throughput and to speed up the code. 
+ If $0.6 \leq C_{\text{peak}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
+ However, if $C_{\text{bw}} \geq 0.8$, the problem might be inherently
+ memory-bound (to be checked), in which case there might be limited potential to optimise further.
+
+
+% It is very clear that these rules as well as the measurements themselves are a little vague and misleading:
+% Code might appear to be memory-bound if we just sum up the individual bandwidth needs, but once we get a mix of memory access patterns, it might not be that bad.
+% Complex algorithms might also change their character from time to time, and this might not be captured by a single benchmark.
+% Finally, even bandwidth-bound code in this case might provide plenty of space to optimise further, if we manage to exploit caches properly. 
 
 
 \paragraph*{How it works}
