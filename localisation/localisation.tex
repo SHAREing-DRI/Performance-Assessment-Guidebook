@@ -1,10 +1,11 @@
-\chapter{Localisation}
+\chapter{Localisation and tool sketch}
 \label{chapter:localisation}
 
 So far, we have assessed our code as one big black box.
 
 \begin{itemize}
-  \item We did not ask \emph{which part of the code} causes a problem.
+  \item We did not ask \emph{which part of the code} causes a problem. We call
+  these the \emph{hotspot}s of a code.
   \item We did not ask \emph{when} it arises throughout the execution.
   \item We did not ask \emph{where}, i.e.~on which rank (if we run over multiple
   nodes) a problem arises.
@@ -12,10 +13,9 @@ So far, we have assessed our code as one big black box.
 
 \noindent
 Before we continue to assess the code and dive deeper into details, it makes
-sense to gather this information or at least to discuss variants how to
-gather it.
-Hereby, it makes sense to take the
-type of flaw that we are after into account:
+sense to gather the information from the three bullet point above or at least to
+discuss variants how to gather it.
+Hereby, we have to take the type of flaw that we are after into account:
 Single core flaws imply that the ``where'' question does not play a role.
 Inter-node flaws might suggest that the ``where'' question is the number one
 question to ask.
@@ -30,9 +30,8 @@ answer our questions.
 However, there are a lot of alternatives out there.
 Some of them work for all three flavours, some of them work particularly well
 for one or two.
-
-
-
-
-
+We discuss some of them.
+This list is not comprehensive and might over-simplify certain aspects, i.e.~we
+might claim that tools are particular good for one thing while expert users and
+their developers know that they can also be used for others.
 

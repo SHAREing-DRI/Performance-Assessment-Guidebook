@@ -1,0 +1,42 @@
+\section{GNU profiler (gprof)} 
+\label{section:localisation:gprof}
+
+\index{Profiler}
+\index{Profiler!Instrumentation}
+Every Linux system is shipped with the GNU profiler (\texttt{gprof}) which is
+therefore a convenient starting point for every a performance analysis.
+\texttt{gprof} is based upon instrumentation:
+You ask the C/C++ or Fortran compiler to instrument
+(Section~\ref{section:terminology:hpc-terms}) your code by passing in
+\texttt{-p} to both the compiler and the linker step.
+After that, the code's execution will monitor the behaviour and dump the
+observation into a file \texttt{gmon.out}.
+By typing in \texttt{gprof ./myexec}, you tell the profiler to take the
+executable's debug information (remember to translate with \texttt{-g}) and
+bring it together with the profile to assemble some meaningful stats.
+
+
+The outcome consists of two major sections: 
+The code first enlists the hotspots, i.e.~the most expensive functions, and then
+it provides a call graph.
+All the output is purely text-based by default.
+There is no need for a fancy GUI or some X-forwarding.
+
+
+
+\paragraph*{Overview}
+ 
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Available everywhere.
+  \item[$\boxplus$] All text-based.
+\end{itemize}
+ 
+ 
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] You have to recompile.
+  \item[$\boxminus$] Limited filter features to reduce the measurement overhead.
+  \item[$\boxminus$] Cannot distinguish between different threads, and is not so
+  straightforward to use with MPI. 
+  \item[$\boxminus$] Focuses on timings and call counts only.
+\end{itemize}
+
