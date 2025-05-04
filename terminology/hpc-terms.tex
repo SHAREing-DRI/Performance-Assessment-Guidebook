@@ -1,4 +1,4 @@
-\section{Fundamental HPC and performance assessment terms}
+\section{Fundamental HPC and assessment terms}
 \label{section:terminology:hpc-terms}
 
 
@@ -24,9 +24,6 @@ performance.
 We have to find a healthy middle ground to make precise, in-depth assessments
 and analyses, without immersing ourselves in technical fuzz.
 
-
-
-\paragraph{Performance assessment vs.~analysis}
 
 
 \paragraph{Some of the most important performance analysis terms}
@@ -63,6 +60,7 @@ We can \emph{sample} program execution.
 Essentially, we run the code, pause it at regular intervals, and each time examine our metric of interest at that point. 
 Over time, we gather a good impression of which functions are called most
 frequently, how many MFlops/s we achieve, and so forth. 
+Some people refer to this process as monitoring.
 As with all statistical methods, the data quality improves the longer an application runs. 
 However, the risk of missing important but brief effects remains.
 
@@ -186,4 +184,23 @@ The \emph{parallel efficiency} is given by
 It quantifies to which degree adding further compute resources was worth it.
 
 
-\paragraph{Further material}
+% \paragraph*{How it works}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxplus$] Pretend you know nothing about the code. Blend out your
+%   expert knowledge and start on a fresh sheet.
+%   \item[$\boxplus$] Stick to the data you measure. 
+%   \item[$\boxplus$] Ignore what others pretend to know or have found. 
+% \end{itemize}
+% 
+% 
+% \paragraph*{How it does not work}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxminus$] Start with the attitute ``I know what this code does and
+%   where there are weaknesses''.
+%   \item[$\boxminus$] Skip assessment steps, as you already know what's going on.
+%   \item[$\boxminus$] Involve someone who's emotionally involved in the code's
+%   development into the reporting. They will always defend their brain child.
+% \end{itemize}
+

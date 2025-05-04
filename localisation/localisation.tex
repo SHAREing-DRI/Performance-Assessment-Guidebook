@@ -14,9 +14,17 @@ So far, we have assessed our code as one big black box.
 Before we continue to assess the code and dive deeper into details, it makes
 sense to gather this information or at least to discuss variants how to
 gather it.
+Hereby, it makes sense to take the
+type of flaw that we are after into account:
+Single core flaws imply that the ``where'' question does not play a role.
+Inter-node flaws might suggest that the ``where'' question is the number one
+question to ask.
+As so often, all depends on its context.
+We need the right tool for the right purpose.
 
 
-The three questions are inspired by the Cube visualisation tool \cite{xxxx}.
+Our three questions above are inspired by the Cube visualisation tool
+\cite{xxxx}.
 Consequently, all the tools that can feed into Cube are natural candidates to
 answer our questions. 
 However, there are a lot of alternatives out there.
@@ -24,12 +32,6 @@ Some of them work for all three flavours, some of them work particularly well
 for one or two.
 
 
-When we think about the right tool for our purpose, it makes sense to take the
-type of flaw that we are after into account:
-Single core flaws imply that the ``where'' question does not play a role.
-Inter-node flaws might suggest that the ``where'' question is the number one
-question to ask.
-As so often, all depends on its context.
 
 
 
