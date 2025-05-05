@@ -1,0 +1,74 @@
+\section{Localisation}
+\label{section:tools:localisation}
+
+So far, we have assessed our code as one big black box.
+
+\begin{itemize}
+  \item We did not ask \emph{which part of the code} causes a problem. 
+  \item We did not ask \emph{when} it arises throughout the execution.
+  \item We did not ask \emph{where}, i.e.~on which rank (if we run over multiple
+  nodes) a problem arises.
+  \item We distinguished, to some degree, \emph{what} we want to study in our
+  code, i.e.~which quantity of interest.
+\end{itemize}
+
+\noindent
+Before we continue to assess the code and dive deeper into details, it makes sense to gather the information from the three bullet points above or at least to discuss various approaches for gathering it.
+Hereby, we must consider the type of flaw we are investigating:
+Single-core flaws imply that the ``where'' question does not play a significant
+role.
+Inter-node flaws might suggest that the ``where'' question is the primary
+concern to address.
+
+Finally, the most frequent quantity of interest (metric) will be time spent in routines.
+In this case, the routines consuming most time are also called \emph{hotspots} of a code.
+However, there are many other metrics that affect runtime, and we might want to study them separately—even though all of them eventually affect the time-to-solution\footnote{Some codes are interested in other metrics such as energy, but they are still rare.}.
+Not all tools can provide answers for all metrics.
+We therefore must carefully select our repertoire of tools.
+
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Once you have a first high-level overview, run a profiler to
+  confirm that effect is either localised or uniformly found over all compute
+  units
+  \item[$\boxplus$] If the flaw is found on few units only or only for a certain
+  compute time or within one function which is not responsible for the majority
+  of the runtime, study the flaw for this program phase, compute unit, function
+  separatedly from all others.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Jump straight into some traces without spending time to
+  think what metrics and program parts are relevant to answer your
+  hypotheses regarding  performance flaws.
+  \item[$\boxminus$] Draw conclusions from global observations on all code parts
+  and compute resources (cores or ranks).
+\end{itemize}
+
+
+
+
+
+
+\begin{assessmentcrime}
+ 80\% of the runtime might be spent on 20\% of the code.
+ For the performance analysis, it is not appropriate to focus on this 20\% of
+ the code only.
+ Instead, you have to focus on all code that does not do any science if this
+ code share is too big.
+\end{assessmentcrime}
+
+Too big means more than 20\%. Flame graphs helfen also gar net. Sie sind sogar
+counter-productive bzgl Outcome. 
+Wie passt die Aussage eben zu der Tatsache, dass wir nix ueber den Code wissen
+sollten.
+Developer muss Black/white List schicken.  Aber eben net ``was wird gebraucht''
+sondern nur ``wo wird gerechnet''.
+
