@@ -103,6 +103,16 @@ Performance counter registers are expensive to manufacture, so they are limited 
 Consequently, some analyses might not be possible on every system, and complex analyses might require multiple code executions, as only a few event types can be measured per run.
 
 
+As we know about the existence of hardware counters, it is clear how sampling and tracing can obtain machine data beyond mere timing and call counts:
+They simply monitor (read out) the counters.
+Through this, they can make statements about the number of floating point operations completed, the number of cache misses, and so forth.
+For many of these concepts, we can invert the control flow:
+Rather than polling a counter or quantity, we can define \emph{interrupts}, i.e.~situations in which the program flow is stopped and we call our profiler or tracer.
+Interrupts can be realised through hardware or software.
+Their beauty is that the performance analysis sits somewhere outside of the core program logic---most of the time, our code runs totally unaware of the analysis in the background.
+
+
+
 
 \paragraph{Hardware jargon}
 
