@@ -31,7 +31,7 @@ simply focus on the scaling behaviour over cores, as we have defined it in
 Section~\ref{section:terminology:hpc-terms:core-terms}:
 We alter the number of cores available to our code until we have reached all the
 cores available, i.e.~use the whole machine, and track the time to solution
-dependance on core counts.
+dependence on core counts.
 
 
 
@@ -74,11 +74,21 @@ export OMP_PROC_BIND=close
  another core specification technique such as Slurm's configs or tasksets (both
  below):
  If you do so, you might force all the \openmp\ threads onto a few cores only,
- i.e.~accidentiall over- or undersubscribe the testbed.
+ i.e.~accidentally over- or undersubscribing the testbed.
 \end{instructions}
 
 
 \begin{instructions}{\slurm}
+
+Using \slurm, we do not have set environment variables ourselves, instead \slurm manages resources and so we can request a quantity of cores by with \texttt{-c} flag, e.g.,
+\begin{verbatim}
+#!/bin/bash
+ 
+#SBATCH -c 2
+ 
+./my_exec
+\end{verbatim}
+or equivalently use \texttt{\#SBATCH --cpus-per-task 2}.
 
 \end{instructions}
 
@@ -91,7 +101,7 @@ taskset -c 0-3 ./myexec
 \end{verbatim}
 
 \noindent
-to emply the first four cores only, e.g.
+to employ, e.g., the first four cores only.
 However, you should be careful when you use this in combination with \slurm~or
 \openmp~which also make choices on cores.
 You might end up with competing or contradictory settings and end up with a
@@ -137,7 +147,7 @@ After that, we collect the remaining $t(p_{\text{intra}})$.
 
 It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
 This means that the speedup deteriorates completely.
-In this case, it is perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into the ``problematic'' range of threads and to neglect the measurements further on.
+In this case, it is perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into this ``problematic'' range of threads and to neglect the measurements further on.
 The performance flaws will already be documented for the smaller core counts
 where we at least continued to see some speedup.
 
@@ -210,5 +220,3 @@ of values, or to study only the value for the maximum core count.
   \item[$\boxminus$] Jump straight into a further ``in-depth'' analysis without
   evaluating the other high-level metrics.
 \end{itemize}
-
-
