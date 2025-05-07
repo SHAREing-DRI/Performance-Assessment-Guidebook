@@ -11,13 +11,13 @@ It might be written logically in a distributed memory fashion.
 
 
 Our method of choice to argue about node-level performance is strong scaling.
-In principle, we ask ourselves ``what what happen if we had only one core on our
+In principle, we ask ourselves ``what would happen if we had only one core on our
 node'' (we use the term core and hardware thread as synonyms from hereon).
 If our code needs 80s on one core, then we would expect that it only needs 40s
 on two, and 20s on four.
 This is obviously an artificial question to ask:
 Why would be not use all the core? 
-Despite the fact that we have the cores anyway and therefore might want to use
+Despite the fact that we have the cores available anyway and therefore might want to use
 them, finding an answer to the ``what if'' questions helps us to uncover
 inefficiencies.
 How much performance do we leave on the way as we use more and more cores?
