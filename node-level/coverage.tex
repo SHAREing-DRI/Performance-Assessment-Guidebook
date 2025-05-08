@@ -1,0 +1,39 @@
+\section{Coverage}
+\label{section:node-level:coverage}
+
+%Gibt es ein Amdahl law?
+%   \item[$\boxplus$] Use Amdahl's law to characterise your code. If it fits to
+%   the law, i.e.~there is an $f_{\text{intra}}$ such that
+%   \eqref{equation:amdahl:speedup}.
+
+
+Studying code is an option. 
+
+Ratio there are two options: number of lines covered vs runtime ratio
+
+
+Zoom into time where only one thread is available
+Filter out other time
+Filter out other threads
+Look at the top code at this time
+Study if it is parallelised
+
+
+
+Linaro gives you an overview of the toatl OpenMP time in the summary
+The overall performance report gives you that information as well, but it
+doesn't break it down over time
+
+
+
+
+Intel APS is another tool where you see to which degree we are covered by
+parallelism.
+
+
+Once we have zoomed in, we can look if this code should actually be covered by
+parallelism
+
+
+
+

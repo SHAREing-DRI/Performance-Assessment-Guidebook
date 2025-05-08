@@ -1,0 +1,83 @@
+\chapter{How to read}
+
+As with any workbook, i.e.~book that's there to guide actual work not to teach a
+big subject, there are numerous ways how to read the text. 
+You can read the manuscript chapter by chapter, but this is unlikely to be the
+most fun experience.
+Below, we collect some ideas how to substructure the reading:
+
+
+\section*{Performance Analysis Course}
+
+We have made reasonable good experience with the following order of activities:
+
+\begin{enumerate}
+  \item Preparation
+  \begin{itemize}
+    \item Ask participants to prepare a benchmark following the recommendations
+     in Section~\ref{section:preparation:benchmarks}.
+  \end{itemize}
+  \item First session
+  \begin{itemize}
+    \item Use the first hour or so to briefly run through the compiler settings
+  in Section~\ref{section:preparation:compiler-settings} to ensure that people
+  do not gather biased/invalid data. In this context, it might also be
+  reasonable to ask them to disable I/O (Section~\ref{section:preparation:io}).
+    \item Start straight with the high-level assessment from
+      Chapter~\ref{chapter:high-level}. Throughout this exercise, participants
+      will learn about the machinery used on-the-fly
+      (cmp.~Section~\ref{section:preparation:machine}).
+  \end{itemize}
+  \item Second session
+  \begin{itemize}
+    \item Run with participants through some basic performance analysis
+    terminology from Section~\ref{section:terminology:hpc-terms}, 
+    \item and then introduce the concept of localisation
+    (Section~\ref{section:tools:localisation}).
+    \item Discuss a range of profilers from Chapter~\ref{chapter:tools} (we
+    always do at least gprof, Map and VTune) and let people expore their code
+    with these tools.
+  \end{itemize}
+  \item Core sessions
+  \begin{itemize}
+    \item Run through the individual chapters starting from
+    Chapter~\ref{chapter:core} one by one.
+  \end{itemize}
+  \item Wrap-up
+  \begin{itemize}
+    \item Let people read through the case studies in
+    Part~\ref{part:case-studies}.
+    \item Ask the audience to present their lessons learned.
+  \end{itemize}
+\end{enumerate}
+
+
+
+\section*{First-time assessment}
+
+We recommend to run through the preparatory remarks in
+Chapter~\ref{chapter:preparation} first and to complete all the checkboxes (dos)
+there.
+Once completed, it is time to run through the high-level assessment remarks in
+Chapter~\ref{chapter:high-level}.
+With most codes, it is highly unlikely that a code will only show one kind of
+flaw in the high-level analysis. 
+
+We propose to run through the detailed analysis step by step afterwards.
+Per step, it makes sense to consult the tools summary
+(Chapter~\ref{chapter:tools}) and notably to try out different things.
+Where appropriate, the reader might prefer to read through one of the case
+studies in Part~\ref{part:case-studies}, just to get some inspiration what tools
+and approaches to try out and how to report outcomes.
+
+
+
+\section*{Assessment}
+
+If you have already completed numerous assessments, the the manuscript is
+mainly a reference document.
+You'd start with the high-level assessment in Chapter~\ref{chapter:high-level},
+before you dig into the various subchapters depending on the initial assessment
+outcome.
+The case studies are not of particular relevance (anymore), as you have already
+completed you own case studies.
