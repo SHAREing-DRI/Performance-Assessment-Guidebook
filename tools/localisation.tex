@@ -34,11 +34,12 @@ We therefore must carefully select our repertoire of tools.
 \begin{itemize}[noitemsep]
   \item[$\boxplus$] Once you have a first high-level overview, run a profiler to
   confirm that effect is either localised or uniformly found over all compute
-  units
+  units.
   \item[$\boxplus$] If the flaw is found on few units only or only for a certain
   compute time or within one function which is not responsible for the majority
   of the runtime, study the flaw for this program phase, compute unit, function
   separatedly from all others.
+  \item[$\boxplus$] Upon your very first profiling, ask a code expert which code parts (functions) actually perform calculations (cmp.~Section~\ref{section:preparation:labelling}).
 \end{itemize}
 
 

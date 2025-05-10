@@ -1,6 +1,52 @@
 \section{Redundant (administrative) work}
 \label{section:node-level:redundant-admin}
 
+
+We have checked that
+
+\begin{itemize}
+  \item all of our source code is covered by parallelism;
+  \item the workload is reasonably well-balanced;
+  \item there is not much tasking overhead;
+  \item the tasks are relatively long.
+\end{itemize}
+
+
+\noindent
+If the code still does not scale particularly well, we may assume that something is flawed with the per-task/per-parallel region overhead:
+
+\begin{hypothesis}
+ Each task or parallel region, respectively, introduces some overhead which is constant.
+ As the number of tasks increases, this overhead increases, too.
+\end{hypothesis}
+
+
+\noindent
+Such an arrangement would materialise in an quasi-sequential program fraction $(1-f_{\text{intra}})$ in \eqref{equation:intra-node:performance-model}:
+The code is parallelised, but this overhead scales with $p_{\text{threads}}$.
+It therefore feeds into the sequential part of the scaling formula, i.e.~it is redundant work which we could also have done once outside of the parallel region.
+
+
+We see such 
+
+Benchmark preparation
+
+
+
+
+Benchmark preparation
+
+
+
+Data collection
+
+
+Evaluation
+
+
+
+Potential optimisation
+
 %Gibt es ein Amdahl law?
 %   \item[$\boxplus$] Use Amdahl's law to characterise your code. If it fits to
 %   the law, i.e.~there is an $f_{\text{intra}}$ such that

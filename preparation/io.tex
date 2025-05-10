@@ -26,3 +26,17 @@ More importantly, if our code writes excessive amounts of data, we
  In the best case, a performance assessment benchmark writes and reads barely any data at all, i.e.~it largely hard-coded and silent.
 
 
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Disable I/O, it exclude reading and writing files from any assessment as far as possible (and as long as you don't want to benchmark exactly this I/O).
+  \item[$\boxplus$] Remove terminal dumps. If the developers want to preserve the output (e.g.~for validation or debugging), suggest to embed them into macros which can be compiled out of the code prior to production runs.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Start with a high-level assessment straightaway. In particular any shared memory measurement will be corrupted by excessive terminal dumps.
+\end{itemize}
