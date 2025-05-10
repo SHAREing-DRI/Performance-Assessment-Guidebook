@@ -27,22 +27,24 @@ The code is parallelised, but this overhead scales with $p_{\text{threads}}$.
 It therefore feeds into the sequential part of the scaling formula, i.e.~it is redundant work which we could also have done once outside of the parallel region.
 
 
+\paragraph{Data collection}
 
-\pargaraph{Benchmark preparation}
-
-Check that the benchmark has kind 
-
-
-
-
-Benchmark preparation
+If our hypothesis holds, then the measured $f_{\text{intra}}$ should decrease as we add more and more threads.
+This might be an almost negligible effect. However, 
+we should also see that the ratio of scientifically relevant calculations (cmp.~Section~\ref{section:preparation:labelling}) should decrease, while the remaining routines gain relative weight.
+This means that we succeed in splitting up the scientifically relevant calculations among the threads, but the code increases in return the total amount of compute spent on administrative tasks.
 
 
 
-Data collection
+\begin{instructions}{\vtune}
+Run two standard hotspot analyses for two different thread counts.
+Filter into the phase of interest and study the Bottom-up profile where you switch the Effective Time column into percentage.
+The relative contribution of the most expensive (scientific) routines will be the lower the higher the thread count.
+The effect typically becomes more pronounced if you narrow the filter down to one thread.   
+\end{instructions}
 
 
-Evaluation
+\paragraph{Evaluation}
 
 
 
@@ -53,3 +55,16 @@ Potential optimisation
 %   the law, i.e.~there is an $f_{\text{intra}}$ such that
 %   \eqref{equation:amdahl:speedup}.
 
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Run a strong scaling test and plot the efficiency. Narrow down the number of setups of interest.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Start with a full-node run right from the start and hope that you spot interesting trends in the data.
+\end{itemize}

@@ -14,17 +14,17 @@
 \newcommand{\openmp}    {OpenMP}
 
 \newenvironment{instructions}[1]
-  {\begin{framed}
-   \begin{flushright}
-    \begin{framed}
+  {\begin{mdframed}[backgroundcolor=grey!5] 
+    \begin{mdframed}[backgroundcolor=blue!20] 
       {\bf #1}
-    \end{framed}
-   \end{flushright}
-   \noindent
+    \end{mdframed}
    \index{#1}
+
+
+   \noindent
   }
   { 
-    \end{framed} 
+    \end{mdframed} 
   }
   
 \newtheorem{doctrine}{Doctrine}

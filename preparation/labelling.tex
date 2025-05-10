@@ -1,4 +1,4 @@
-\section{Understand the code's complexity}
+\section{Labelling of code parts}
 \label{section:preparation:labelling}
 
 Software typically contains quite a lot of boilerplate code: 
@@ -17,6 +17,19 @@ In a linear algebra code, the actual matrix-vector products, scalar products, \l
 The allocations for temporary block matrices, the exchange routines for rows of the matrices, any indexing over the sparsity pattern, and so forth do not contribute calculations.
 They are absolutely essential, but they do not give us the MFlops/s.
 
+
+As your analysis progresses, you might run into situations where functions suddenly appear to be hot that you have not seen before.
+In this case, you can kind of safely assume that these functions do \emph{not} contribute to the science directly.
+If they didn't show up for a small-scale, few-core run, then they likely do not feed directly into the result.
+
+
+\begin{instructions}{\vtune}
+Start a multithreaded run and mark the actual computational phase in the timeline at the bottom.
+Switch to the \emph{Bottom up} view.
+\emph{Zoom in and filter by selection} will narrow down the profile to the region of interest.
+Sort by \emph{Effective Time} and change to \emph{Show Data As \ldots~Percentage}.
+Make notes of all the entries above roughly 1\% (rule of thumb) and/or track the top 10 routines. 
+\end{instructions}
 
 \paragraph*{How it works}
 
