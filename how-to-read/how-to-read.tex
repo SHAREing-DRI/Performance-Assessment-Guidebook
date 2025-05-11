@@ -81,3 +81,36 @@ before you dig into the various subchapters depending on the initial assessment
 outcome.
 The case studies are not of particular relevance (anymore), as you have already
 completed you own case studies.
+
+
+\section*{Feedback}
+
+The quintessential objective of any assessment is to give feedback to developers.
+Once they make changes to their source code, it is important to re-start the 
+assessment from scratch.
+There is always this temptation to return to the particular characteristics of interest that have led to a report, to see how the code changes by the development team have altered these characteristics, and then to continue from there.
+
+
+It is important to reassess the ``flaw'' metrics.
+However, this should only be a validation that something has changed.
+After that, we have to start from scratch, as performance optimisation is a complicated process where one change might introduce flaws, improvement or character changes in a completely different part of the code or affect a completely different flavour of the performance.
+If we alter a particular code part that makes the scaling deteriorate for example, this might have a severe knock on effect on the core performance.
+If we improve the core performance, the GPU offloading might all at a sudden run into data transfer issues.
+There are numerous examples for these side-effects.
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Conduct a performance assessment which both covers all aspects of the code (cmp.~Chapter~\ref{chapter:high-level}) plus goes in-depth all the way through for all flaws identified.
+  \item[$\boxplus$] Hand this completed assessment back to the developers to address the flaws.
+  \item[$\boxplus$] Restart the assessment from scratch top-down, i.e.~starting with the high-level assessment covering all code runtime nuances.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Mix code optimisation and performance assessment workflows.
+  \item[$\boxminus$] Restart the assessment from the place where you stopped when you reported a flaw and continue digging through the assessment decision metrics without redoing a high-level, overarching assessment.
+\end{itemize}
