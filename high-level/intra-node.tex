@@ -56,7 +56,18 @@ As a rule of thumb, we should have a memory footprint which is at least 20\% of 
 \paragraph{Data collection}
 
 For the data collection, we first time the simulation without any parallelisation, which is, trivially, a single-core run.  
-We then switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
+After that, we switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
+
+
+\begin{assessmentcrime}
+ Use a code base that is relatively inefficient on a single core and use this as baseline for any scaling claims.
+\end{assessmentcrime}
+
+\noindent
+It is important that we question the code developers on different code variants prior to the assessment:
+If they offer, for example, quite sophisticated task-based parallelism for share memory, we still should calibrate all runtime against a serial code without these tasks.
+That is a fair benchmark that avoids any tasking overhead where it is not needed.
+
 
 \begin{instructions}{\openmp}
  In OpenMP, we can simply set \texttt{OMP\_NUM\_THREADS} to achieve this.
