@@ -51,9 +51,18 @@ If the spin time or overhead time in the area of interest exceeds 20\% of the to
 
 \paragraph{Optimisation and follow-up steps}
 
-Remove
-atomic variables
+Too much synchronisation requires an in-depth analysis of where these synchronisations come from.
+If we can remove them, this is the gold solution.
+If we can not remove them, two standard techniques might be able to speed up the code:
 
+If individual built-in variables are to be kept in-sync, we should switch them all to atomics.
+Even if sequences of variables are to be synchronised, relying on a sequence of atomics should be significantly faster than protecting the whole block.
+
+In many cases, it should be possible to work with thread-local variables and to reduce/synchronise them at the end of a thread's/task's/section's lifetime.
+If you reduce the scalar product over a matrix or vector, for example, this reduction can happen per task.
+It might be convenient to have a big global variable and to accumulate the $L_2$ residual there.
+However, it is usually way faster if each tasks computes its own residual value first (over a subchunk of the involved vectors or several compute mesh cells or matrix blocks), and then finally reduces these local contributions into a global value.
+ 
 
 
 \paragraph*{How it works}
