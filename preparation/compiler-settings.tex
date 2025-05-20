@@ -27,7 +27,7 @@ The flag is called \texttt{-mhost} with GNU.
 
 \begin{instructions}{\intelcompiler}
  With the Intel compiler, you sometimes can pick between the generic
- LLVM/community versions of a feature and one optimised by Intel itself (with
+ LLVM (community) versions of a feature and one optimised by Intel itself (with
  the latter obviously performing better on bespoke Intel architecture). For
  example, \texttt{-fopenmp} enables the general OpenMP implementation whereas
  \texttt{-fiopenmp} gives you an in-house version of the same. 
@@ -54,6 +54,12 @@ Some compilers support more detailed information (e.g.~using \texttt{-g3}).
 It requires studying the compiler's feedback whether these flags disable
 optimisations, in which case we might have to balance insight vs.~best-case
 speed.
+
+\begin{checklist}
+ \item Your benchmark is compiled with debug symbols (\texttt{-g}).
+ \item Your benchmark is compiled with the highest optimisation level (\texttt{-O3} plus a hardware-specific instruction set such as picked by \texttt{-xhost}).
+\end{checklist}
+
 
 \begin{instructions}{\maqao}
  If you run \maqao~over your code, the tool will report back to you what

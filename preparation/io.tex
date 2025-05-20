@@ -8,6 +8,11 @@
 String operations are excessively expensive.
 
 
+\begin{checklist}
+ \item Your benchmark does {\bf not} write (a lot of) files.
+ \item Your benchmark does {\bf not} write a lot of information to the terminal.
+\end{checklist}
+
 
 In this context, it is important that there's no I/O.
 We don't want to study complex outputs; we are busy enough with handling the output of performance analysis tools.

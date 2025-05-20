@@ -46,6 +46,12 @@ Having a ``small'' setup that completes in reasonable time is important since so
     tools fail to handle the amount of data collected.
 
 
+\begin{checklist}
+ \item Your benchmark compiles as a black box, i.e.~you can give it to another person together with a \texttt{README} file and there might be a few instructions that they have to copy-n-paste into their terminal, but other than that there's no other preparatory work to be completed.
+ \item Your benchmark runs without any user interaction.
+ \item Your benchmark finishes within less than ten minutes on a single core.
+\end{checklist}
+
 No matter how we create this setup, we have to be able to run all experiments with absolutely minimal user interaction (cmp.~Section~\ref{section:behaviour:automate}).
 If we have to run through a complex pipeline for each individual experiment, we will not be able to measure anything productively.
 
@@ -65,3 +71,5 @@ If we have to run through a complex pipeline for each individual experiment, we 
   \item[$\boxminus$] Try to make a code run and design a benchmark yourself. This is the job of a domain/code expert.
   \item[$\boxminus$] Expect insight from benchmarks that somebody without domain expertise has chosen.
 \end{itemize}
+
+
