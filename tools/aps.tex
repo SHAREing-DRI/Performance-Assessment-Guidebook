@@ -1,0 +1,41 @@
+\section{APS}
+
+\aps~is an analysis tool which generates high-level overview/summary pages of how a code performs.
+The usage is close to trivial:
+
+\begin{verbatim}
+mpirun aps ./appl args
+#aps -report result folder
+aps-report result folder
+\end{verbatim}
+
+\noindent
+which should create a plain HTML file to study.
+If you code does not use MPI, skip the \texttt{mpirun}.
+
+
+The tool works best on Intel machinery, as it can read out the machine's performance counter.
+These counters are not available (that way) on other vendors' machines.
+In this case, you can restrict APS to focus on certain modi through \texttt{aps --collection-mode=mpi,openmp}.
+
+\aps~provides a global overview of the code's behaviour.
+
+Further to that, you might need \texttt{#SBATCH --disable-perfparanoid}
+
+
+\paragraph*{Overview}
+ 
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Simple to use with support for MPI, share memory parallelisation, I/O and vectorisation features.
+  \item[$\boxplus$] Yields simple HTML pages which are easy to share and archive.
+\end{itemize}
+ 
+ 
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Provides the full range of information only on Intel CPUs.
+  \item[$\boxminus$] Limited filter features to reduce the measurement overhead.
+  \item[$\boxminus$] Cannot distinguish between different threads, and is not so
+  straightforward to use with MPI. 
+  \item[$\boxminus$] Focuses on timings and call counts only.
+\end{itemize}
+

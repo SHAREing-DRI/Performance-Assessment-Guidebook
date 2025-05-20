@@ -1,6 +1,7 @@
 \newcommand{\xp} {eXtreme Programming}
 
 \newcommand{\amplifier}     {Amplifier}
+\newcommand{\aps}           {Intel Performance Application Snapshot (APS)}
 \newcommand{\gdb}           {GDB}
 \newcommand{\extrae}        {extrae}
 \newcommand{\intelcompiler} {Intel compiler}
@@ -10,9 +11,9 @@
 \newcommand{\maqao}         {MAQAO}
 \newcommand{\openmp}        {OpenMP}
 \newcommand{\otter}         {Otter}
-\newcommand{\scorep}    {scorep}
-\newcommand{\scalasca}  {scalasca}
-\newcommand{\slurm}     {Slurm}
+\newcommand{\scorep}        {scorep}
+\newcommand{\scalasca}      {scalasca}
+\newcommand{\slurm}         {Slurm}
 \newcommand{\vtune}         {VTune}
 
 \newenvironment{instructions}[1]
@@ -29,10 +30,24 @@
     \end{mdframed} 
   }
   
+\newenvironment{reader-guide}
+  {\begin{mdframed}[backgroundcolor=grey!5] 
+    \begin{mdframed}[backgroundcolor=red!20] 
+      \begin{flushright}
+        {\bf Reader's guide}
+      \end{flushright}
+    \end{mdframed}
+   \noindent
+  }
+  { 
+    \end{mdframed} 
+  }
+
+
 \newtheorem{doctrine}{Doctrine}
 \newtheorem{hypothesis}{Hypothesis}
 \newtheorem{flaw}{Flaw}
 \newtheorem{assessmentcrime}{Assessment crime}
 \newtheorem{performancemetric}{Performance metric (rule of thumb)}
-\newtheorem{guidance}{Guidance to the first-time reader}
+
   
