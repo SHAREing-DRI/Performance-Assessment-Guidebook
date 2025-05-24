@@ -6,3 +6,49 @@
 %   the law, i.e.~there is an $f_{\text{intra}}$ such that
 %   \eqref{equation:amdahl:speedup}.
 
+
+Jetzt haben wir ja ganz bewusst weniger Tasks erzeugt. 
+Somit ist the Evaluierung mit Kontext zu versehen
+
+\begin{hypothesis}
+ There are too many critical sections that cannot be entered by more than one thread, such that the threads tend to synchronise each other.
+\end{hypothesis}
+
+
+\paragraph{Data collection}
+
+\begin{itemize}
+  \item The effective CPU time (in the user code) is low compared to the actual execution time.
+  \item There is a huge spin time.
+  \item We see a massive lock contention.
+\end{itemize}
+
+\noindent
+
+\begin{instructions}{\vtune}
+In \vtune, too many synchronisation statements materialise in a high spin time as compared to the effective time.  
+This leads to a low effective CPU utilisation (below is an example with eight cores, where we effectively only use four of them).
+\end{instructions}
+
+
+\paragraph{Evaluation}
+
+If the spin time or overhead time in the area of interest exceeds 20\% of the total execution time, i.e.~if the time we actually spend in our code underruns 80\% of the total time, we have a severe synchronisation flaw.
+
+
+\paragraph{Optimisation and follow-up steps}
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Validate that the administrative (non-science) fraction of the code scales with the scientific core calculations.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] The administrative overhead will always increase relatively, so an increase in itself is not a flaw. An extraordinary increase coupled with limited scalability however is.
+\end{itemize}

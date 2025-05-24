@@ -44,14 +44,16 @@ In line with all other metrics, we consider a code phase or loop as reasonably b
 If we underrun this threshold, the code is not super balanced.
 
 
+\paragraph{Optimisation and follow-up steps}
+ 
+Imbalances in loops are straightforward to resolve as long as the loop is reasonably big.
+We can switch to smaller grain sizes (subloop sizes) or enable dynamic scheduling if the individual chunks have largely varying runtimes.
+However, which route to follow is not clear a priori.
+For task-based parallelism, things are more difficult anyway.
 
-% \paragraph{Optimisation and follow-up steps}
-% 
-% Imbalances in loops are straightforward to resolve as long as the loop is reasonably big.
-% We can switch to smaller grain sizes (subloop sizes) or enable dynamic scheduling if the individual chunks have largely varying runtimes.
-% However, which route to follow is not clear a priori.
-% For task-based parallelism, things are more difficult anyway.
-% Either way, more work is required \ldots
+Therefore, we would urge an assessor to stop the analysis here straightaway.
+More work is required to understand where imbalances come from.
+In case of a well-balanced workload, we also have to dig deeper into the code, as we know that it does not scale even though the work distribution seems to be good.
 
 
 
