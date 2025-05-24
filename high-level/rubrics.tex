@@ -18,6 +18,7 @@ In line with our overall presentation approach, we use thresholds of 60\% and 80
 That is, if the GPU performance is somewhere close to 100\%, all is fine.
 However, it is drops below 80\%, we flag it as yellow.
 Once the metrics we define for GPUs underrun 60\%, we claim that there are definitely major issues.
+It is convenient to present the overall data as spiderweb diagram (below for a code that has I/O issues, doesn't scale particularly well between nodes and has no GPU yet reasonably good core performance and node scaling):
 
  \begin{center}
   \includegraphics[width=0.55\textwidth]{high-level/performance_diag.pdf}
