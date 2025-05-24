@@ -1,14 +1,70 @@
 \section{Balancing}
 \label{section:node-level:balancing}
 
-%   \item[$\boxplus$] Use Amdahl's law to characterise your code. If it fits to
-%   the law, i.e.~there is an $f_{\text{intra}}$ such that
-%   \eqref{equation:amdahl:speedup}.
+Likely the first thing to check for a parallel code running over multiple cores is to which degree it exploits all of these cores:
+Is the work balanced?
+If we do not exploit all cores, we cannot expect to squeeze out all of the performance of the node.
+The clearest signpost that the balancing is not there yet is that the code does not speed up and we activate more and more cores.
+We do not scale.
 
-cube is nice
+\begin{hypothesis}
+ The work is not properly distributed among the cores.
+\end{hypothesis}
 
-map can break it down into individual loops/comptuations
 
-We have to highlight that these effects are often localised in time (see
-Andrei's remarks). THis is already discussed in a previous section, but it makes
-sense to re-iteratre.
+
+\paragraph{Data collection}
+
+Most profilers have quite an extensive support to identify ill-balancing.
+After all, this is the most obvious, ultimative, original sin of non-scaling.
+
+\begin{instructions}{\vtune}
+ The hotspot and threading analysis of \vtune~both offer you a bottom-up view, where imbalances are clearly visible:
+ 
+ \begin{center}
+   \includegraphics[width=0.7\textwidth]{node-level/vtune-imbalance-00.png}
+ \end{center}
+ 
+ \noindent
+ The idle threads here don't really idle: They continue to run even if they have nothing to do, but spin all the time, i.e.~wait busily for new work to drop in. 
+ We can dig deeper with the \emph{HPC Performance Characterization} analysis, where we see imbalances broken down over individual functions or loops, respectively.
+ The mode is particularly useful for loop-/data-parallelism.
+ For code that relies a lot on tasks, it is not straightforward to localise imbalances, and we might have to do some manual analysis work.
+
+ \begin{center}
+   \includegraphics[width=0.7\textwidth]{node-level/vtune-imbalance-01.png}
+ \end{center}
+\end{instructions}
+
+
+
+\paragraph{Evaluation}
+
+In line with all other metrics, we consider a code phase or loop as reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point.
+If we underrun this threshold, the code is not super balanced.
+
+
+
+% \paragraph{Optimisation and follow-up steps}
+% 
+% Imbalances in loops are straightforward to resolve as long as the loop is reasonably big.
+% We can switch to smaller grain sizes (subloop sizes) or enable dynamic scheduling if the individual chunks have largely varying runtimes.
+% However, which route to follow is not clear a priori.
+% For task-based parallelism, things are more difficult anyway.
+% Either way, more work is required \ldots
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Track how long the cores actually compute and compare it to the time where they do not deliver science.
+  \item[$\boxplus$] If there are severe imbalances, continue to work through hypotheses to find out where the imbalances come from.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Immediately try to fix imbalances by altering loops, grain sizes or introducing tasks and more parallel loops.
+\end{itemize}

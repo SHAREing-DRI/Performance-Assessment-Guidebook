@@ -9,6 +9,7 @@ Many threads might run in parallel, but if they permanently hit areas protected 
  There are too many critical sections that cannot be entered by more than one thread, such that the threads tend to synchronise each other.
 \end{hypothesis}
 
+\marginpar{A lot of fluctuation in the runtime can be a sign of too much sync, as it becomes non-deterministic}
 
 \noindent
 Depending on the type of synchronisation, it will manifest in different behaviour that we can measure:

@@ -46,6 +46,10 @@ Actually, no mainstream tasking backend supports this.
 Our code has to provide means to package multiple logical tasks into one physical task.
 
 
+Once we alter the grain sizes, it is mandatory to return to the overall assessment.
+It is not unlikely that we harm the balancing (Section~\ref{section:node-level:balancing}) and have to balance carefully between a good balancing and concurrency level on the side and limited overhead o the other.
+
+
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
