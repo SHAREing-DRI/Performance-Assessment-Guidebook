@@ -21,12 +21,12 @@ algorithm or science case.
 In scientific computing, we typically work with an iterative approach:
 First, we \emph{measure} or \emph{benchmark} how a code performs.
 Second, we use these data to inform our \emph{performance assessment}, i.e.~our reporting.
-Third, we conduct a \emph{performance analysis} to explain why the code exhibits the observed behavior.
+Third, we conduct a \emph{performance analysis} to explain why the code exhibits the observed behaviour.
 Finally, this analysis feeds into program tuning or optimisation, and we repeat the workflow.
 
 
 
-If we take our list of activities and integrate it with the definition of the performance analysis workflow, it becomes clear that the tuning step is out-of-scope here.
+If we take our list of activities and integrate it within the definition of the performance analysis workflow, it becomes clear that the tuning step is out-of-scope here.
 Another related technique is out-of-scope, too:
 The most advanced papers in scientific computing, particularly within high-performance computing, deliver a performance model;
 essentially a pen-and-paper assessment of what a code should be able to deliver.
@@ -49,7 +49,7 @@ from computing centers, centralised HPC specialists, or external service provide
 If we want to discuss performance analysis methodology, it is counterproductive to assume in-depth code knowledge.
 Many people conducting assessments cannot be experts in every code they examine.
 Second, requiring code expertise within assessment teams would imply that core developers are always available.
-This might be an ideal in the spirit of eXtreme Programming \cite{xxx}, where
+This might be an ideal in the spirit of eXtreme Programming \cite{beck1999}, where
 the customer must be accessible at all times.
 It is unrealistic in science, where PIs are busy with various tasks, developers
 frequently leave projects---as they graduate, accept new positions, or are
@@ -60,7 +60,7 @@ Finally (and most importantly), knowledge about a codebase tends to bias the ass
 
 
 
-Developers inevitably make assumptions about reasons for code behavior when working on performance analysis.
+Developers inevitably make assumptions about reasons for code behaviour when working on performance analysis.
 (Senior) Developers tend to ``defend'' their code, explaining any flaws as
 natural consequences of their domain's challenging nature, their awareness of future requirements, or their in-depth knowledge of other setups not covered by the present configuration.
 Simultaneously, we have frequently observed junior developers downplaying or
@@ -69,7 +69,7 @@ things really should work''---and consequently interpreting every piece of data
 through this lens.
 This list is not comprehensive.
 The whole team dynamics dimension deserves further discussion (in
-Section~\ref{xxxx}).
+Section~\ref{section:communication:team-dynamics}).
 For the time being, we conclude that having emotionally invested developers
 involved in early assessment is counterproductive due to their inherent bias.
 
@@ -104,7 +104,7 @@ Abstract.
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Start with the attitute ``I know what this code does and
+  \item[$\boxminus$] Start with the attitude ``I know what this code does and
   where there are weaknesses''.
   \item[$\boxminus$] Skip assessment steps, as you already know what's going on.
   \item[$\boxminus$] Involve someone who's emotionally involved in the code's

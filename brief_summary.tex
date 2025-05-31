@@ -1,0 +1,41 @@
+\chapter{Summary}
+\label{chapter:summary}
+This document is still early into its preparation. However, it demonstrates some key points around our main focus of building a performance analysis methodology that seeks to avoid jumping straight for a performance tool. Instead we want a methodology that starts high-level and only reaches for tool, when appropriate. Rather than being lead by the tool, we want to be lead \emph{towards} a tool by the methodology.
+
+
+
+\section{Recap}
+% brief recap of some fundamental questions
+Though this iteration of the document is just a brief introduction, it covers some of the necessities for establishing a rigorous performance assessment service. 
+
+%% terminology
+We believe that beginning with an overview of terminology in Chapter~\ref{chapter:terminology}, including the fundamentals of HPC, is a vital starting point. Many users and developers come to HPC without a technical background in computing, and it is important now more than ever to set out an agreed set of terms for this performance analysis methodology. Beyond acting as a glossary of HPC and performance terms, Chapter~\ref{chapter:terminology} also establishes some of the key concepts of how we are to conduct a performance assessment such as treating a code as a blackbox and noting measurements of runtime performance objectively, without jumping quickly to deductions.
+
+%% it's good to prepare for reproducibility of your experiment
+Preparation for a performance assessment is key to reproducibility. Chapter~\ref{chapter:preparation} lays out some details of our `experimental reproducibility', i.e.~ before carrying out a performance assessment, we need to establish the fundamentals of setting up our benchmark. Once the benchmark example has been agreed upon, setting up the compiler and other variables such as I/O, etc. is a crucial part of how to make sure that varying, e.g. the number of cores gives reliable data. It should be noted that within this preparation, we may also see performance gains in tuning compiler options. This preparation stage is a key point of the performance assessment in which engagement with the service user is crucial. In order to get a useful benchmark example which is indicative of a real simulation run, the domain specialist needs to set this up.
+
+%% the high-level assessment avoids people falling down a rabbit hole of tools!
+This current document finishes with a high-level approach to an assessment in Chapter~\ref{chapter:high-level}. One reason for this is we find often without this initial high-level approach, HPC users will immediately jump to a tool which can give a miriad of data and metrics. This sometimes sends an HPC user down a wrong path as they may not be following a structure methodology to rigorously analyse performance; or, we have even found that some people are put off by the overwhelming data and the user gives up on the analysis as they get a sensation of: ``where do I begin?''. 
+
+The high-level approach can be a stepping stone into a more detailed analysis as it simply  breaks down performance into five topics: core, intra-node, inter-node, GPU, I/O. For some tool developers, the tools direct the user towards an almost `Matryoshka doll' model of performance, i.e.~core performance sits within intra-node performance which sits within inter-node performance. We believe this to be an over simplification, and in reality, these performance topics can never be truly de-coupled from one another. The high-level approach presented here is not seeking to focus the analyst down one particular avenue or another, it simply gives an overview of the performance landscape for a particular code. 
+
+
+\section{Outlook}
+% summarise the extentions to come in the longer version
+Having established that this document is not the finished work, it is worthwhile detailing what is to come in future versions. In particular: 1. what is left out of the current methodology; 2. what is to be discussed about the implementation of this methodology into a performance assessment service.
+
+% 1. decision trees
+Firstly, performance topic decision trees. We believe there is value in beginning with the high-level performance assessment, and we indeed recommend beginning with this for any performance assessment. However, this is by definition not a complete analysis in and of itself. Through a series of performance analysis workshops we have begun to design a series of decision trees. 
+
+Each performance topic will have a decision tree, i.e.~having conducted the high-level assessment the analyst will have to make a decision as to which topic to begin with and the decision trees will direct the analyst through a series of binary outcomes to isolate individual performance issues. For example, for intra-node performance we can begin by asking if the code is dominantly parallelised, if not then our performance engineering should be directed towards increasing the scope of parallelisation (though again we note that said engineering falls outside the scope of this work). If there is significant parallelism, then we can ask if there is good load-balancing. If there is good load balance then we can explore synchronisation, if not we turn to checking if there are enough tasks, etc. as we work down the tree. We plan to have decision trees for each performance topic with good progress made on core, intra-node and inter-node with our focus next turning to GPU and I/O.
+
+
+% 2. producing a performance assessment start to 'finish', e.g., case studies we have thus far
+Secondly, once we have introduced the decision trees we can describe our entire performance assessment methodology including case-studies. As we work through the creation of this manuscript, we are employing this methodology on existing codes whilst also engaging with other users/developers through performance analysis workshops. We include points on building the performance analysis results into a finished report alongside these case studies.
+
+% 3. the service as a whole: interface, reproducibility analysis, 
+Lastly, we will give details as to the implementation of the assessment service from an organisational stand point. Beyond setting out the assessment methodology, there are also a number of points around how do you actually build a functional assessment service from the interactions with scientists and developers through to the interface of the service.
+
+One component of the service interface is planned to be a reproducibility analysis, i.e.~if an HPC developer is deciding to engage with a performance assessment then it is worth auditing the reproducibility of their software. For example, is the code documented, using version control, implementing CI/CD pipeline, etc. A performance assessment can mean a developer is already giving their time to stop and reflect on their code and so introducing some time to also implement some good software practices can have two effects: 1. it helps the sustainability of their software going forward; 2. it helps the job of the analyst if the building and running of the software is well documented and hosted on a well maintained repository.
+
+In summary, this document lays out just beginning of delivering a performance assessment, and the future iteration of this document will expand upon this methodology whilst also discussing the infrastructure of how to implement this methodology as a functional performance assessment service. 

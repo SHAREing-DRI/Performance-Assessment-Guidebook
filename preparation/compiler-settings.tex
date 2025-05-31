@@ -1,7 +1,7 @@
 \section{Compiler setup}
 \label{section:preparation:compiler-settings}
 
-Before we start, it is important to doublecheck whether we have used the correct
+Before we start, it is important to double-check whether we have used the correct
 compiler settings. It makes no sense to benchmark a code which is not producing
 tailored code for our particularly machinery (therefore it is important to
 benchmark on the right system), and it makes no sense to benchmark a code that
@@ -18,9 +18,9 @@ Second, we create code that is tailored towards our particular machinery.
 The correct setting for this depends once again on your compiler. 
 With LLVM and GNU, you can use flags starting with \texttt{-mXXXX} to specify 
 machinery-specific optimisations, i.e.~you can exactly say for which processor
-generation, instruction set, \ldots~you want to compiler to create binary code.
+generation, instruction set, \ldots~you want for the compiler to create binary code.
 If your compile node is of the same type as your test node, then simply
-use \texttt{-xhost} and the compiler will pick the higest instruction set
+use \texttt{-xhost} and the compiler will pick the highest instruction set
 available.
 The flag is called \texttt{-mhost} with GNU.
 
@@ -45,7 +45,7 @@ The flag is called \texttt{-mhost} with GNU.
 Finally, we might want to add debug symbols.
 These instruct the compiler to insert additional information into the source
 code which tools can then later use to draw inference
-from which source code line a certain instruction stems from.
+from, e.g.~which source code line a certain instruction stems from.
 Usually, you cannot know from a single instruction in a machine code, where this
 comes from in the original code.
 With the debug systems, we inject exactly this information into the executable.
@@ -70,10 +70,6 @@ speed.
  Also, the recommendation aspect goes beyond pure reporting and is helpful.
 \end{instructions}
 
-
-
-
-\paragraph*{How it works}
 
 
 \paragraph*{How it works}

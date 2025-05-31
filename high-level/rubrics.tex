@@ -4,7 +4,7 @@
 We classify codes along five different metrics:
 
 \begin{enumerate}
-  \item Inter node,
+  \item inter node,
   \item intra node,
   \item core performance,
   \item GPUs, and
@@ -16,9 +16,9 @@ For each of these rubrics, we initially aim for a single three-valued:
 All is fine (green), there might be issues (yellow) or there are obvious flaws (red).
 In line with our overall presentation approach, we use thresholds of 60\% and 80\% to distinguish these classes.
 That is, if the GPU performance is somewhere close to 100\%, all is fine.
-However, it is drops below 80\%, we flag it as yellow.
+However, if it drops below 80\%, we flag it as yellow.
 Once the metrics we define for GPUs underrun 60\%, we claim that there are definitely major issues.
-It is convenient to present the overall data as spiderweb diagram (below for a code that has I/O issues, doesn't scale particularly well between nodes and has no GPU yet reasonably good core performance and node scaling):
+It is convenient to present the overall data via a spiderweb diagram (below for a code that has I/O issues, doesn't scale particularly well between nodes, has no GPU yet reasonably good core performance and node scaling):
 
  \begin{center}
   \includegraphics[width=0.55\textwidth]{high-level/performance_diag.pdf}
@@ -26,7 +26,7 @@ It is convenient to present the overall data as spiderweb diagram (below for a c
 
 
 \noindent
-The idea to look at the five different performance dimensions separatedly is natural yet does not come along without shortcomings.
+The idea to look at the five different performance dimensions separately is natural yet does come along without shortcomings.
 Many performance issues within a code affect multiple dimensions.
 Think about a poor GPU utilisation that materialises in bad load balancing as well.
 When we dig down recursively into finer and finer metrics later on, we have to take such cross-influence into account.
@@ -42,11 +42,9 @@ This implies that the final picture might not reflect the real behaviour of a sc
 As we analyse the dimensions of performance characteristics independently, the order does not really make a difference.
 In theory.
 In practice, we have to start somewhere.
-I personally made the experience that \ldots
-
-%  that it is usually favourable to start with the node-level analysis (intra-node): 
-% If the individual cores are not used properly, MPI often does not make that much of a difference and we struggle to keep GPUs busy.
-% Often, the next dimension is naturally identified once we look at the node-level performance, i.e.~it tells us what to analyse next.
+We have personally had the experience that it is typically favourable to start with the node-level analysis (intra-node): 
+If the individual cores are not used properly, MPI often does not make that much of a difference and we struggle to keep GPUs busy.
+Often, the next dimension is naturally identified once we look at the node-level performance, i.e.~it tells us what to analyse next.
 
 
 
@@ -54,7 +52,7 @@ I personally made the experience that \ldots
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] Ignore most of things you know about tools to avoid that you are not able to see obvious shortcomings.
+  \item[$\boxplus$] Ignore most things you know about tools to avoid that you are not able to see obvious shortcomings.
   \item[$\boxplus$] When you report on your findings, focus exclusively on what you observe. Avoid any attempt to interpret things.
 \end{itemize}
 
@@ -63,7 +61,7 @@ I personally made the experience that \ldots
 
 \begin{itemize}[noitemsep]
   \item[$\boxminus$] Throw a huge, powerful tool onto your code and expect it to flag problems immediately.
-  \item[$\boxminus$] Start to measure without a clear what you want to measure.
+  \item[$\boxminus$] Start to measure without a clear plan of what you want to measure.
 \end{itemize}
 
 

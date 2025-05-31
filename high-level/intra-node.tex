@@ -13,10 +13,10 @@ It might be written logically in a distributed memory fashion.
 Our method of choice to argue about node-level performance is strong scaling.
 In principle, we ask ourselves ``what would happen if we had only one core on our
 node'' (we use the term core and hardware thread as synonyms from hereon).
-If our code needs 80s on one core, then we would expect that it only needs 40s
-on two, and 20s on four.
+If our code needs 80 cores on one node, then we would expect that it only needs 40 cores
+on two, and 20 cores on four.
 This is obviously an artificial question to ask:
-Why would be not use all the core? 
+Why would we not use all the node? 
 Despite the fact that we have the cores available anyway and therefore might want to use
 them, finding an answer to the ``what if'' questions helps us to uncover
 inefficiencies.
@@ -55,7 +55,7 @@ As a rule of thumb, we should have a memory footprint which is at least 20\% of 
 
 \paragraph{Data collection}
 
-For the data collection, we first time the simulation without any parallelisation, which is, trivially, a single-core run.  
+For the data collection, we first run the simulation without any parallelisation, which is, trivially, a single-core run.  
 After that, we switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
 
 
@@ -65,7 +65,7 @@ After that, we switch to the parallel code version and vary the core count $p_{\
 
 \noindent
 It is important that we question the code developers on different code variants prior to the assessment:
-If they offer, for example, quite sophisticated task-based parallelism for share memory, we still should calibrate all runtime against a serial code without these tasks.
+If they offer, for example, quite sophisticated task-based parallelism for shared memory, we still should calibrate all runtime against a serial code without these tasks.
 That is a fair benchmark that avoids any tasking overhead where it is not needed.
 
 
@@ -91,7 +91,7 @@ export OMP_PROC_BIND=close
 
 \begin{instructions}{\slurm}
 
-Using \slurm, we do not have set environment variables ourselves, instead \slurm manages resources and so we can request a quantity of cores by with \texttt{-c} flag, e.g.,
+Using \slurm, we do not have set environment variables ourselves, instead \slurm manages resources and so we can request a quantity of cores with the \texttt{-c} flag, e.g.,
 \begin{verbatim}
 #!/bin/bash
  
@@ -146,8 +146,8 @@ node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
 
 \noindent
 From the set of measurements (Figure~\ref{figure:intra-node}), we first compare
-the two timing for a single core (the red dot vs.~the green dot above it).
-This gives us a $t_{\text{serial}}$ and a $t_{\text{intra}}(1)$.
+the two timings for a single core (the red dot vs.~the green dot above it).
+This gives us a $t_{\text{serial}}$ and a $t_{\text{intra}}(1)$ given in red and green, respectively.
 As we use different executables---once compiled with support for shared memory
 and once without---these times will differ and we'd assume
 $t_{\text{serial}} \leq t_{\text{intra}}(1)$.
@@ -177,7 +177,7 @@ However, one might argue that this is already part of an in-depth analysis rathe
 \index{Speedup}
 With the speedups at hand, we can compute the code's parallel efficiency.
 We use a slightly modified version as compared to
-\eqref{equation:hpc-terms:speedup} and \eqref{equation:hpc-terms:efficiency},
+Equations \eqref{equation:hpc-terms:speedup} and \eqref{equation:hpc-terms:efficiency},
 where we calibrate the runtimes against the serial code runtime:
 
 \begin{performancemetric}
@@ -191,7 +191,7 @@ indicator for inter-node performance flaws.
 \end{performancemetric}
 
 \noindent
-We use this quantify to determine if we consider the code to have an intra-node
+We use this quantity to determine if we consider the code to have an intra-node
 flaw.
 Obviously, we will obtain a series of these quantities.
 The assessor might decide to compute an average, to argue over different regimes

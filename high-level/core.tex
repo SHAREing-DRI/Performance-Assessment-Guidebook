@@ -1,6 +1,8 @@
-\section{Performance dimension: Core architecture}
+\section{Core performance}
 
-\marginpar{Roofline is too involved for this section. It is good for developers. Discuss this and move it ot a later section}
+% The roofline discussions have been moved to a roofline.tex file in the 'core' directory
+
+%\marginpar{instead of the discussion of roofline, we insert a discussion of the bandwidth against flops matrix}
 
 For the core-level analysis, we examine how efficiently your code harnesses the chip's microarchitecture. 
 Does your code leverage the most advanced instruction sets available?
@@ -10,29 +12,12 @@ Are we memory-bound?
 Today's chips come equipped with powerful vector computing capabilities and sophisticated cache and streaming features designed to move data smoothly between memory and compute registers. 
 Our analysis evaluates how effectively your implementation takes advantage of these capabilities.
 
+To capture core behaviour at a high-level we simply want to measure the code's bandwidth and peak performance relative to the maxima of the hardware. Tools can tempt us to reach immediately for a roofline model, or potentially even more detailed metrics around cache misses, vectorisation ratios, etc. These topics are relevant to a core performance analysis, but we want to start high-level or we otherwise risk focusing on an individual metric which obfuscates or distractes our analysis. By focusing simply on bandwidth and peak performance, our initial core performance investigation should sit us somewhere on the `traffic light' matrix below.
 
-Our method for evaluating core architecture usage is a simplified variant of the roofline model \cite{xxxxx}. 
-We start with two key boundaries: 
-On the one hand, the maximum memory bandwidth of the system across various arithmetic intensities (AI) creates the diagonal ``roofline''. 
-While temporary performance spikes might occur with optimal cache usage, this diagonal represents our realistic bandwidth limit. 
-On the other hand, the chip's peak computational performance establishes a firm upper boundary, represented by the horizontal line (Figure~\ref{figure:core-architecture}).
+%\paragraph{Benchmark preparation}
 
-Once we measure our code's throughput and performance, we can draw lines parallel to these two thresholds matching our observations. 
-The implementation is considered efficient as long as it performs within $C_{\text{bw}} \geq 80\%$ or reasonably efficient as long as it remains within $C_{\text{bw}} \geq 60\%$ of these maximum values.
-
-
-Visually, our thresholds create 60\% and 80\% corridors beneath the maximum thresholds. 
-The ideal zone is where these corridors intersect (Figure~\ref{figure:core-architecture}). 
-A performance within the corridor under the peak if fine, too.
-However, we will rarely find such a code in practice.
-Being close to the peak bandwidth is might also fine, as we might have an intrinsically memory-bound algorithm.
-
-
-
-\paragraph{Benchmark preparation}
-
-Throughout this assessment, we use one fixed problem setup.
-It has to be reasonably demanding such that it makes sense to exploit all threads of the node plus it computes something reasonable.
+%Throughout this assessment, we use one fixed problem setup.
+%It has to be reasonably demanding such that it makes sense to exploit all threads of the node plus it computes something reasonable.
 
 \begin{assessmentcrime}
  We assess a setup that fits completely into one of the caches.
@@ -46,31 +31,9 @@ It has to be reasonably demanding such that it makes sense to exploit all thread
 \noindent
 Both properties are easy to check: 
 Measure the total memory footprint of your code and ensure that the working set exceeds the largest cache you find on your system (cmp.~remarks on caches below).
-Further to that, check your compiler's manual and ensure you use a bespoke code version for your target system---something the \texttt{-march} or \texttt{-xarch} as well as the highest compiler optimisations (\texttt{-O3}) for example give you. 
+Further to that, check your compiler's manual and ensure you use a bespoke code version for your target system---something that the \texttt{-march} or \texttt{-xarch} as well as the highest compiler optimisations (\texttt{-O3}) for example give you. 
 
 
-\paragraph{Data collection}
-
-\begin{figure}[htb]
- \begin{center}
-  \includegraphics[width=0.7\textwidth]{high-level/core-architecture.pdf}
- \end{center}
- \caption{
-  Schematic illustration of a roofline analysis of a code.
-  We illustrate the peak performance threshold (dark dotted horizontal line) and the maximum bandwidth (diagonal).
-  The code's actual compute performance delivered and memory bandwidth used is by a factor of $C_{\text{peak}}$ or $C_{\text{bw}}$ respectively lower than these maximum thresholds.
-  \label{figure:core-architecture}
- }
-\end{figure}
-
-Realistic bounds for the roofline are easy to obtain through a number of tools.
-The ``only'' tricky bit is how we calibrate the memory bandwidth.
-Memory interconnects are designed to serve all hardware threads on their chips.
-We will not be able to assess if we use them efficiently if we use only one
-core, as we will simply not be able to saturate the theoretical bandwidth with
-only of of these.
-Therefore, we typically run the benchmark over the whole node
-and then divide the throughput by the number of cores to obtain a realistic threshold for a single core.
 
 
 To some degree, the argument holds the other way round for the cores:
@@ -80,7 +43,7 @@ They therefore downclock the system when they encounter lots of compute-intense
 operations.
 As we only assess scalar peak performance in this first exercise, this
 effect should not arise or be negligible. 
-You might however want to doublecheck.
+You might however want to double-check.
 
 
 \begin{instructions}{\likwid}
@@ -95,16 +58,16 @@ likwid-bench -t peakflops -w N:10000MB:128
    
    
 \noindent
-The Stream Triad \cite{xxxx} benchmark is a brilliant starting point to obtain realistic throughput bounds.
-As we are not (yet) interested in explanations how well caches are used, it is important to pick a reasonably big setup that exceeds all caches.
+The Stream Triad \cite{mccalpin1995} benchmark is a brilliant starting point to obtain realistic throughput bounds.
+As we are not (yet) interested in explanations of how well caches are used, it is important to pick a reasonably big setup that exceeds all caches.
 2GByte should be plenty.
 It depends on our measurement strategy if we assess the single core bandwidth or
-take the whole node's (here with 128 threads) throughput an re-calibrate it
+take the whole node's (here with 128 threads) throughput and re-calibrate it
 accordingly.
  
 The instruction set usage is something we can evaluate per core.
-Depending on the character of the code, we might want to pick a more avanced instruction set (e.g.~\texttt{peakflops\_sse} or \texttt{peakflops\_avx\_fma}).
-As long as we argue about the overall code performance, I find the plain peak performance to be absolutely sufficient. 
+Depending on the character of the code, we might want to pick a more advanced instruction set (e.g.~\texttt{peakflops\_sse} or \texttt{peakflops\_avx\_fma}).
+As long as we argue about the overall code performance, we find the plain peak performance to be absolutely sufficient. 
 Being within 80\% of that one for the total program execution is typically a good sign.
 
 
@@ -135,11 +98,11 @@ provides you with the information relevant, although the exact names of the grou
 \paragraph{Evaluation}
 
 Once we know the maximum bandwidth and the obtained bandwidth, we can compute
-the ratio (or normalised measured bandwith) $C_{\text{bw}}$.
+the ratio (or normalised measured bandwidth) $C_{\text{bw}}$.
 Along the same lines, we determine the normalised peak $C_{\text{peak}}$.
 The latter is a little bit weird (and we will revise it later), as we typically
 normalise against the scalar peak performance.
-This is suprising given that all mainstream CPUs support vectorisation and hence
+This is surprising given that all mainstream CPUs support vectorisation and hence
 can deliver several times more than that.
 However, we empirically found that starting with a comparison against the
 baseline is a good starting point:
@@ -202,13 +165,14 @@ an and-based correlation of the two metrics.
 \end{center}
 
 \noindent
-If $C_{\text{peak}} \geq 0.8$, the code does uses the compute capabilities
+If $C_{\text{peak}} \geq 0.8$, the code uses the compute capabilities
 (very) efficiently.
 However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional space to improve the throughput and to speed up the code. 
  If $0.6 \leq C_{\text{peak}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
  However, if $C_{\text{bw}} \geq 0.8$, the problem might be inherently
  memory-bound (to be checked), in which case there might be limited potential to optimise further.
 
+%%TAFlynn - not sure why the following paragraph was commented out, seems ok to me. Maybe we just leave it out of the first iteration of the document anyway
 
 % It is very clear that these rules as well as the measurements themselves are a little vague and misleading:
 % Code might appear to be memory-bound if we just sum up the individual bandwidth needs, but once we get a mix of memory access patterns, it might not be that bad.
@@ -227,8 +191,8 @@ However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Apply some performance counters as a black box without a roofline model.
-  \item[$\boxminus$] Run the roofline model for individual functions or loops and make statements on the overall code.
+  \item[$\boxminus$] Apply some performance counters as a black box without a focus on bandwidth and peak performance.
+  \item[$\boxminus$] Jump straight for a tool with gives significant data on vectorisation, cache misses, etc.
   \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
 \end{itemize}
 

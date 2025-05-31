@@ -1,15 +1,16 @@
-\section{Performance dimension: Inter-node}
+
+\section{Inter-node performance}
 \label{section:high-level:inter-node}
 
 Inter-node behaviour means that code runs over multiple physically separated nodes. 
 In our case, this implies that it uses MPI.
 We work with a programming model which treats memory physically and logically as separate.
 There are software solutions that pretend to the code to have one large shared memory.
-Such virtually shared memory solutions would fall into this assessment category as well, as long as we use more than one physical processor.
+Such virtually shared memory solutions would fall into this assessment category as well, so long as we use more than one physical processor.
 
 
 Our method of choice to argue about inter-node performance is weak scaling.
-We apply basically the vanilla version of Gustafson's law \cite{xxx}, where we assume 
+We apply basically the vanilla version of Gustafson's law \cite{gustafson1988}, where we assume 
 that the runtime of the code is determined by
 
 \begin{equation}
@@ -27,8 +28,8 @@ That is, we increase $f_{\text{inter}}$.
 To keep it constant, we have to increase the problem size appropriately, such that the $f_{\text{inter}}$ remains roughly the same for all setups, i.e.~no matter how many ranks we use.
 
 
-Given this ``we alter the problem size to keep $f$ roughly constant'' discussion, it is formally better to write $t(1, p_{\text{ranks}})$ rather than only $t(1)$---even though almost no write-up does so.
-When we compare our model to \eqref{equation:intra-node:performance-model}, we observe that \eqref{equation:inter-node:performance-model} lacks a penalty parameter.
+Given said ``we alter the problem size to keep $f$ roughly constant'' discussion, it is formally better to write $t(1, p_{\text{ranks}})$ rather than only $t(1)$---even though almost no write-up does so.
+When we compare our model to Equation \eqref{equation:intra-node:performance-model}, we observe that Equation \eqref{equation:inter-node:performance-model} lacks a penalty parameter.
 Indeed, we introduce another parameter of interest here:
 We assume that each data point in \eqref{equation:inter-node:performance-model} contains two types 
 
@@ -65,14 +66,14 @@ For the bigger setups, we won't be able to evaluate the problem on only one node
 If we have a problem of size $N$ on one node, a problem of size $2N$ does only have to be evaluated on two nodes.
 There is no need to run this one on two nodes as well.
 
-
-While we collect these data, it makes sense to immediately calibrate them with $T^{(0)}$.
-
-
-Overhead
+t.b.d.
+%While we collect these data, it makes sense to immediately calibrate them with $T^{(0)}$.
 
 
-The regime where problems become too small is easy to identify:
+%Overhead
+
+
+%The regime where problems become too small is easy to identify:
 This is where the strong scaling curves (Section~\ref{section:high-level:intra-node}) plateau or even start to rise again over the core count.
 
 
@@ -90,7 +91,7 @@ This is where the strong scaling curves (Section~\ref{section:high-level:intra-n
 % 
 % \subsection{Is there a problem?}
 % 
-% The underlying Gustafson's law~\cite{xxx} reads
+% The underlying Gustafson's law~\cite{gustafson1988} reads
 % 
 % \[
 %  t(1) = p \cdot f \cdot t(p)  + (1-f) t(p),

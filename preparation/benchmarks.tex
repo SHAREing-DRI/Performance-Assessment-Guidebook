@@ -4,7 +4,7 @@
 Before we start a performance assessment, we need to agree on what type of measurements to perform:
 There has to be one well-defined benchmark. If we are given a set of
     setups and try to compare them, this will make our task complicated. We run
-    risk to compare different characteristics produced by different code parts.
+    the risk of comparing different characteristics produced by different code parts.
 
 \begin{itemize}
   \item This one benchmark has to run without any user interaction. In the
@@ -23,18 +23,18 @@ We need a well-defined toy setup, and we have to be able to modify its size to m
 In this context, it is important that we know exactly how changes of input sizes affect the compute workload:
 We have to know or have to be told the computational complexity of the underlying algorithms. 
 If we have a pure Monte Carlo setup, then doing 100 times more trials should last around 100 times longer.
-If we have a parabolic PDE solver with explicit time stepping and a regular grid, we have to know that the problem sizes increases by a factor of $2^d$ if we half the mesh spacing. 
+If we have a parabolic Partial Differential Equation (PDE) solver with explicit time stepping and a regular grid, we have to know that the problem sizes increases by a factor of $2^d$ if we half the mesh spacing. 
 However, these algorithms also have to reduce the time step size, so if we measure over a fixed time span, we actually will have four times more time steps and therefore increase the workload by a factor of $2^{d+2}$ once we half the mesh size.
-Finally, if we run an adaptive AMR code for a hyperbolic setup with explicit time stepping or an SPH code, we need some kind of output that tells us exactly how many particles or mesh cells we have and what time step sizes we have picked. In this case, time step sizes go down linearly with mesh spacing.
+Finally, if we run an Adaptive Mesh Refinement (AMR) code for a hyperbolic setup with explicit time stepping or a Smoothed-Particle Hydrodynamics (SPH) code, we need some kind of output that tells us exactly how many particles or mesh cells we have and what time step sizes we have picked. In this case, time step sizes go down linearly with mesh spacing.
 At the end of the day, we are interested in the \emph{throughput} of the system, i.e.~the time we need to update one quantity of interest.
 It is this metric that we will start from in the next steps. 
 
 
 However, if domain experts tell us afterwards, i.e.~after we have completed our assessment---they will always do that afterwards
     when they are unhappy with the outcome---that this particular run is not
-    characteristic for larger runs, as it leaks a feature or does not really use a particular routine
-    heavily, our whole assessment exercise if corrupted.
-And it the whole assessment will be a big disappointment. 
+    characteristic for larger runs, as it lacks a feature or does not really use a particular routine
+    heavily, our whole assessment exercise is corrupted.
+And with it the whole assessment will be a big disappointment. 
 It is their job to pick a setup that represents what we are interested in and is nevertheless reasonably small.
 
 
@@ -42,7 +42,7 @@ Having a ``small'' setup that completes in reasonable time is important since so
     tools induce significant overheads, i.e.~make the code significantly slower.
     If our vanilla run already needs more than an hour, we will never get an
     answer on time. Furthermore, a lot of tools gather significant amounts of
-    data per second. Long-running simulations thus run risk that our analysis
+    data per second. Long-running simulations thus run the risk that our analysis
     tools fail to handle the amount of data collected.
 
 
@@ -52,7 +52,7 @@ Having a ``small'' setup that completes in reasonable time is important since so
  \item Your benchmark finishes within less than ten minutes on a single core.
 \end{checklist}
 
-No matter how we create this setup, we have to be able to run all experiments with absolutely minimal user interaction (cmp.~Section~\ref{section:behaviour:automate}).
+No matter how we create this setup, we have to be able to run all experiments with absolutely minimal user interaction. %(cmp.~Section~\ref{section:behaviour:automate}).
 If we have to run through a complex pipeline for each individual experiment, we will not be able to measure anything productively.
 
 

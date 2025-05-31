@@ -1,57 +1,28 @@
 \chapter{How to read}
 
-As with any workbook, i.e.~book that's there to guide actual work not to teach a
-big subject, there are numerous ways how to read the text. 
+As with any workbook --- i.e.~a book that's there to guide actual work not to teach a
+big subject --- there are numerous ways to read the text. 
 You can read the manuscript chapter by chapter, but this is unlikely to be the
 most fun experience.
-Below, we collect some ideas how to substructure the reading:
+Below, we collect some ideas on how to substructure the reading:
 
 
-\section*{Performance Analysis Course}
+\section*{Context}
 
-We have made reasonable good experience with the following order of activities:
+% broad overview
+This document is part of an ongoing body work of designing and implementing a structured performance analysis methodology with the future aim of building a performance assessment service.
 
-\begin{enumerate}
-  \item Preparation
-  \begin{itemize}
-    \item Ask participants to prepare a benchmark following the recommendations
-     in Section~\ref{section:preparation:benchmarks}.
-  \end{itemize}
-  \item First session
-  \begin{itemize}
-    \item Use the first hour or so to briefly run through the compiler settings
-  in Section~\ref{section:preparation:compiler-settings} to ensure that people
-  do not gather biased/invalid data. In this context, it might also be
-  reasonable to ask them to disable I/O (Section~\ref{section:preparation:io}).
-    \item Start straight with the high-level assessment from
-      Chapter~\ref{chapter:high-level}. Throughout this exercise, participants
-      will learn about the machinery used on-the-fly
-      (cmp.~Section~\ref{section:preparation:machine}).
-  \end{itemize}
-  \item Second session
-  \begin{itemize}
-    \item Run with participants through some basic performance analysis
-    terminology from Section~\ref{section:terminology:hpc-terms}, 
-    \item and then introduce the concept of localisation
-    (Section~\ref{section:tools:localisation}).
-    \item Discuss a range of profilers from Chapter~\ref{chapter:tools} (we
-    always do at least gprof, Map and VTune) and let people expore their code
-    with these tools.
-  \end{itemize}
-  \item Core sessions
-  \begin{itemize}
-    \item Run through the individual chapters starting from
-    Chapter~\ref{chapter:core} one by one.
-  \end{itemize}
-  \item Wrap-up
-  \begin{itemize}
-    \item Let people read through the case studies in
-    Part~\ref{part:case-studies}.
-    \item Ask the audience to present their lessons learned.
-  \end{itemize}
-\end{enumerate}
+The work presented here is a precursor to a far more detailed text which will include a structured methodology for conducting performance assessments. In this iteration we introduce: relevant terminology for High-Performance Computing (HPC) and performance analysis; preparing for an assessment; and finally how to begin an assessment from a high-level. 
 
+\section*{Current state of manuscript}
 
+Both Chapter~\ref{chapter:terminology} and \ref{chapter:preparation} are predominantly complete though with notable exceptions such as Section~\ref{section:preparation:complexity} which are yet to be completed, and are labelled as `t.b.d'. 
+
+Within Chapter~\ref{chapter:high-level}, the first three sections are largely finished and have been written in conjunction with implementing these methodologies during recent performance analysis workshops. Section~\ref{section:high-level:inter-node} has been started but the ending of this section still needs significant work. We want to implement more of this `inter-node' assessment before making recommendations that are unfounded. Sections~\ref{section:high-level:gpu} and \ref{section:high-level:io} are yet to be worked through, though Section~\ref{section:high-level:localisation} is mostly complete. 
+
+Clearly sections labelled as `complete' may also need to be extended as further work is done, as the content may become insufficient. Note however that some forward references may link to topics to come in future versions of this manuscript, e.g.~discussions of tools, performance assessment service, etc. 
+
+Finally, Chapter~\ref{chapter:summary} will not be part of the final document (as with this section and the previous) but recaps the current progress of this document whilst also discussing the content to come in the next iteration of this document. 
 
 \section*{First-time assessment}
 
@@ -67,14 +38,14 @@ We propose to run through the detailed analysis step by step afterwards.
 Per step, it makes sense to consult the tools summary
 (Chapter~\ref{chapter:tools}) and notably to try out different things.
 Where appropriate, the reader might prefer to read through one of the case
-studies in Part~\ref{part:case-studies}, just to get some inspiration what tools
+studies in Part~\ref{part:case-studies}, just to get some inspiration on what tools
 and approaches to try out and how to report outcomes.
 
 
 
 \section*{Assessment}
 
-If you have already completed numerous assessments, the the manuscript is
+If you have already completed numerous assessments, then the manuscript is
 mainly a reference document.
 You'd start with the high-level assessment in Chapter~\ref{chapter:high-level},
 before you dig into the various subchapters depending on the initial assessment
@@ -95,7 +66,7 @@ It is important to reassess the ``flaw'' metrics.
 However, this should only be a validation that something has changed.
 After that, we have to start from scratch, as performance optimisation is a complicated process where one change might introduce flaws, improvement or character changes in a completely different part of the code or affect a completely different flavour of the performance.
 If we alter a particular code part that makes the scaling deteriorate for example, this might have a severe knock on effect on the core performance.
-If we improve the core performance, the GPU offloading might all at a sudden run into data transfer issues.
+If we improve the core performance, the GPU offloading might all of a sudden run into data transfer issues.
 There are numerous examples for these side-effects.
 
 

@@ -10,8 +10,8 @@ people without a computer science background, and that most scientists do not
 have an extensive HPC training.
 It is therefore not only a matter of accessibility of the performance analysis
 and assessment itself to try to avoid too much jargon---if we use too much of
-it, we run risk that our outputs, i.e.~the assessments themselves, cannot be
-read and interpreted appropriatedly by our target audience.
+it, we run the risk that our outputs, i.e.~the assessments themselves, cannot be
+read and interpreted appropriately by our target audience.
 After all, most of the assessments are not done for ourselves, but for other
 scientists.
 
@@ -37,15 +37,15 @@ Here, we record performance data of individual events.
 We are interested in the sequence of operations occurring within the system.
 Profiling focuses on the effect of program execution while tracing focuses on
 the source of behaviour (Figure~\ref{figure:hpc-terms:profiling-tracing}).
-Many developers confuse these definitions, which we took from the VI-HPS
-community \cite{}.
+Many developers confuse these definitions, which we took from the \href{https://www.vi-hps.org/}{VI-HPS} community.
 
+% could not find an appropriate VI-HPS reference at the moment, so I just settled for using href. We can address this again in the future
 
 \index{Tracing!Filtering}
 Tracing can certainly be used to generate profiles, provided the recorded performance data encompasses all quantities required for a particular metric. 
-Conversely, the reverse problem is ill-defined—it is generally impossible to reconstruct a trace from a profile without specialized knowledge of the code's internal workings.
+Conversely, the reverse problem is ill-defined: it is generally impossible to reconstruct a trace from a profile without specialized knowledge of the code's internal workings.
 One might immediately ask why we don't trace all the time. 
-The answer is equally obvious: 
+The answer is equally simple: 
 It is too expensive. 
 Tracing generates enormous amounts of data. 
 Therefore, all real-world tracing relies heavily on filtering, where you determine beforehand which types of
@@ -133,7 +133,7 @@ All the cores on a node share their memory (but cores from different nodes do
 typically not share memory).
 Technically, many vendors call their cores \emph{hardware threads}, as a core
 is a technical building block and might host multiple threads. 
-We use hardware thread and core as synonym.
+We use hardware thread and core as synonyms.
 
 
 On larger systems, you do not use the compute nodes directly.
@@ -152,11 +152,11 @@ In return, jobs handed over to these queues are scheduled with high priority.
 
 Compilation should be on the login node, as the actual compute nodes might not
 provide all the required software, and many production nodes are also shielded
-from the Internet, i.e.~even updating you repository is pain.
+from the Internet, i.e.~even updating you repository is a pain.
 Benchmarking should not be done on the login nodes, as you share them with all
 other users. 
 In contrast, you can tell the scheduler that you want to have nodes
-\emph{exclusive}, so no other user interfers with your measurements.
+\emph{exclusive}, so no other user interferes with your measurements.
 This is particularly important for all data stemming from performance counters,
 as these counters are a hardware feature that we read out, i.e.~our profiler or
 tracer cannot distinguish if a hardware counter's data stems from your code or
@@ -179,7 +179,7 @@ The \emph{speedup} of a program is defined as
 \end{equation}
 
 \noindent
-which is typically smaller or equal to one and tells us how much faster we made
+which is typically smaller than or equal to one and tells us how much faster we made
 an application by using $p$ compute units (cores or nodes) rather than only one.
 
 \index{Parallel efficiency}
@@ -192,25 +192,3 @@ The \emph{parallel efficiency} is given by
 
 \noindent
 It quantifies to which degree adding further compute resources was worth it.
-
-
-% \paragraph*{How it works}
-% 
-% \begin{itemize}[noitemsep]
-%   \item[$\boxplus$] Pretend you know nothing about the code. Blend out your
-%   expert knowledge and start on a fresh sheet.
-%   \item[$\boxplus$] Stick to the data you measure. 
-%   \item[$\boxplus$] Ignore what others pretend to know or have found. 
-% \end{itemize}
-% 
-% 
-% \paragraph*{How it does not work}
-% 
-% \begin{itemize}[noitemsep]
-%   \item[$\boxminus$] Start with the attitute ``I know what this code does and
-%   where there are weaknesses''.
-%   \item[$\boxminus$] Skip assessment steps, as you already know what's going on.
-%   \item[$\boxminus$] Involve someone who's emotionally involved in the code's
-%   development into the reporting. They will always defend their brain child.
-% \end{itemize}
-
