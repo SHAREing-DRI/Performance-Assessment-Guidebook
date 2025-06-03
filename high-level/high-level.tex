@@ -14,6 +14,7 @@ In this chapter, we propose a workflow running along few very simple principles:
   \item We are not interested in explanations of \emph{why} we see any performance flaws. We simply document \emph{what flaws} we observe.
 \end{enumerate}
 
+
 \noindent
 Per dimension, we later break all performance flaws found down into subrubrics, and dig deeper and deeper into the code.
 Along this way, we construct working hypotheses of why the code performs poorly.
@@ -21,4 +22,14 @@ But this comes later.
 For the time being, we focus in a bird's eye view, which is an analysis which we
 can conduct, for example, with a simple electronic spreadsheet, a few tools and
 mere timings.
+
+
+\begin{assessmentcrime}
+  Modern preformance analysis tools (e.g.~\aps~and \map) and methodologies offer a high-level overview as kind of an automatic service.
+  This is a very valuable feature, as it provides you with a quick overview of your code's characteristics.
+  While we appreciate these opportunities, we are however not sure if this is really the right starting point for performance assessment.
+  In our work approach, we do not use one single run and its characterisation to get started, but we use many different runs (with different configurations) to zoom into particular feature dimensions such as intra-node scaling and see if there are issues there.
+  Instead of one global overview, we obtain a set of metrics which we combine into an application profile. 
+  We not rely on a {\bf one run uncovers it all} approach.
+\end{assessmentcrime}
 
