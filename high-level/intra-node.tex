@@ -25,7 +25,7 @@ How much more computation should we be able to squeeze out of the machine?
 
 
 The underlying performance model is called Amdahl's law, and we will return to
-this law in Chapter~\ref{chapter:node-level}.
+this law in Chapter~\ref{section:node-level:amdahls-law}.
 For the time being, we can abstract from any performance model or law, and
 simply focus on the scaling behaviour over cores, as we have defined it in
 Section~\ref{section:terminology:hpc-terms:core-terms}:
@@ -35,7 +35,7 @@ dependence on core counts.
 
 
 
-\paragraph{Benchmark preparation}
+\subsection{Benchmark preparation}
 
 Throughout this assessment, we use one fixed problem setup.
 The setup has to be chosen such that we can compute it on a single core if necessary.
@@ -53,11 +53,12 @@ We can barely blame the code.
 As a rule of thumb, we should have a memory footprint which is at least 20\% of the total RAM available on the whole node.
 
 
-\paragraph{Data collection}
+\subsection{Data collection}
 
 For the data collection, we first run the simulation without any parallelisation, which is, trivially, a single-core run.  
+This gives us $t_{\text{serial}}$.
 After that, we switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
-
+This gives us $t_{\text{intra}}(p_{\text{intra}})$.
 
 \begin{assessmentcrime}
  Use a code base that is relatively inefficient on a single core and use this as baseline for any scaling claims.
@@ -67,6 +68,12 @@ After that, we switch to the parallel code version and vary the core count $p_{\
 It is important that we question the code developers on different code variants prior to the assessment:
 If they offer, for example, quite sophisticated task-based parallelism for shared memory, we still should calibrate all runtime against a serial code without these tasks.
 That is a fair benchmark that avoids any tasking overhead where it is not needed.
+
+Consequently, $t_{\text{serial}} \not= t_{\text{intra}}(1)$ since we use different executables---once compiled with support for shared memory and once without.
+The two measurements will differ and we can assume $t_{\text{serial}} \leq t_{\text{intra}}(1)$.
+If the code is not available without any parallelisation, use $t_{\text{serial}} = t_{\text{intra}}(1)$.
+After that, we collect the remaining $t_{\text{intra}}(p_{\text{intra}})$ with the parallel code variant.
+
 
 
 \begin{instructions}{\openmp}
@@ -120,17 +127,28 @@ suboptimal system usage.
 \end{instructions}
 
 
-\noindent
+
+\begin{instructions}{\mpi}
 If we have a code base which employs MPI only, we set the number of ranks per
 node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
 
+For hybrid MPI+X codes, we have a certain freedom:
+We can use an arbitrary number of MPI ranks---indeed our analysis also works for pure MPI codes as long as we stick to one node---and use threads on top such that we exploit all $p_{\text{threads}}$ hardware threads of interest.
+Picking one rank and four threads is, logically, equivalent to picking two ranks and two threads each.
+It is part of the assessment to play around with these degrees of freedom.
+Once again: If we spot sudden runtime jumps (yellow dots in example sketch) and if these jumps coincide with a NUMA domain or socket, then this might be a strong indicator that we should use MPI instead of threading.
+However, one might argue that this is already part of an in-depth analysis rather than a high-level overview.
+\end{instructions}
 
-\begin{assessmentcrime}
+
+\noindent
  If you have the opportunity to mask out the initialisation time and to focus
  only on the ``real'' runtime of your benchmark code, use it at this point.
  Notably when you work with very short execution times, the initialisation
  overhead might otherwise dominate your measurements.
-\end{assessmentcrime}
+
+
+\subsection{Evaluation}
 
 
 \begin{figure}
@@ -140,76 +158,79 @@ node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
   \caption{
    A scatter plot tracking the (strong) scaling data feeding into our intra-node analysis.
    The red node is the code's runtime without any parallelisation enabled, while the green and yellow measurements stem from the parallelised code over various cores.
+   For our high-level analysis, we are interested at which point (core count) the resulting parallel efficiency falls below an acceptable threshold.
    \label{figure:intra-node}
   }
 \end{figure}
 
-\noindent
-From the set of measurements (Figure~\ref{figure:intra-node}), we first compare
-the two timings for a single core (the red dot vs.~the green dot above it).
-This gives us a $t_{\text{serial}}$ and a $t_{\text{intra}}(1)$ given in red and green, respectively.
-As we use different executables---once compiled with support for shared memory
-and once without---these times will differ and we'd assume
-$t_{\text{serial}} \leq t_{\text{intra}}(1)$.
-If the code is not available without any parallelisation, assume 
-$t_{\text{serial}} = t_{\text{intra}}(1)$.
-After that, we collect the remaining $t(p_{\text{intra}})$.
-
-
-It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots).
-This means that the speedup deteriorates completely.
-In this case, it is perfectly reasonable to constrain the maximum $p_{\text{threads}}$ such that the we do not run into this ``problematic'' range of threads and to neglect the measurements further on.
-The performance flaws will already be documented for the smaller core counts
-where we at least continued to see some speedup.
-
-
-For hybrid MPI+X codes, we have a certain freedom:
-We can use an arbitrary number of MPI ranks---indeed our analysis also works for pure MPI codes as long as we stick to one node---and use threads on top such that we exploit all $p_{\text{threads}}$ hardware threads of interest.
-This means, we have a certain degree of freedom.
-Picking one rank and four threads is, logically, equivalent to picking two ranks and two threads each.
-It is part of the assessment to play around with these degrees of freedom.
-Once again: If we spot sudden runtime jumps (yellow dots in example sketch) and if these jumps coincide with a NUMA domain or socket, then this might be a strong indicator that we should use MPI instead of threading.
-However, one might argue that this is already part of an in-depth analysis rather than a high-level overview.
-
-
-\paragraph{Evaluation}
 
 \index{Speedup}
-With the speedups at hand, we can compute the code's parallel efficiency.
+\index{Efficiency}
+Our roadmap to determine how good the shared memory behaviour is, i.e.~our strategy to come up with a single number, is straightforward.
+First, we calculate the code's parallel efficiency.
 We use a slightly modified version as compared to
 Equations \eqref{equation:hpc-terms:speedup} and \eqref{equation:hpc-terms:efficiency},
 where we calibrate the runtimes against the serial code runtime:
 
-\begin{performancemetric}
-The modified parallel core efficiency
 \[
 E_{\text{intra}}(p_{\text{intra}}) =
 \frac{t_{\text{serial}}}{t(p_{\text{intra}}) \cdot p_{\text{intra}}}
 \]
-normalised against the serial runtime without any parallelism support is a good
-indicator for inter-node performance flaws.
+
+\noindent
+is normalised against the serial runtime without any parallelism support.
+We track how much we sacrifice by introducing the parallelism in the first place, which is typically a better indicator for inter-node performance flaws than the textbook efficiency definition.
+
+
+Second, we determine the number of cores for which our parallel efficiency falls below the thresholds 80\% or 60\% respectively (Figure~\ref{figure:intra-node}):
+
+
+\begin{eqnarray*}
+ p_{\text{critical,intra}}^{\text{80\%}} & = & \argmax _{p_{\text{intra}}} \{ E_{\text{intra}}(p_{\text{intra}}) \geq 0.8 \} \\
+ p_{\text{critical,intra}}^{\text{60\%}} & = & \argmax _{p_{\text{intra}}} \{ E_{\text{intra}}(p_{\text{intra}}) \geq 0.6 \}.
+\end{eqnarray*}
+
+
+\noindent
+It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots in the figure).
+This means that the speedup deteriorates completely.
+The above metric tries to flag early if we run into such a regime or also into one that leads to a stagnation of the runtime and hence to an efficiency decline.
+
+
+Finally, we introduce our performance metric.
+It normalised the critical thresholds agains the maximum number of cores or threads $p_{\text{max,intra}}$ that we have on our system.
+ 
+\begin{performancemetric}
+ We evaluate 
+ \[
+  C_{\text{intra}}^{\text{80\%}} = \frac{ p_{\text{critical,intra}}^{\text{80\%}} }{ p_{\text{max,intra}} }
+  \qquad
+  \text{and}
+  \qquad
+  C_{\text{intra}}^{\text{60\%}} = \frac{ p_{\text{critical,intra}}^{\text{60\%}} }{ p_{\text{max,intra}} }
+ \]
+ \noindent
+ to determine how well the code scales over a given node.
 \end{performancemetric}
 
 \noindent
-We use this quantity to determine if we consider the code to have an intra-node
+We use the two metrics to determine if we consider the code to have an intra-node
 flaw.
-Obviously, we will obtain a series of these quantities.
-The assessor might decide to compute an average, to argue over different regimes
-of values, or to study only the value for the maximum core count.
 
 \begin{center}
- \begin{tabular}{r|p{0.62\textwidth}}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
   Efficiency & Description \\
   \hline
-  $E_{\text{intra}}(p_{\text{intra}}) \geq 0.8$
+  $C_{\text{intra}}^{\text{80\%}} \geq 0.8$
    & \cellcolor{green!25} Shared memory scaling is good.
   \\
-  $0.6 \leq E_{\text{intra}}(p_{\text{intra}}) < 0.8$
+  $C_{\text{intra}}^{\text{80\%}} < 0.8$ $\wedge $
+  $C_{\text{intra}}^{\text{60\%}} \geq 0.6$
    & \cellcolor{yellow!25} Shared memory scaling is not particularly good, and
    we notably might run into problems with the next generation of chips where
    the core count will increase.
   \\
-  $E_{\text{intra}}(p_{\text{intra}}) < 0.6$
+  otherwise
    & \cellcolor{red!25} Shared memory scaling is poor.
  \end{tabular}
 \end{center}
@@ -219,15 +240,14 @@ of values, or to study only the value for the maximum core count.
 
 \begin{itemize}[noitemsep]
   \item[$\boxplus$] Compile your code without multithreading/parallel support and compare its performance to a code without any parallelisation to determine the overhead of the parallel implementation.
-  \item[$\boxplus$] Run a strong scaling study and calibrate the constants of an extended Amdahl model against these measurements. 
+  \item[$\boxplus$] Run a strong scaling study and compare the efficiency to prescribed thresholds how many cores you want to the system to use reasonably efficiently. 
 \end{itemize}
 
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Skip intra-node scalability studies, as the code is ``only'' MPI.
+  \item[$\boxminus$] Skip intra-node scalability studies, as the code is ``only'' MPI. If a code is only MPI, you should still do strong scaling tests on a single node, where MPI physically uses shared memory.
   \item[$\boxminus$] Perform a sole strong scalability study without taking the implementation penalty into account.
-  \item[$\boxminus$] Jump straight into a further ``in-depth'' analysis without
-  evaluating the other high-level metrics.
+  \item[$\boxminus$] Jump straight into a further ``in-depth'' analysis without evaluating the other high-level metrics.
 \end{itemize}

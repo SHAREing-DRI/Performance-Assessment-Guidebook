@@ -1,4 +1,3 @@
-
 \section{Inter-node performance}
 \label{section:high-level:inter-node}
 
@@ -44,7 +43,7 @@ t(p_{\text{ranks}}) & = & t_{\text{useful}}(p_{\text{ranks}}) + t_{\text{overhea
 of runtime.
 
 
-\paragraph{Benchmark preparation}
+\subsection{Benchmark preparation}
 
 For weak scaling, we increase the problem size as we add additional nodes.
 Therefore, it is important that we understand the cost function $T^{(0)}$. 
@@ -58,7 +57,7 @@ Therefore, it is important that we understand the cost function $T^{(0)}$.
 As a rule of thumb, we can simply track the memory footprint per rank and ensure that it stays within a certain regime such as 60\% of the available memory per node.
 
 
-\paragraph{Data collection}
+\subsection{Data collection}
 
 The data collection is very similar to the strong scaling studies in Section~\ref{section:high-level:intra-node}:
 We track the cost of the computation (time-to-solution) over multiple nodes for each problem size.
