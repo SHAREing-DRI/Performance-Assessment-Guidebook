@@ -1,8 +1,36 @@
 \section{GPU performance}
 \label{section:high-level:gpu}
 
-t.b.d.
-\\
+\begin{instructions}{Intel VTune}
+ t.b.d.
+\end{instructions}
+
+\begin{instructions}{AMD rocprofiler-system}
+ t.b.d.
+\end{instructions}
+
+\begin{instructions}{Nvidia Nsight}
+ Nvidia Nsight Systems
+
+ Nvidia Nsight Compute
+ t.b.d.
+\end{instructions}
+
+\begin{center}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  GPU Occupation & Description \\
+  \hline
+  $C_{\text{GPU}} \geq 0.8$
+   & \cellcolor{green!25} The GPU is well occupied with work.
+  \\
+  $0.6 \leq C_{\text{GPU}} < 0.8$
+   & \cellcolor{yellow!25} The GPU is not being occupied with work well, this could become a significant issue with other GPUs including newer generations.
+  \\
+  $C_{\text{GPU}} < 0.6$
+   & \cellcolor{red!25} The GPU is not being significantly under utilised.
+ \end{tabular}
+\end{center}
+
 
 %\subsection{Draft ideas:}
 %GPU performance issues broadly fit into two main areas: 1) significant wait times for data transfers from host to device; 2) inefficient occupation of the GPU.

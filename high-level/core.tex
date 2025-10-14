@@ -52,8 +52,8 @@ With \likwid\, it is only a few lines
 \begin{verbatim}
 likwid-bench -t triad -W S0:2GB:1
 likwid-bench -t triad -W N:2GB:128
-likwid-bench -t peakflops -w S0:10000MB:1
-likwid-bench -t peakflops -w N:10000MB:128
+likwid-bench -t peakflops -w S0:16kB:1
+likwid-bench -t peakflops -w N:128*16kB:128
 \end{verbatim}
    
    
@@ -64,6 +64,8 @@ As we are not (yet) interested in explanations of how well caches are used, it i
 It depends on our measurement strategy if we assess the single core bandwidth or
 take the whole node's (here with 128 threads) throughput and re-calibrate it
 accordingly.
+
+We use a convention advised by the Likwid developers in which the \texttt{peakflops} microbenchmark is performed with an input dataset half the size of the L1 cache \cite{}. For example, in the commands above we use a 16kB input which is half the size of a 32kB L1 cache (which we can find by running the \texttt{likwid-topology} command). As we scale the \texttt{peakflops} microbenchmark across a node, we scale up this data input size by the number of cores, e.g., in our example across 128 cores we use an input of $128\times16\text{kB}$.
  
 The instruction set usage is something we can evaluate per core.
 Depending on the character of the code, we might want to pick a more advanced instruction set (e.g.~\texttt{peakflops\_sse} or \texttt{peakflops\_avx\_fma}).

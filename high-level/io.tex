@@ -1,4 +1,48 @@
 \section{I/O performance}
 \label{section:high-level:io}
 
-t.b.d.
+% there are clear questions here of how this metric conflicts with the note that we want to 'turn off I/O'
+\begin{instructions}{Darshan}
+For a dynamic runtime analysis we setup Darshan with
+\begin{verbatim}
+export DARSHAN_DIR=/apps/developers/tools/darshan/3.3.1/1/
+
+intel-2021.4-intelmpi-2021.6 # path to Darshan
+export DARSHAN_LOGDIR=./darshan_logs
+mpiexec -genv LD_PRELOAD ${DARSHAN_DIR}/lib/libdarshan.so
+-np 4 ./my-exe
+\end{verbatim}
+the logging environment variable name can be different so make sure to run
+\begin{verbatim}
+    darshan-config --log-path
+\end{verbatim}
+to find the name on your system. Once this has created a \texttt{*.darshan} binary this can analysed via
+\begin{verbatim}
+    darshan-parser --total my_log.darshan 
+\end{verbatim}
+The relevant metrics from this output are in the form
+\begin{verbatim}
+STDIO_F_*_TIME: cumulative time spent in different 
+types of functions.
+\end{verbatim}
+Therefore depending on different forms of I/O --- e.g., \texttt{POSIX}, \texttt{MPIIO}, \texttt{STDIO}, \texttt{H5F}, \texttt{H5D}, \texttt{PNETCDF\_FILE}, \texttt{LUSTRE}, \texttt{DFS}, \texttt{DAOS} --- we need to sum together the read and write times.
+\end{instructions}
+
+\begin{instructions}{VTune}
+ t.b.d.
+\end{instructions}
+
+\begin{center}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  I/O Proportion & Description \\
+  \hline
+  $C_{\text{I/O}} \geq 0.8$
+   & \cellcolor{green!25} I/O does not dominate runtime.
+  \\
+  $0.6 \leq C_{\text{I/O}} < 0.8$
+   & \cellcolor{yellow!25} I/O forms a significant part of the total runtime.
+  \\
+  $C_{\text{I/O}} < 0.6$
+   & \cellcolor{red!25} I/O dominates the runtime.
+ \end{tabular}
+\end{center}
