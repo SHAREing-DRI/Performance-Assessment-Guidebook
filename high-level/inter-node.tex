@@ -9,28 +9,28 @@ Such virtually shared memory solutions would fall into this assessment category 
 
 
 Our method of choice to argue about inter-node performance is weak scaling.
-We apply basically the vanilla version of Gustafson's law \cite{gustafson1988}, where we assume 
+%We apply basically the vanilla version of Gustafson's law \cite{gustafson1988}, where we assume 
 that the runtime of the code is determined by
 
-\begin{equation}
- \label{equation:inter-node:performance-model}
- t(1) = t(p_{\text{ranks}}) \left( f_{\text{inter}} p_{\text{ranks}} + (1-f_{\text{inter}}) \right).
-\end{equation}
+%\begin{equation}
+% \label{equation:inter-node:performance-model}
+ %t(1) = t(p_{\text{ranks}}) \left( f_{\text{inter}} p_{\text{ranks}} + (1-f_{\text{inter}}) \right).
+%\end{equation}
 
 
 \noindent
-In this model, we reconstruct the time $t(1)$ for a code that we would need to run an experiment on one rank only.
-Implicitly, we assume that $f_{\text{inter}}$ stays constant for all setups.
-This deserves a brief excursus: 
-If we took one setup and distributed it among multiple nodes, we typically would introduce more and more overhead as we use more ranks.
-That is, we increase $f_{\text{inter}}$.
-To keep it constant, we have to increase the problem size appropriately, such that the $f_{\text{inter}}$ remains roughly the same for all setups, i.e.~no matter how many ranks we use.
+%In this model, we reconstruct the time $t(1)$ for a code that we would need to run an experiment on one rank only.
+%Implicitly, we assume that $f_{\text{inter}}$ stays constant for all setups.
+%This deserves a brief excursus: 
+%If we took one setup and distributed it among multiple nodes, we typically would introduce more and more overhead as we use more ranks.
+%That is, we increase $f_{\text{inter}}$.
+%To keep it constant, we have to increase the problem size appropriately, such that the $f_{\text{inter}}$ remains roughly the same for all setups, i.e.~no matter how many ranks we use.
 
 
-Given said ``we alter the problem size to keep $f$ roughly constant'' discussion, it is formally better to write $t(1, p_{\text{ranks}})$ rather than only $t(1)$---even though almost no write-up does so.
-When we compare our model to Equation \eqref{equation:intra-node:performance-model}, we observe that Equation \eqref{equation:inter-node:performance-model} lacks a penalty parameter.
-Indeed, we introduce another parameter of interest here:
-We assume that each data point in \eqref{equation:inter-node:performance-model} contains two types 
+%Given said ``we alter the problem size to keep $f$ roughly constant'' discussion, it is formally better to write $t(1, p_{\text{ranks}})$ rather than only $t(1)$---even though almost no write-up does so.
+%When we compare our model to Equation \eqref{equation:intra-node:performance-model}, we observe that Equation \eqref{equation:inter-node:performance-model} lacks a penalty parameter.
+%Indeed, we introduce another parameter of interest here:
+%We assume that each data point in \eqref{equation:inter-node:performance-model} contains two types 
 
 \begin{eqnarray}
 t(p_{\text{ranks}}) & = & t_{\text{useful}}(p_{\text{ranks}}) + t_{\text{overhead}}(p_{\text{ranks}}) 

@@ -146,23 +146,17 @@ an and-based correlation of the two metrics.
 
 
 \begin{center}
- \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
-  & $C_{\text{bw}}\geq 0.8$ & $0.8 > C_{\text{bw}}\geq 0.6$ & $0.6 > C_{\text{bw}}$ \\
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  Peak FLOPS proportion & Description \\
   \hline
   $C_{\text{peak}} \geq 0.8$
-   & \cellcolor{green!25}
-   & \cellcolor{green!25} perfect
-   & \cellcolor{orange!25}
+   & \cellcolor{green!25} Core compute performance is good.
   \\
   $0.8 > C_{\text{peak}} \geq 0.6$
-   & \cellcolor{green!25}
-   & \cellcolor{orange!25} 
-   & \cellcolor{orange!25} flaw
+   & \cellcolor{yellow!25} Core compute performance is not effectively using the hardware to its maximum potential. 
   \\
   $0.6 > C_{\text{peak}}$
-   & \cellcolor{red!25}
-   & \cellcolor{red!25} severe flaw
-   & \cellcolor{red!25} 
+   & \cellcolor{red!25} Core compute performance is poor.
  \end{tabular}
 \end{center}
 
@@ -199,3 +193,23 @@ However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional 
 \end{itemize}
 
 
+%\begin{center}
+% \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
+%  & $C_{\text{bw}}\geq 0.8$ & $0.8 > C_{\text{bw}}\geq 0.6$ & $0.6 > C_{\text{bw}}$ \\
+%  \hline
+%  $C_{\text{peak}} \geq 0.8$
+%   & \cellcolor{green!25}
+%   & \cellcolor{green!25} perfect
+%   & \cellcolor{orange!25}
+%  \\
+%  $0.8 > C_{\text{peak}} \geq 0.6$
+%   & \cellcolor{green!25}
+%   & \cellcolor{orange!25} 
+%   & \cellcolor{orange!25} flaw
+%  \\
+%  $0.6 > C_{\text{peak}}$
+%   & \cellcolor{red!25}
+%   & \cellcolor{red!25} severe flaw
+%   & \cellcolor{red!25} 
+% \end{tabular}
+%\end{center}
