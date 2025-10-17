@@ -1,42 +1,3 @@
-% - Target group has to be clearer: in-depth or application-domain focused
-% - Tool information density plus training material is not appropriate for latter group
-% - Future workshops have to cover both domains separately
-% 
-% - Application people want to do performance engineering but don't know how to do (and that they have to do) assessment first
-% - They pick the first tool and then stick to it and hence often miss out on big picture
-% 
-% - Success model: pair up tool expert with domain expert
-% - Tool training is there for assessor, but not necessarily for the domain expert who wants to do performance engineering
-% - This contradicts my previous assumption that tools are there predominantly for performance engineer
-% 
-% - Maybe the assessments have to come first
-% - Success stories are key (like the ones POP has delivered)
-% 
-% - A lot of tools are too difficult to use; counterpart is MAQAO or APS or Perf Snapshot
-% 
-% - Pitch assessment gurus directly for tool workshops
-% - Create for others a tutorial "how to assess your code's performance" 
-
-
-
-% Assessment
-% 
-% Analysis
-% 
-% Engineering
-% 
-% Diagnostics delivered not the solution
-
-
-
-
-% Hypothesis vs diagnosis
-% 
-% Many people phrase things as diagnosis although they are really rather a hypothesis 
-
-
-
-
 \section{What we do}
 
 
@@ -51,106 +12,53 @@ explanation comes from a machine's point of view: It does not argue about the
 algorithm or science case.
 \end{enumerate}
 
-\begin{readerguide}
- Feel free to skip the remainder of this chapter if you are a first-time reader. 
-\end{readerguide}
 
+\begin{doctrine}
+ \emph{Performance Assessment} documents code behaviour from an outsider's point of view. It captures what we see (benchmarking).
+ \emph{Performance Analysis} explains why a code behaves the way it does.
+ \emph{Performance Engineering} improves the performance.
+\end{doctrine}
 
 \noindent
-In scientific computing, we typically work with an iterative approach:
-First, we \emph{measure} or \emph{benchmark} how a code performs.
-Second, we use these data to inform our \emph{performance assessment}, i.e.~our reporting.
-Third, we conduct a \emph{performance analysis} to explain why the code exhibits the observed behaviour.
-Finally, this analysis feeds into program tuning or optimisation, and we repeat the workflow.
+The three steps typically build up on each other.
+Performance assessment is a little bit like a health screening in medicine.
+We run a couple of standard benchmarks (similar to blood pressure, oxygen saturation and pulse for example). 
+If some metrics are not in the region where we want them to be, we issue further tests, i.e.~we switch to the analysis part.
 
+The skills we need first and foremost are to know what tests we should conduct or commission, and we have to be able to read the outcomes.
+If the test metrics are not what they should be, we eventually transfer the patient (code) to a specialist and run further tests.
+Based upon these tests, we finally start the treatment. 
 
+\begin{readerguide}
+ This text starts with a performance assessment before it switches to some performance analysis.
+ It does not cover aspects of performance engineering.
+\end{readerguide}
 
-If we take our list of activities and integrate it within the definition of the performance analysis workflow, it becomes clear that the tuning step is out-of-scope here.
-Another related technique is out-of-scope, too:
-The most advanced papers in scientific computing, particularly within high-performance computing, deliver a performance model;
-essentially a pen-and-paper assessment of what a code should be able to deliver.
-This is impossible if we adhere to the principles above: having limited
-knowledge and only explaining observed behavior rather than relating it to
-external factors (such as input data or algorithmic choices) or algorithmic
-context.
-We commit to a data-driven approach.
-Obviously, such an approach might complement an analytic, theoretical assessment
-of code, but we recommend considering this as an entirely separate cup of tea.
+\noindent
+Our working assumption is that performance engineering requires inevitably domain or code experise which we cannot/might not have as generalists.
 
-
-
-We will inevitably face difficulties if we truly do not know the code we are evaluating:
-Explaining certain effects is so much easier with some (rudimentary)
-understanding of the code.
-However, there are three compelling reasons to treat code as a (logical) black box:
-First, performance assessment is often delegated to non-developers: colleagues
-from computing centers, centralised HPC specialists, or external service providers.
-If we want to discuss performance analysis methodology, it is counterproductive to assume in-depth code knowledge.
-Many people conducting assessments cannot be experts in every code they examine.
-Second, requiring code expertise within assessment teams would imply that core developers are always available.
-This might be an ideal in the spirit of eXtreme Programming \cite{beck1999}, where
-the customer must be accessible at all times.
-It is unrealistic in science, where PIs are busy with various tasks, developers
-frequently leave projects---as they graduate, accept new positions, or are
-reassigned---and where code components are often written by individuals and are
-so complex that only a few people understand the core parts.
-Finally (and most importantly), knowledge about a codebase tends to bias the assessment.
-
-
-
-
-Developers inevitably make assumptions about reasons for code behaviour when working on performance analysis.
-(Senior) Developers tend to ``defend'' their code, explaining any flaws as
-natural consequences of their domain's challenging nature, their awareness of future requirements, or their in-depth knowledge of other setups not covered by the present configuration.
-Simultaneously, we have frequently observed junior developers downplaying or
-challenging existing code---likely to prove themselves by pointing out ``how
-things really should work''---and consequently interpreting every piece of data
-through this lens.
-This list is not comprehensive.
-The whole team dynamics dimension deserves further discussion (in
-Section~\ref{section:communication:team-dynamics}).
-For the time being, we conclude that having emotionally invested developers
-involved in early assessment is counterproductive due to their inherent bias.
-
-
-\begin{wip}
- The link to team dynamics is broken as this part is work in progress and not yet written.
-\end{wip}
 
 \begin{assessmentcrime}
-\label{assessmentcrime:code-expert-bias}
-People conduct assessments as code experts.
-Due to this, they deliver biased assessments since they think they already know the code's performance characteristics and its flaws without an objective assessment of its ``real'' behaviour.
-\end{assessmentcrime}
+ Developers tend to skip the assessment part and sometimes the analysis.
+\end{assessmentcrime} 
 
-
-For a high-quality assessment, it helps to step back and (pretend to) know nothing.
-This way, we avoid entering performance analysis with bias.
-Adhere strictly to the observational perspective.
-Even if it is your own code, try to detach yourself and pretend you have no prior knowledge.
-Abstract.
-
-
-
-
+\noindent
+They want to get their hands dirty and improve the code.
+However, this is deeply unscientific and unreasonable without a proper assessment and triggers lots of follow-up complications.
+Systematic work on performance always follows the sequence assessment--analysis--improvement (engineering).
 
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] Pretend you know nothing about the code. Blend out your
-  expert knowledge and start on a fresh sheet.
-  \item[$\boxplus$] Stick to the data you measure. 
-  \item[$\boxplus$] Ignore what others pretend to know or have found. 
+  \item[$\boxplus$] Ignore everything you know nothing about the code and focus on the data you measure. 
+  \item[$\boxplus$] Stop any development while you assess and analyse.
 \end{itemize}
 
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Start with the attitude ``I know what this code does and
-  where there are weaknesses''.
+  \item[$\boxminus$] Start with the attitude ``I want to fix a flaw''.
   \item[$\boxminus$] Skip assessment steps, as you already know what's going on.
-  \item[$\boxminus$] Involve someone who's emotionally involved in the code's
-  development into the reporting. They will always defend their brain child.
 \end{itemize}
 
