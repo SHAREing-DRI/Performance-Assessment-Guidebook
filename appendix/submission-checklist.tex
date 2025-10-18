@@ -1,2 +1,92 @@
-\section{Submission checklist}
+\chapter{Submission checklist}
 \label{appendix:submission-checklist}
+
+This chapter hosts a set of checkpoints that groups might introduce \emph{before} they start to conduct assessments and analyses.
+They form kind of a common sense contract between the code owner and the person conducting a review and ensure that some typical hickups and problems are avoided.
+As it has this legal flair, we call the parties involved the code \emph{owner} vs.~the code \emph{analyst}, even though these roles in practice might be blurred and taken up by code developers themselves. 
+The checklists complement the aspects and checklists discussed in Chapter~\ref{chapter:preparation}.
+While Chapter~\ref{chapter:preparation} is written from an analysis/assessment point of view and hence targets predominantly the analyst, 
+the checklists here are more owner-focused and notably highlight the interaction between analysts and owners.
+
+
+\section{Code submission}
+
+Before we accept a piece of code for the assessment and analysis, it is important to identify what we expect from the owner submitting the code.
+This covers first of all the artefact itself:
+
+\begin{checklist}
+ \item There is a central archive with all files required to run the code. The archive is self-contained.
+ \item This archive is frozen, i.e.~noone changes the object of an assessment while the assessment is going on.
+\end{checklist}
+
+\noindent
+The latter point is obviously once written down, but deserves to be highlighted:
+If an object of study changes as we try to assess it, it is virtually impossible to get the big picture right.
+Obviously, continuous benchmarking and performance analysis can and should be part of professional scientific software development.
+However, if we try to conduct an objective assessment, we have to work with a fixed object of study.
+That means, we should freeze the development for the time being or at least work on kind of a stable (release) branch.
+If a code does not (yet) support all dimensions of an assessment (cmp.~Chapter~\ref{chapter:high-level}) or some dimensions are not yet stable, this is the time to flag this, so we can exclude them from the analysis.
+Further to the mere artefact submission, we expect some more information from the owner: 
+
+\begin{checklist}
+ \item The code comes along with instructions how to install and run the code base on a reference system without any implicit dependencies: All requirements (e.g.~module files) are clearly documented. In the best case, the code is provided with a container.
+ \item The owner submits a characteristic run of their code, which does only run for about 10 minutes.
+ \item The owner clarifies explicitly how many nodes/cores/GPUs this reference setup requires.
+ \item The owner provides clear guidance how to alter the problem size and runtime of their solver to faciliate efficient benchmarking.
+ \item The owner specifies how I/O can be switched on/off.
+\end{checklist}
+
+\noindent
+Submitting a characteristic run means that the owner describes how we can start such a run on the reference system ourself.
+This is the litmus test:
+If we cannot (even) start a baseline run, then the code/submission is obviously not yet in a shape to be assessed and we have to stop immediately.
+
+
+The attribute ``characteristic'' requires the owner to doublecheck if the setting handed over make sense.
+Both parties want the outcomes of the benchmarking and analysis to be meaningful.
+We assume that the owner wants to learn something about the code from an objective analyst, while the analyst wants to know right from the start that their work is relevant.
+We want to avoid a situation where we are told afterwards that the analysis' results are meaningless because ``in the real world, we would use a completely different setup''.
+This has happened to us before. 
+
+
+\section{Code of conduct}
+
+Along the lines ``this has happened to us before'', we write down some simple principles how to behave regarding the analysis:
+
+\begin{checklist}
+ \item The owner is available to the analyst for questions around the code while the assessment project is going on, and try to answer questions re code usage and setups quickly and constructively.
+ \item The owner will refrain from challenging the assessment methodology.
+ \item The owner commits to acknowledge all . 
+\end{checklist}
+
+\noindent
+The first item can be subject of debate.
+However, an analyst usually wants to get 
+
+
+\section{Outcomes}
+
+It is important to sort out what happens with any outcomes before the assessment starts.
+The two items below can be subject of debate, but they align with principles of open, fair and reproducible science:
+
+\begin{checklist}
+ \item The owner grants the analyst the right to publish their review. 
+ \item The analyst commits to an objective assessments which refrains of ``blaming'' a code for certain behaviour. 
+\end{checklist}
+
+\noindent
+This sounds defensive and it is defensive, but we have observed numerous situations where developers reacted annoyed up to angry when they read assessments.
+Scientists tend to develop emotional attachment to their codes, and are not amused if an independent analysis highlights of shortcomings.
+It is important to acknowledge that this is exactly the purpose of an analysis.
+It is not there to confirm how exceptionally great some piece of code is already, but should inform future development.
+
+
+
+\section{Agreed objectives}
+
+\begin{checklist}
+ \item The owner specifies what alternative/target architectures they have in mind for production runs.
+ \item The owner specifies their target configuration, i.e.~how many nodes/GPUs they intend to use for production runs.
+ \item The owner specifies their target setup, i.e.~how bit the problem size will be for production runs.
+ \item The owner specifies how much data their target configuration will likely write for production runs. 
+\end{checklist}
