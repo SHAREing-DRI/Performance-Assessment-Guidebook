@@ -1,7 +1,11 @@
 \section{Inter-node performance}
 \label{section:high-level:inter-node}
 
-Inter-node behaviour means that code runs over multiple physically separated nodes. 
+\begin{wip}
+    This section is in early development, but the key takeaways currently are to perform a weak scaling analysis. Similar to the intra-node rubric, we again monitor parallel efficiency and note when it drops below $80\%$ and $60\%$.
+\end{wip}
+
+Inter-node behaviour means that the code runs over multiple physically separated nodes. 
 In our case, this implies that it uses MPI.
 We work with a programming model which treats memory physically and logically as separate.
 There are software solutions that pretend to the code to have one large shared memory.
@@ -10,7 +14,7 @@ Such virtually shared memory solutions would fall into this assessment category 
 
 Our method of choice to argue about inter-node performance is weak scaling.
 %We apply basically the vanilla version of Gustafson's law \cite{gustafson1988}, where we assume 
-that the runtime of the code is determined by
+%that the runtime of the code is determined by
 
 %\begin{equation}
 % \label{equation:inter-node:performance-model}
@@ -32,21 +36,21 @@ that the runtime of the code is determined by
 %Indeed, we introduce another parameter of interest here:
 %We assume that each data point in \eqref{equation:inter-node:performance-model} contains two types 
 
-\begin{eqnarray}
-t(p_{\text{ranks}}) & = & t_{\text{useful}}(p_{\text{ranks}}) + t_{\text{overhead}}(p_{\text{ranks}}) 
-  \nonumber
-  \\
-  & = & \left( C_{\text{useful}} + (1-C_{\text{useful}}) \right) \ t(p_{\text{ranks}})
-\end{eqnarray}
+%\begin{eqnarray}
+%t(p_{\text{ranks}}) & = & t_{\text{useful}}(p_{\text{ranks}}) + t_{\text{overhead}}(p_{\text{ranks}}) 
+ % \nonumber
+ % \\
+ % & = & \left( C_{\text{useful}} + (1-C_{\text{useful}}) \right) \ t(p_{\text{ranks}})
+%\end{eqnarray}
 
-\noindent
-of runtime.
+%\noindent
+%of runtime.
 
 
 \subsection{Benchmark preparation}
 
-For weak scaling, we increase the problem size as we add additional nodes.
-Therefore, it is important that we understand the cost function $T^{(0)}$. 
+For weak scaling, we increase the problem size as we add additional nodes such that the approximate work load for each node remains relatively constant (in the ideal case).
+%Therefore, it is important that we understand the cost function $T^{(0)}$. 
 
 
 \begin{assessmentcrime}
@@ -54,8 +58,9 @@ Therefore, it is important that we understand the cost function $T^{(0)}$.
 \end{assessmentcrime}
 
 \noindent
-As a rule of thumb, we can simply track the memory footprint per rank and ensure that it stays within a certain regime such as 60\% of the available memory per node.
+As a rule of thumb, we can simply track the memory footprint per rank and ensure that it stays within a certain regime such as 60\% of the available memory per node. 
 
+When preparing a benchmark for the inter-node, weak scaling analysis a key point is raised for the performance analyst: we must have some understanding of how to scale the problem size.
 
 \subsection{Data collection}
 
@@ -65,15 +70,19 @@ For the bigger setups, we won't be able to evaluate the problem on only one node
 If we have a problem of size $N$ on one node, a problem of size $2N$ does only have to be evaluated on two nodes.
 There is no need to run this one on two nodes as well.
 
-t.b.d.
-%While we collect these data, it makes sense to immediately calibrate them with $T^{(0)}$.
+When preparing the benchmark we discussed that performance analyst must understand how to scale up the problem. However, when collecting data there are also key questions of how to scale up the resources. 
 
+For example, if we take an example of a hybrid parallel MPI+OpenMP code. Our intra-node analysis may have found that this code is efficient over 32 threads on one node (where we only define 1 rank on this node). How are we to scale up these resources? Do we define 32 threads per node and simply assign 1 MPI rank for each node? We could therefore run 2 nodes with 32 threads each, we cannot simply say that this is more performant than 4 nodes with 16 threads. We see this as already delving into a deeper analysis of efficient resource use and so would advise the analyst at this stage to continue behaving somewhat `ignorant'. 
+
+When defining the resources for the weak-scaling, the analyst could again return to the code's developers and ask: what are the typical assignments of MPI ranks, threads, etc. for their code. For example, many multi-node GPU codes define an MPI rank per GPU. It is possible that the code's developers have some `best practice' which the analyst could use and test. Otherwise, we simply advise scaling up the best performing intra-node resource definition.
+
+%While we collect these data, it makes sense to immediately calibrate them with $T^{(0)}$.
 
 %Overhead
 
 
 %The regime where problems become too small is easy to identify:
-This is where the strong scaling curves (Section~\ref{section:high-level:intra-node}) plateau or even start to rise again over the core count.
+%This is where the strong scaling curves (Section~\ref{section:high-level:intra-node}) plateau or even start to rise again over the core count.
 
 
 % 
@@ -99,3 +108,70 @@ This is where the strong scaling curves (Section~\ref{section:high-level:intra-n
 % \noindent
 % but that's not that useful here.
 
+\subsection{Evaluation}
+
+Our roadmap to determine how good the distributed-memory behaviour is, i.e.~our strategy to come up with a single number, is straightforward.
+First, we calculate the code's parallel efficiency.
+In the context intra-node scaling, we define parallel efficiency in terms of the serial runtime, $t_{\text{serial}}$, which is preferably a `true' serial run, i.e., not just a single core run but a run in which any parallel libraries are explicitly turned off. We here define our weak-scaling parallel efficiency as
+
+\[
+E_{\text{inter}}(p_{\text{inter}}) =
+\frac{t(1)}{t(p_{\text{inter}})},
+\]
+
+\noindent in which $p_{\text{inter}}$ represents the number of nodes. We avoid defining inter-node parallel efficiency in terms of a serial run, as typically a single-node run will still be running in parallel on this node, e.g., using OpenMP multithreading across this node.
+
+Using this inter-node parallel efficiency we can then define the node counts above which the efficiency drops below $80\%$ and $60\%$ 
+
+\begin{eqnarray*}
+ p_{\text{critical,inter}}^{\text{80\%}} & = & \argmax _{p_{\text{inter}}} \{ E_{\text{inter}}(p_{\text{inter}}) \geq 0.8 \} \\
+ p_{\text{critical,inter}}^{\text{60\%}} & = & \argmax _{p_{\text{inter}}} \{ E_{\text{inter}}(p_{\text{inter}}) \geq 0.6 \}.
+\end{eqnarray*}
+
+We then use these node counts to define inter-node metrics which are node count thresholds for $80\%$ and $60\%$ parallel efficiency normalised against some measure of the maximum number of nodes available. 
+ 
+\begin{performancemetric}
+ We evaluate 
+ \[
+  C_{\text{inter}}^{\text{80\%}} = \frac{ p_{\text{critical,inter}}^{\text{80\%}} }{ p_{\text{max,inter}} }
+  \qquad
+  \text{and}
+  \qquad
+  C_{\text{inter}}^{\text{60\%}} = \frac{ p_{\text{critical,inter}}^{\text{60\%}} }{ p_{\text{max,inter}} }
+ \]
+ \noindent
+ to determine how well the code scales over a given node.
+\end{performancemetric}
+
+\begin{wip}
+    I think we need a better definition of $p_{\text{max,inter}}$ in this context. This is a less intuitive value than in the intra-node analysis. We either use the maximum number of nodes available on the system, or some upper bound set by the resource allocation, or even scale of the algorithm, etc.
+\end{wip}
+
+\begin{center}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  Efficiency & Description \\
+  \hline
+  $C_{\text{inter}}^{\text{80\%}} \geq 0.8$
+   & \cellcolor{green!25} Distributed memory scaling is good.
+  \\
+  $C_{\text{inter}}^{\text{80\%}} < 0.8$ $\wedge $
+  $C_{\text{inter}}^{\text{60\%}} \geq 0.6$
+   & \cellcolor{yellow!25} Distributed memory scaling is not particularly good.
+  \\
+  otherwise
+   & \cellcolor{red!25} Distributed memory scaling is poor.
+ \end{tabular}
+\end{center}
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] t.b.d.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] t.b.d.
+\end{itemize}

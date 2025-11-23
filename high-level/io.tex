@@ -1,7 +1,19 @@
 \section{I/O performance}
 \label{section:high-level:io}
 
+\begin{wip}
+    This section is also still in its early stages of development, but the key takeaway is: we gauge the `high-level' I/O performance of a benchmark by the proportion of runtime it spends in reads and writes.
+\end{wip}
+
+\subsection{Benchmark preparation}
 % there are clear questions here of how this metric conflicts with the note that we want to 'turn off I/O'
+
+When preparing the benchmark for core, intra-node, inter-node and GPU analysis, we advised turning off I/O as this can make some of the measurements unreliable. However, I/O performance is crucial for some code's and so here we advise turning on some example of typical I/O load, which again can be information provided by the code's developers.
+
+\subsection{Data Collection}
+
+t.b.d.
+
 \begin{instructions}{Darshan}
 For a dynamic runtime analysis we setup Darshan with
 \begin{verbatim}
@@ -32,6 +44,16 @@ Therefore depending on different forms of I/O --- e.g., \texttt{POSIX}, \texttt{
  t.b.d.
 \end{instructions}
 
+\subsection{Evaluation}
+
+\begin{performancemetric}
+ We evaluate 
+ \[
+  C_{\text{I/O}} = 1 - \frac{t_{\text{read}} + t_{\text{write}}}{t_{\text{total}}}
+\]
+where $t_{\text{read}}$ and $t_{\text{write}}$ are the times the code spends in reading and writing data, respectively, whilst $t_{\text{total}}$ is simply the total runtime (inclusive of $t_{\text{read}}$ and $t_{\text{write}}$).
+\end{performancemetric}
+
 \begin{center}
  \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
   I/O Proportion & Description \\
@@ -46,3 +68,17 @@ Therefore depending on different forms of I/O --- e.g., \texttt{POSIX}, \texttt{
    & \cellcolor{red!25} I/O dominates the runtime.
  \end{tabular}
 \end{center}
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] t.b.d.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] t.b.d.
+\end{itemize}

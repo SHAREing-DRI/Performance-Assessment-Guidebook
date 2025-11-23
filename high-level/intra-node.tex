@@ -25,7 +25,7 @@ How much more computation should we be able to squeeze out of the machine?
 
 
 The underlying performance model is called Amdahl's law, and we will return to
-this law in Chapter~\ref{section:node-level:amdahls-law}.
+this law in a future chapter. %Chapter~\ref{section:node-level:amdahls-law}.
 For the time being, we can abstract from any performance model or law, and
 simply focus on the scaling behaviour over cores, as we have defined it in
 Section~\ref{section:terminology:hpc-terms:core-terms}:
@@ -37,6 +37,13 @@ dependence on core counts.
 
 \subsection{Benchmark preparation}
 
+\begin{wip}
+Do we insist upon a single problem setup? I don't think so, but do we go with a rule of thumb that our memory use should be greater than 20\% of our node memory. For example, we could
+\begin{itemize}
+\item \textbf{Core} - this benchmark should exceed the cache size
+\item \textbf{Intra-node} - this should consist of atleast 20\% of memory, so on single core this could take up to say an hour, so long as the runtime decreases reasonably for the higher core counts
+\end{itemize}
+\end{wip}
 Throughout this assessment, we use one fixed problem setup.
 The setup has to be chosen such that we can compute it on a single core if necessary.
 However, it also has to be reasonably big such that it makes sense to exploit all threads of a node.
@@ -74,6 +81,9 @@ The two measurements will differ and we can assume $t_{\text{serial}} \leq t_{\t
 If the code is not available without any parallelisation, use $t_{\text{serial}} = t_{\text{intra}}(1)$.
 After that, we collect the remaining $t_{\text{intra}}(p_{\text{intra}})$ with the parallel code variant.
 
+\begin{assessmentcrime}
+    We do not use the compute resources exclusively. For example in SLURM, clusters often have exclusive queues, or the \texttt{--exclusive} flag can be passed.
+\end{assessmentcrime}
 
 
 \begin{instructions}{\openmp}
@@ -98,7 +108,7 @@ export OMP_PROC_BIND=close
 
 \begin{instructions}{\slurm}
 
-Using \slurm, we do not have set environment variables ourselves, instead \slurm manages resources and so we can request a quantity of cores with the \texttt{-c} flag, e.g.,
+Using \slurm, we do not have to set environment variables ourselves, instead \slurm manages resources and so we can request a quantity of cores with the \texttt{-c} flag, e.g.,
 \begin{verbatim}
 #!/bin/bash
  
@@ -138,8 +148,15 @@ Picking one rank and four threads is, logically, equivalent to picking two ranks
 It is part of the assessment to play around with these degrees of freedom.
 Once again: If we spot sudden runtime jumps (yellow dots in example sketch) and if these jumps coincide with a NUMA domain or socket, then this might be a strong indicator that we should use MPI instead of threading.
 However, one might argue that this is already part of an in-depth analysis rather than a high-level overview.
+
+We recommend that for a code of this form: when working with a researcher or developer, it best to request a typical configuration that they may use. They may be able to advise on their experiences, and from there we can then perturb about this configuration.
 \end{instructions}
 
+\begin{instructions}{Likwid}
+Likwid has the in-built \texttt{likwid-pin} tool for handling thread-affinity for a specified number of cores. Cores can be requested explicitly, i.e., specific NUMA domains, sockets, etc. can be requested as each core has a unique identifier (as with \texttt{taskset}). The gives the analyst greater flexibility in the choice of cores across the node, whilst also being flexible to incorporate with other Likwid tools.
+
+T.B.D.
+\end{instructions}
 
 \noindent
  If you have the opportunity to mask out the initialisation time and to focus
@@ -179,7 +196,7 @@ E_{\text{intra}}(p_{\text{intra}}) =
 
 \noindent
 is normalised against the serial runtime without any parallelism support.
-We track how much we sacrifice by introducing the parallelism in the first place, which is typically a better indicator for inter-node performance flaws than the textbook efficiency definition.
+We track how much we sacrifice by introducing the parallelism in the first place, which is typically a better indicator for inter-node performance flaws than the textbook efficiency definition. % do we inter or intra-node here?
 
 
 Second, we determine the number of cores for which our parallel efficiency falls below the thresholds 80\% or 60\% respectively (Figure~\ref{figure:intra-node}):
@@ -192,13 +209,13 @@ Second, we determine the number of cores for which our parallel efficiency falls
 
 
 \noindent
-It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots in the figure).
+It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots in Figure~\ref{figure:intra-node}).
 This means that the speedup deteriorates completely.
 The above metric tries to flag early if we run into such a regime or also into one that leads to a stagnation of the runtime and hence to an efficiency decline.
 
 
 Finally, we introduce our performance metric.
-It normalised the critical thresholds agains the maximum number of cores or threads $p_{\text{max,intra}}$ that we have on our system.
+It normalises the critical thresholds against the maximum number of cores or threads $p_{\text{max,intra}}$ that we have on our system.
  
 \begin{performancemetric}
  We evaluate 
