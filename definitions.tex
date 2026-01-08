@@ -59,6 +59,20 @@
     \end{mdframed} 
   }
 
+\newenvironment{checklisttitled}[1]
+  {\begin{mdframed}[backgroundcolor=gray!10] 
+    \begin{mdframed}[backgroundcolor=green!20] 
+      \begin{flushright}
+        {\bf Checklist (#1)}
+      \end{flushright}
+    \end{mdframed}
+   \begin{enumerate}[label=\fbox{\arabic*},noitemsep]
+  }
+  { 
+   \end{enumerate}
+    \end{mdframed} 
+  }
+
 
 \newenvironment{wip}
   {
