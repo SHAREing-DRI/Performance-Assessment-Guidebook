@@ -3,7 +3,7 @@
 
 
 On an individual node, our first goal has to be that we use all the hardware threads efficiently.
-Some people prefer the term cores of threads.
+Some people prefer the term cores or speak only of threads (even though we might want to distinguish the logical from the physical thread concept).
 The term intra-node hence means all those cores sharing one memory.
 Hereby it does not matter if we have a code using MPI or a genuine multithreading language:
 We assess the runtime characteristics for a code physically sharing its memory.
