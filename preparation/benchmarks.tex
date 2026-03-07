@@ -2,34 +2,35 @@
 \label{section:preparation:benchmarks}
 
 Before we start a performance assessment, we need to agree on what type of measurements to perform:
-There has to be one well-defined benchmark. If we are given a set of
-    setups and try to compare them, this will make our task complicated. We run
-    the risk of comparing different characteristics produced by different code parts.
+There has to be one well-defined benchmark. 
+If we are given a set of different setups and try to compare them, this will make our task complicated. 
+We run the risk of comparing different characteristics produced by different code parts.
 
 \begin{itemize}
   \item This one benchmark has to run without any user interaction. In the
     normal case, the sponsor has to provide a script which builds and runs the
     whole benchmark ``as a black-box''.
-  \item It has to be very easy to scale that benchmark up and down, i.e.~to make the problem solved slightly bigger or smaller. 
+  \item It has to be very easy to scale that benchmark up and down, i.e.~to make the problem solved bigger or smaller\footnote{
+   For classic PDE solvers or molecular dynamcis simulations, this is easy: 
+   you increase or decrease the mesh points or particles, respectively.
+   For AI workloads, we can manipulate batch sizes for example.
+   There are simulations, where the problem size is invariantly tied to the problem to be solved, i.e.~we cannot simply make it slightly bigger or smaller.
+   In this case, this item has to be taken with a pinch of salt and corresponding metrics and measurements have to be adopted or skipped. 
+  }. 
   \item The benchmark has to be a simulation run which is representative of a real-world run.
-  \item The benchmark does not run for too long, and it does not terminate too early. ``Good'' runs are often 3--5 minutes, so we get a good coverage of performance characteristics, but we do not wait for ages.
+    It might be significantly smaller and shorter, but it should reflect the core characteristics.
+    If the benchmark does so is domain knowledge, i.e.~an assessor has to rely on community and expert feedback to ensure this property holds.
+  \item The benchmark may not run for too long, and it may not terminate too early. ``Good'' runs are often 3--5 minutes, so we get a good coverage of performance characteristics, but we do not wait for ages.
 %  \item The benchmark has to represent performance characteristics.
 \end{itemize}
 
 \noindent
 None of the properties are surprising:
 We need a well-defined toy setup, and we have to be able to modify its size to make statements on its scalability.
-In this context, it is important that we know exactly how changes of input sizes affect the compute workload:
-We have to know or have to be told the computational complexity of the underlying algorithms. 
-If we have a pure Monte Carlo setup, then doing 100 times more trials should last around 100 times longer.
-If we have a parabolic Partial Differential Equation (PDE) solver with explicit time stepping and a regular grid, we have to know that the problem sizes increases by a factor of $2^d$ if we half the mesh spacing. 
-However, these algorithms also have to reduce the time step size, so if we measure over a fixed time span, we actually will have four times more time steps and therefore increase the workload by a factor of $2^{d+2}$ once we half the mesh size.
-Finally, if we run an Adaptive Mesh Refinement (AMR) code for a hyperbolic setup with explicit time stepping or a Smoothed-Particle Hydrodynamics (SPH) code, we need some kind of output that tells us exactly how many particles or mesh cells we have and what time step sizes we have picked. In this case, time step sizes go down linearly with mesh spacing.
-At the end of the day, we are interested in the \emph{throughput} of the system, i.e.~the time we need to update one quantity of interest.
-It is this metric that we will start from in the next steps. 
+In this context, it is important that we know exactly how changes of input sizes affect the compute workload (Section~\ref{section:preparation:complexity}).
 
 
-However, if domain experts tell us afterwards, i.e.~after we have completed our assessment---they will always do that afterwards
+If domain experts tell us afterwards, i.e.~after we have completed our assessment---they will always do that afterwards
     when they are unhappy with the outcome---that this particular run is not
     characteristic for larger runs, as it lacks a feature or does not really use a particular routine
     heavily, our whole assessment exercise is corrupted.
@@ -43,6 +44,55 @@ Having a ``small'' setup that completes in reasonable time is important since so
     answer on time. Furthermore, a lot of tools gather significant amounts of
     data per second. Long-running simulations thus run the risk that our analysis
     tools fail to handle the amount of data collected.
+Training material from VI-HPS, e.g., recommends around 10 minutes, and it the precise value is up to (the patience of) the assessor.
+When colleagues submit their code, they typically provide a reference configuration using more than one core.
+We will later reduce the available resources artificially to obtain insight into the code's behaviour.
+If the baseline already runs for 10 minutes and we take a quarter of the resources, such experiments quickly become infeasible.
+
+
+Two more properties are important: 
+
+
+\begin{itemize}
+  \item It has to be clear how to disable I/O for the benchmark. This topic is covered by Section~\ref{section:preparation:io}.
+  \item The baseline configuration has to consume a reasonable amount of memory, but may not fill out the whole memory either.
+\end{itemize}
+
+
+\noindent
+If a setup is too small---notably if it fits into the local caches---we will not obtain realistic data, as critical system components that quickly develop into bottlenecks are not used.
+We provide remarks on machine properties in Section~\ref{section:preparation:machine}.
+If a setup is too big however, we again run risk that there is not enough slack for tools to run additional statistics on a program run.
+A memory footpring of 20\%--80\% of the main memory is reasonable.
+Attempting to keep the runtime down, we typically operate closer to 20\%, as long as this is significantly more than the L3 cache and significantly more than the GPU's local memory.  
+While the ways to extract system properties are discussed in the aforementioned Section~\ref{section:preparation:machine}, there are different tools to record a code's memory consumption:
+
+
+\begin{instructions}{\linux}
+ Linux's \texttt{/usr/bin/time} offers the option to track the maximum memory usage\footnotesize{Does not work with \texttt{time} without the absolute path.}.
+ Adding the \texttt{-p} flag yields additional information which delivers, depending on the system configuration, information on the maximum memory envelope.  
+\end{instructions}
+
+
+\begin{instructions}{\linux}
+ Linux comes along with different on-board tools to track the memory consumption of a code, so assessors can validate any statement on the actual memory footprint.
+ A simple \texttt{top} displays the memory usage and can be used to extract all relevant information (there are more sophisticated variants such as \texttt{atop} or \texttt{htop}, but \texttt{top} is available on each and every system).
+ \begin{itemize}
+   \item Log into the compute node of interest, i.e.~the node on which a code runs. With \slurm, \texttt{squeue} provides you with the node name, while your admin team has to allow \texttt{ssh} into the node.
+   \item Combine the call with \texttt{-b -d <duration>} to run \texttt{top} in sampling mode.
+   \item Pipe the outcome into a text file.
+ \end{itemize}
+\end{instructions}
+
+
+\begin{instructions}{\valgrind}
+ The \valgrind~tools perhaps provide the gold solution to monitor memory usage.
+ They can be used a simple prefix to the program call:
+ \begin{verbatim}
+ valgrind --tool=massif ./yourcode
+ \end{verbatim}
+ yields all the data require to get an overview of a code's memory needs.
+\end{instructions}
 
 
 \begin{checklist}
