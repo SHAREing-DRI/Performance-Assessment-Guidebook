@@ -37,13 +37,6 @@ dependence on core counts.
 
 \subsection{Benchmark preparation}
 
-\begin{wip}
-Do we insist upon a single problem setup? I don't think so, but do we go with a rule of thumb that our memory use should be greater than 20\% of our node memory. For example, we could
-\begin{itemize}
-\item \textbf{Core} - this benchmark should exceed the cache size
-\item \textbf{Intra-node} - this should consist of atleast 20\% of memory, so on single core this could take up to say an hour, so long as the runtime decreases reasonably for the higher core counts
-\end{itemize}
-\end{wip}
 Throughout this assessment, we use one fixed problem setup.
 The setup has to be chosen such that we can compute it on a single core if necessary.
 However, it also has to be reasonably big such that it makes sense to exploit all threads of a node.
@@ -57,7 +50,7 @@ However, it also has to be reasonably big such that it makes sense to exploit al
 We may assume that a node and its memory are somehow balanced.
 If we don't use a reasonable amount of this memory for a test run, then there is simply not enough work to do to utilise all cores.
 We can barely blame the code.
-As a rule of thumb, we should have a memory footprint which is at least 20\% of the total RAM available on the whole node.
+Along with previous recommmendations, we should have a memory footprint which is at least 20\% of the total RAM available on the whole node (cf.~Section~\ref{section:preparation:benchmarks}).
 
 
 \subsection{Data collection}
@@ -152,10 +145,16 @@ However, one might argue that this is already part of an in-depth analysis rathe
 We recommend that for a code of this form: when working with a researcher or developer, it best to request a typical configuration that they may use. They may be able to advise on their experiences, and from there we can then perturb about this configuration.
 \end{instructions}
 
-\begin{instructions}{Likwid}
-Likwid has the in-built \texttt{likwid-pin} tool for handling thread-affinity for a specified number of cores. Cores can be requested explicitly, i.e., specific NUMA domains, sockets, etc. can be requested as each core has a unique identifier (as with \texttt{taskset}). The gives the analyst greater flexibility in the choice of cores across the node, whilst also being flexible to incorporate with other Likwid tools.
-
-T.B.D.
+\begin{instructions}{\likwid}
+Likwid has the in-built \texttt{likwid-pin} tool for handling thread-affinity for a specified number of cores. 
+Cores can be requested explicitly, i.e., specific NUMA domains, sockets, etc. can be requested. 
+This gives the analyst great flexibility in the choice of cores across the node.
+The \likwid~call typically resembles
+\begin{verbatim}
+likwid-pin -c 0-...
+\end{verbatim}
+but you can also provide a comma-separated list of specific cores.
+Using \likwid's pinning with OpenMP means that there's no need to set \texttt{OMP\_NUM\_THREADS} anymore---the pinning yields properly set OpenMP settings implicitly.
 \end{instructions}
 
 \noindent
