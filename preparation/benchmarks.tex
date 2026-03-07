@@ -91,8 +91,11 @@ While the ways to extract system properties are discussed in the aforementioned 
  \begin{verbatim}
  valgrind --tool=massif ./yourcode
  \end{verbatim}
+ 
+ \noindent
  yields all the data require to get an overview of a code's memory needs.
- Different to \texttt{top} and \texttt{time} it however introduces some runtime overhead.
+ Different to \texttt{top} and \texttt{time} it however introduces (potentially massive) runtime overhead.
+ At this point, a simpler monitoring call might be more appropriate.
 \end{instructions}
 
 
