@@ -1,9 +1,9 @@
-\chapter{Process}
+\chapter{Process and workflow}
 % \setcounter{section}{0}
 \label{chapter:process}
 
 
-The guidebook suggests a very simplistic assessment workflow:
+The guidebook proposes a straightforward four-step assessment workflow:
 
 \begin{center}
   \includegraphics[width=0.7\textwidth]{process/workflow.pdf}
@@ -11,49 +11,75 @@ The guidebook suggests a very simplistic assessment workflow:
 
 
 \begin{enumerate}
-  \item We start with a pre-assessment (Section~\ref{chapter:preparation}).
-    This phase assesses if the code of study is ready to be assessed.
-    It checks if the code is straightforward to install without expert knowledge,
-    provides the required knobs to change its behaviour,
-    passes certain sanity checks,
-    and its meets minimum requirements.
-    It ensures that the code offers a well-suited benchmark.
-    The phase is typically assessed by the team responsible for benchmarking, 
-    but it is the responsibility of the code's authors to ensure that a code meets all requirement.
-    If it does not, the assessment has to come to an end, as an assessment team needs commitment by the code owners to make best use of their time. 
-  \item In the high level assessment (Section~\ref{chapter:high-level}), we identify five areas of interest and study each of them separatedly.
-    The aim of this phase is to identify areas in which a code performs well and areas where we see issues.
-    Studying the five areas independently has drawbacks, but helps the follow-up steps to focus.
-    This step is performed by the assessment team independently of the code developers.
-    However, the outcome has to be interpreted/weighted collaboratively with the code developers
-    who also have to indicate if further in-depth analysis should be performed.
-  \item Once areas of interest are identified, we zoom into a certain area of interest (Part~\ref{part:performance-assessment}) and try to find out why a code underperforms in a certain area.
-    This yet done independently by the assessment team taking the feedback on the previous step in to account.
-  \item The analysis should inform further code tuning. 
-    This code tuning however is part of a wider performance engineering and does not fall into the remit of the core performance assessment.
-    It eventually should lead to a re-assessment of the code base.
+  \item 
+    The \emph{pre-assessment} (Chapter~\ref{chapter:preparation}) determines whether the code is ready to be assessed. 
+    It verifies that the code installs without expert knowledge, exposes the required configuration knobs, passes basic sanity checks, and meets minimum requirements.
+    It validates that it offers a well-suited benchmark. 
+    This phase is carried out by the benchmarking team, but it is the code authors' responsibility to ensure all requirements are met. 
+    If they are not, the assessment terminates: 
+    an assessment team cannot work productively continue.
+  \item 
+    The \emph{high-level assessment} (Chapter~\ref{chapter:high-level}) examines five areas of interest independently, identifying where the code performs well and where problems arise. 
+    Studying the five areas separately has drawbacks, but sharpens the focus of subsequent steps. 
+    This phase is conducted by the assessment team without involvement from the code developers.
+    However, its findings must be interpreted and weighted collaboratively with the developers, who also indicate whether further in-depth analysis is warranted.  
+  \item 
+    Once areas of concern are identified, the \emph{in-depth assessment} (chapters from Part~\ref{part:performance-assessment}) drills into specific weaknesses to diagnose why the code underperforms. 
+    This phase is again conducted independently by the assessment team, informed by the feedback gathered in the previous step.
+  \item
+    The findings feed into \emph{code tuning}. 
+    This falls within the broader scope of performance engineering rather than the core assessment, and should ultimately trigger a re-assessment of the codebase.
 \end{enumerate}
 
 
 \paragraph{Goals}
 
-The process with its distinct phases is defined around few core principles:
+
+The phased process is built around three core principles.
+They shape the workflow above.
+
 
 \begin{itemize}
-  \item[Objective]
-  \item[Autonomous]
-  \item[Responsibility]
+  \item {\bf Objectivity}. 
+    The assessment must be objective and free of bias. 
+    This requires a strict separation between the roles of assessor and code owner (developer), even in cases where the same person occupies both roles.
+  \item {\bf Autonomy}. 
+    Assessments can be conducted in close collaboration with developers or kept entirely separate. 
+    The POP methodology, for example, requires strong involvement from code owners.
+    By contrast, EuroHPC technical assessments for resource allocation aim to minimise such involvement---the assessor should require no knowledge of the codebase. 
+    The present methodology follows the latter tradition.
+  \item {\bf Responsibility}. 
+    The process assigns clear ownership over who delivers what, and when. 
+    Defined check-in points require developers to deliver specific inputs, while deliberately excluding them from other phases---keeping the workflow productive for the assessment team and assigning the ownership of the analysis to the assessment experts.
 \end{itemize}
 
 
 
 \paragraph{Shortcomings}
-Net unabhaengig
-
-DAG net 
 
 
-What is important
+Like any process, the current approach carries trade-offs.
+
+First, the strict separation of roles and the emphasis on autonomy demand a certain level of code maturity: 
+the code must be usable by a non-expert with little to no prior knowledge of the codebase or domain. 
+In particular in agile projects in scientific computing, where the user base is often very small and highly specialised, these risks are particularly pronounced. 
+While the process excludes developers from the majority of the assessment, it requires strong commitment from the code owners to deliver a ready-to-use benchmark in the first place.
+
+Second, the reliance on reports as the primary output also creates a risk of conflict, as developers may dispute findings and bristle at how they are presented.
+This is particularly important in scientific code development projects, where code authors develop a strong emotional attachment to code, since they build their career on it.
+A successful delivery of (multiple) code assessments requires a constructive collaboration.
+The fact that the process tries to be as objective and therefore somtimes might yield brutal insights or performance statements, challenges constructive collaboration.
+This has to be taken into account (and moderated) by the involved senior managers. 
+
+Third, the attempt to isolate performance flaws and metrics bears risk to separate flaws that are strongly correlated.
+For example, poor core utilisation on some cores might lead to a situation where the overall load balancing appears to be weak.
+The assessment handles these metrics independently and hence runs risk to report balancing issues rather than the cause of the problem.
+This is an example, where domain and code expertise can help, but it remains a fundamental drawback baked into the process itself.
+
+Finally, both the role separation and the exclusion of optimisation work create a risk of losing expert knowledge embedded in the code or domain. 
+This tension is addressed in the wrap-up discussion (Section~\ref{section:high-level:wrap-up}), which acknowledges that independent assessments can struggle to connect findings to scientific requirements. 
+Prioritising steps, metrics, and studies nevertheless remains difficult. 
+The present approach always risks trading independence and objectivity for deeper insight.
 
 
-Symptomatic vs data-driven
+ 
