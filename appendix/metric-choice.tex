@@ -17,10 +17,7 @@ With this configuration, the occupancy was observed to be 62.4\%, and the rate o
 Increasing the number of blocks to 1600 (twenty times the number of streaming multiprocessors), the occupancy was observed at about 92\%, but the rate of work was lower at about 14.6 TFLOP/s.
 Additionally, due to the architectural specifics of GPUs, increasing the number of blocks to 401 increased occupancy to 62.6\%, and decreased rate of work to 13.1 TFLOP/s.
 
-With this example in hand, it became clear that occupancy was not a good metric for the rubric, and
-
-
-
+% Original comment in Slack:
 % Should the high-level GPU performance metric to be FLOPS compared to hardware max rather than occupancy?
 % I personally think it should, for a couple of reasons I can articulate now.
 % First, rate of work feels like it is more important than hardware utilisation, and reaching high rate of work compared to hardware theoretical max is very similar to occupancy in hardware utilisation terms.
