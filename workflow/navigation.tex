@@ -1,0 +1,38 @@
+\section{Navigation}
+\label{capter:high-level:navigation}
+
+There is a plethora of properties for each of the five rubrics of interest that one might want to study.
+Doing this in an anarchic way following intuition is often not goal-oriented, and runs risk that important details are missed out.
+While the following sections per ``flaw'' host sets of effects to dive into, an overarching challenge is how these ideas and aspects are properly structured.
+
+We originally intended to create something like a decision tree:
+a unique, clear, deterministic guideline which effects to study one after the other with the goal to come up with a clear explanation why a code behaves the way it does and notably which properties to tackle first.
+Such a guideline would provide a guideline similar to:
+First look at the load balancing.
+If the load balancing is bad, fix it; otherwise have a look at the number of synchronisation points.
+  
+However, initial assessments quickly made it clear that such a decision tree is very difficult to construct.
+Indeed, it is not clear wheather a universally acceptable tree to assess performance does exist. 
+Different people definitely have different ideas of what such a tree should look like,
+but it might indeed be reasonable and valuable to use a tailored tree per assessment exercise and code.
+
+Therefore, we propose to arrange performance effects to study in a directed graph.
+It is the assessor's duty to navigate this graph to find explanations.
+For each code assessments, the route might yield a different graph sequence,
+i.e.~each assessment will yield a decision tree informed by the graph, but there is no uniformely applied tree in the first place.
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Navigate through the graph of effects to study one by one.
+  \item[$\boxplus$] Keep track of the effects analysed and record the resulting decision tree.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Aim for a decision tree that can universally and mechanically applied to all benchmarks.
+  \item[$\boxminus$] Pick different effects to look at randomly without following the causal dependencies encoded within the decision graph.
+\end{itemize}
