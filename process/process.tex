@@ -1,4 +1,4 @@
-\chapter{Process and workflow}
+\chapter{Process}
 % \setcounter{section}{0}
 \label{chapter:process}
 
@@ -53,7 +53,17 @@ They shape the workflow above.
     Defined check-in points require developers to deliver specific inputs, while deliberately excluding them from other phases---keeping the workflow productive for the assessment team and assigning the ownership of the analysis to the assessment experts.
 \end{itemize}
 
+\noindent
+Further to that, we introduce a few additional conventions:
 
+\begin{itemize}
+  \item 
+    {\bf Specificity}. The assessments are machine-specific, benchmark-specific and configuration-specific.
+    They make no attempt to generalise for the code over multiple machines, for different benchmark settings, or even only configurations of certain (hyper-)parameters such as GPU warp sizes, cores per rank, or MPI buffer settings.
+    This means that all statements refer to the specific test setup.
+    They can make statements along the lines ``this code scales poorly for this particular configuration of cores per rank'', but it is not possible to derive further, deeper insight;
+    although it is obviously possible to compare the same assessments for the same code for multiple machines with each other, or to derive improved system setups from the analysis.
+\end{itemize}
 
 \paragraph{Shortcomings}
 
