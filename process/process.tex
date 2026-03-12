@@ -5,8 +5,55 @@
 
 The guidebook suggests a very simplistic assessment workflow:
 
+\begin{center}
+  \includegraphics[width=0.7\textwidth]{process/workflow.pdf}
+\end{center}
+
+
+\begin{enumerate}
+  \item We start with a pre-assessment (Section~\ref{chapter:preparation}).
+    This phase assesses if the code of study is ready to be assessed.
+    It checks if the code is straightforward to install without expert knowledge,
+    provides the required knobs to change its behaviour,
+    passes certain sanity checks,
+    and its meets minimum requirements.
+    It ensures that the code offers a well-suited benchmark.
+    The phase is typically assessed by the team responsible for benchmarking, 
+    but it is the responsibility of the code's authors to ensure that a code meets all requirement.
+    If it does not, the assessment has to come to an end, as an assessment team needs commitment by the code owners to make best use of their time. 
+  \item In the high level assessment (Section~\ref{chapter:high-level}), we identify five areas of interest and study each of them separatedly.
+    The aim of this phase is to identify areas in which a code performs well and areas where we see issues.
+    Studying the five areas independently has drawbacks, but helps the follow-up steps to focus.
+    This step is performed by the assessment team independently of the code developers.
+    However, the outcome has to be interpreted/weighted collaboratively with the code developers
+    who also have to indicate if further in-depth analysis should be performed.
+  \item Once areas of interest are identified, we zoom into a certain area of interest (Part~\ref{part:performance-assessment}) and try to find out why a code underperforms in a certain area.
+    This yet done independently by the assessment team taking the feedback on the previous step in to account.
+  \item The analysis should inform further code tuning. 
+    This code tuning however is part of a wider performance engineering and does not fall into the remit of the core performance assessment.
+    It eventually should lead to a re-assessment of the code base.
+\end{enumerate}
+
+
+\paragraph{Goals}
+
+The process with its distinct phases is defined around few core principles:
+
+\begin{itemize}
+  \item[Objective]
+  \item[Autonomous]
+  \item[Responsibility]
+\end{itemize}
+
+
 
 \paragraph{Shortcomings}
 Net unabhaengig
 
 DAG net 
+
+
+What is important
+
+
+Symptomatic vs data-driven
