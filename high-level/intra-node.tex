@@ -1,6 +1,11 @@
 \section{Intra-node (node-level) performance}
 \label{section:high-level:intra-node}
 
+\begin{summary}
+ We consider a code to make good use of the cores on a system if it can use more than 80\% of its cores with more than 80\% of (strong scaling) efficiency.
+ We consider a code to make reasonable use of the cores if it can use more than 60\% of the total core counts with more than 80\% efficiency.
+\end{summary}
+
 
 On an individual node, our first goal has to be that we use all the hardware threads efficiently.
 Some people prefer the term cores or speak only of threads (even though we might want to distinguish the logical from the physical thread concept).
@@ -127,6 +132,7 @@ However, you should be careful when you use this in combination with \slurm~or
 \openmp~which also make choices on cores.
 You might end up with competing or contradictory settings and end up with a
 suboptimal system usage.
+We also faced some issues with TBB using this approach. 
 \end{instructions}
 
 

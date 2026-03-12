@@ -15,9 +15,6 @@ We classify codes along five different rubrics:
 For each of these rubrics, we initially aim for a single three-valued:
 All is fine (green), there may be issues (yellow) or there are obvious flaws (red).
 In line with our overall presentation approach, we use thresholds of 60\% and 80\% to distinguish these classes.
-That is, if the GPU performance is somewhere close to 100\%, all is fine.
-However, if it drops below 80\%, we flag it as yellow.
-Once the metrics we define for GPUs underrun 60\%, we claim that there are definitely major issues.
 It is convenient to present the overall data via a spiderweb diagram (below for a code that has I/O issues, doesn't scale particularly well between nodes, has no GPU yet reasonably good core performance and node scaling):
 
  \begin{center}
@@ -39,17 +36,8 @@ Notably, we will disable I/O for all studies unless we study I/O itself (cmp.~Se
 This implies that the final picture might not reflect the real behaviour of a science run. 
 
 
-As we analyse the dimensions of performance characteristics independently, the order does not really make a difference.
-In theory.
-In practice, we have to start somewhere.
-We have personally had the experience that it is typically favourable to start with the node-level analysis (intra-node): 
-If the individual cores are not used properly, MPI often does not make that much of a difference and we struggle to keep GPUs busy.
-Often, the next dimension is naturally identified once we look at the node-level performance, i.e.~it tells us what to analyse next.
-
-\begin{wip}
-I think the previous paragraph might need to be updated, as we are typically beginning with core analysis now...
-\end{wip}
-
+As we analyse the dimensions of performance characteristics independently, and the order of the analyses therefore does not really make a difference.
+As flagged throughout Section~\ref{chapter:process}, this approach helps to manage complexity but has intrinscial weaknesses in itself.
 
 
 \paragraph*{How it works}

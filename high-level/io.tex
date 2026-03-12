@@ -1,8 +1,13 @@
 \section{I/O performance}
 \label{section:high-level:io}
 
+\begin{summary}
+ We consider a code not to suffer from IO constraints if it spends less than 20\% of its runtime in I/O.
+\end{summary}
+
 \begin{wip}
     This section is also still in its early stages of development, but the key takeaway is: we gauge the `high-level' I/O performance of a benchmark by the proportion of runtime it spends in reads and writes.
+    I personally think 20\% is quite significant. It would be better again to argue over the 
 \end{wip}
 
 \subsection{Benchmark preparation}
