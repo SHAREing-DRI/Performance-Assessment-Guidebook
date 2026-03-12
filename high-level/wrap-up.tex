@@ -9,20 +9,35 @@
 
 Any high-level analysis should be wrapped up and summarised by the assessor. 
 Producing visual artefacts helps to convey key insights effectively. 
-However, this summary must be written and shared with care.
-
 The outcome metrics are objective in the sense that they represent observed code behaviour.
 There is no room for evaluation or contextualisation. 
-In particular, claims of code exceptionalism must be challenged directly:
+Nevertheless, this summary must be written and shared with care.
+Also dealing with feedback and comments requires guidelines.
 
+
+\paragraph{Challenging the outcome}
+
+Claims of code exceptionalism must be challenged directly:
 If developers argue that their code is so complex and specialised that poor performance on certain metrics is natural and expected ``for this particular field'', that claim can be noted but must not influence the assessment or its publication. 
 The assessment reflects the state of the code. 
 If developers instead argue that the code behaves differently in practice, this reveals that they have failed to provide a characteristic, meaningful benchmark---not that the assessment is wrong. 
-In both cases, such pushback is a warning sign and grounds to consider terminating the assessment process.
 
-The situation is different when it comes to correlating and weighting the five high-level metrics. 
-When the high-level assessment is used to prioritise follow-up studies, the assessor must consult code and domain experts to determine where to focus. 
-A code exhibiting both poor core performance and poor I/O behaviour does not necessarily warrant tackling both issues: 
+
+In both cases, such pushback is a warning sign and grounds to consider terminating the assessment process.
+As both cases are not unheard of, it makes sense to agree on a code of conduct prior to the start of the assessment.
+This includes an agreement of the code owner to study the outcome and provide (constructive) feedback.
+
+
+
+\paragraph{Intrepreting the data}
+
+Correlating and weighting the five high-level metrics requires domain/code experts' input. 
+The five metrics provide raw data, and it is not clear how 85\% in one rubric relate to 85\% in another rubric.
+It is impossible for the assessor to have knowledge about priorisation and weighting.
+Once the data are available, it is the domain and code experts who have to add it to wrap up the high-level assessment:
+Notably whenever the high-level assessment is used to prioritise follow-up studies, the assessor must consult code and domain experts to determine where to focus.
+
+For example, a code exhibiting both poor core performance and poor I/O behaviour does not necessarily warrant tackling both issues: 
 the code community is best placed to judge which flaw has the greater impact on their science. 
 The metrics presented in this chapter carry no relative weighting against one another.
 
