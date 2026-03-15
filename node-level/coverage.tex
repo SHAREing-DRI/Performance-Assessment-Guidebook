@@ -2,12 +2,12 @@
 \label{section:node-level:coverage}
 
 
-\begin{summary}
+\begin{hypothesis}
  If only a fraction of the code is parallelised and if this fraction is too small, this becomes the reason for poor (strong) scaling.
- Therefore, we analyse how much of a code is covered by parallelism, i.e.~could in theory run in parallel.
-\end{summary}
+\end{hypothesis}
 
 
+To follow up on our working hypothesis, we analyse how much of a code is covered by parallelism, i.e.~could in theory run in parallel.
 Our strategy to follow-up on the hypothesis that there might not be enough concurrency in a code covers studies along different dimensions.
 On the one hand, we can use a standard strong scaling model and fit it to measurement.
 If it fits, it yields an abstract metric of how much of the code is serial. 
@@ -175,22 +175,7 @@ Otherwise, we will continue to dive into the code anyway.
 
 
 
-\paragraph*{How it works}
-
-\begin{itemize}[noitemsep]
-  \item[$\boxplus$] Use Amdahl's formula to find out if your code follows the simplistic scaling law qualitatively and quantitatively.
-  \item[$\boxplus$] Employ a tool to validate sufficient code coverage.
-\end{itemize}
-
-
-\paragraph*{How it does not work}
-
-\begin{itemize}[noitemsep]
-  \item[$\boxminus$] Run a few arbitrary experiments, determine $f_{\text{intra}}$ through regression, and draw general conclusions about your code.
-\end{itemize}
-
-
-\paragraph*{Evaluation}
+\subsection{Evaluation}
 
 \begin{enumerate}
   \item[$\boxtimes$] If the strong scaling model fits and $f_{\text{intra}} \ll 0.2$, the code should in principle scale. 
@@ -207,3 +192,20 @@ Otherwise, we will continue to dive into the code anyway.
     If possible, the assessment should zoom into the profile and name the bad guys. 
     Things are slightly different for task-based codes, where additional profiling steps are necessary.
 \end{enumerate}
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Use Amdahl's formula to find out if your code follows the simplistic scaling law qualitatively and quantitatively.
+  \item[$\boxplus$] Employ a tool to validate sufficient code coverage.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Run a few arbitrary experiments, determine $f_{\text{intra}}$ through regression, and draw general conclusions about your code.
+\end{itemize}
+

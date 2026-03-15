@@ -1,19 +1,17 @@
 \section{Balancing}
 \label{section:node-level:balancing}
 
-Likely the first thing to check for a parallel code running over multiple cores is to which degree it exploits all of these cores:
-Is the work balanced?
-If we do not exploit all cores, we cannot expect to squeeze out all of the performance of the node.
-The clearest signpost that the balancing is not there yet is that the code does not speed up and we activate more and more cores.
-We do not scale.
-
 \begin{hypothesis}
- The work is not properly distributed among the cores.
+ The code is split up into a sufficiently large chunk of concurrent sections, but these sections are of massively different size.
+ It is this imbalance that harms the performance.
 \end{hypothesis}
 
 
+If work is imbalanced, some cores will idle at one point.
+If we do not exploit all cores all the time, we cannot expect to squeeze out all of the performance of the node.
 
-\paragraph{Data collection}
+
+\subsection{Data collection}
 
 Most profilers have quite an extensive support to identify ill-balancing.
 After all, this is the most obvious, ultimative, original sin of non-scaling.
@@ -37,23 +35,16 @@ After all, this is the most obvious, ultimative, original sin of non-scaling.
 \end{instructions}
 
 
-
-\paragraph{Evaluation}
-
-In line with all other metrics, we consider a code phase or loop as reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point.
-If we underrun this threshold, the code is not super balanced.
+\subsection{Evaluation}
 
 
-\paragraph{Optimisation and follow-up steps}
- 
-Imbalances in loops are straightforward to resolve as long as the loop is reasonably big.
-We can switch to smaller grain sizes (subloop sizes) or enable dynamic scheduling if the individual chunks have largely varying runtimes.
-However, which route to follow is not clear a priori.
-For task-based parallelism, things are more difficult anyway.
 
-Therefore, we would urge an assessor to stop the analysis here straightaway.
-More work is required to understand where imbalances come from.
-In case of a well-balanced workload, we also have to dig deeper into the code, as we know that it does not scale even though the work distribution seems to be good.
+
+\begin{enumerate}
+  \item[$\boxtimes$] In line with all other metrics, we consider a code phase or loop reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point in time.
+  \item[$\boxtimes$] If we underrun this threshold, the code is not super balanced.
+We can switch to smaller grain sizes (iteration space chunks) or enable dynamic scheduling if the individual chunks have largely varying runtimes.
+\end{enumerate}
 
 
 
@@ -61,12 +52,13 @@ In case of a well-balanced workload, we also have to dig deeper into the code, a
 
 \begin{itemize}[noitemsep]
   \item[$\boxplus$] Track how long the cores actually compute and compare it to the time where they do not deliver science.
-  \item[$\boxplus$] If there are severe imbalances, continue to work through hypotheses to find out where the imbalances come from.
+  \item[$\boxplus$] If there are severe imbalances, continue to work through hypotheses to find out where the imbalances come from and reduce the granularity such that there are enough pieces of work.
 \end{itemize}
 
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Immediately try to fix imbalances by altering loops, grain sizes or introducing tasks and more parallel loops.
+  \item[$\boxminus$] Stop the analysis once the work is perfectly balanced. Performance might still suffer from overheads.
 \end{itemize}
+
