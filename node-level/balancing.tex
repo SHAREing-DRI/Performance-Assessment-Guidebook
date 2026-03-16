@@ -37,15 +37,14 @@ After all, this is the most obvious, ultimative, original sin of non-scaling.
 
 \subsection{Evaluation}
 
-
-
-
 \begin{enumerate}
   \item[$\boxtimes$] In line with all other metrics, we consider a code phase or loop reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point in time.
   \item[$\boxtimes$] If we underrun this threshold, the code is not super balanced.
-We can switch to smaller grain sizes (iteration space chunks) or enable dynamic scheduling if the individual chunks have largely varying runtimes.
 \end{enumerate}
 
+
+Natural performance optimisations are switching to smaller grain sizes (iteration space chunks) or to enable dynamic scheduling if the individual chunks have largely varying runtimes.
+However, these are already code tweaks, i.e.~beyond the scope of this handbook.
 
 
 \paragraph*{How it works}

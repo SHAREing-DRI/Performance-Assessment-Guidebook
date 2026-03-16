@@ -1,5 +1,11 @@
-\section{Concurrency level}
+\section{Concurrency level vs.~observed parallelisam}
 \label{section:node-level:concurrency}
+
+\begin{hypothesis}
+ The concurrency level is, in principle, high, but fails to materialise.
+ The observes parallelism hence is a result of other flaws, but not of a lack of actual parallelisation in the code.
+\end{hypothesis}
+
 
 Jetzt haben wir ja ganz bewusst weniger Tasks erzeugt. 
 Somit ist the Evaluierung mit Kontext zu versehen
@@ -25,6 +31,13 @@ In \vtune, too many synchronisation statements materialise in a high spin time a
 This leads to a low effective CPU utilisation (below is an example with eight cores, where we effectively only use four of them).
 \end{instructions}
 
+
+\subsection{Evaluation}
+
+\begin{enumerate}
+  \item[$\boxtimes$] In line with all other metrics, we consider a code phase or loop reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point in time.
+  \item[$\boxtimes$] If we underrun this threshold, the code is not super balanced.
+\end{enumerate}
 
 \paragraph{Evaluation}
 
