@@ -9,7 +9,7 @@ While the following sections---one for each of the five fundamental assessment d
 For example, should we first study the bandwidth and then the latency behaviour before we look at vectorisation, or the other way round?
 
 We originally intended to create something like a decision tree:
-a unique, clear, deterministic guideline which phenomena to study one after the other with the goal to come up with a clear explanation why a code behaves the way it does.
+a unique, clear, deterministic guideline of which phenomena to study one after the other with the goal to come up with a clear explanation of why a code behaves the way it does.
 Such a tree yielding a cascade of hypotheses to follow would provide a guideline that reads similar to:
 First look at the load balancing.
 If the load balancing is bad, fix it; otherwise have a look at the number of synchronisation points.
@@ -17,7 +17,7 @@ Then continue with false sharing.
 And so forth. 
   
 Initial assessments with trial trees made it clear to us that such a decision tree is very difficult to construct.
-Indeed, it is not clear wheather a universally acceptable hypothesis tree to assess performance does exist. 
+Indeed, it is not clear whether a universally acceptable hypothesis tree to assess performance does exist. 
 Different people definitely have different ideas of what such a tree should look like,
 but it might indeed be reasonable and valuable to use a tailored tree per assessment exercise and code.
 
@@ -33,7 +33,7 @@ Each assessment therefore will yield a decision tree informed by the graph, i.e.
   \end{center}
   \caption{
     Left: 
-    In the example, we have a graph over hypotheses (effects) \texttt{A}--\texttt{D} that we might want to test for.
+    In the example, we have a graph over hypotheses (effects) \texttt{A}--\texttt{E} that we might want to test for.
     Per hypotheses, there can be observations (small blue circles) which suggest certain explanations (green) for the code's behaviour.
     In most cases, diving into one phenomenon will however require studying another follow-up hypothesis.
     As we work our way through the graph of hypotheses excluding more and more potential explanations,

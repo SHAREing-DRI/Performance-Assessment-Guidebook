@@ -2,16 +2,28 @@
 \label{section:high-level:gpu}
 
 \begin{summary}
- We consider a code to make efficient use of the GPUs if
+ We consider a code to make efficient use of the GPUs if it 
+ achieves more than 80\% of the theoretical peak performance of the GPU. We consider
+ a code to make reasonable use of the GPUs if it achieves more than 60\%. 
 \end{summary}
 
 \begin{wip}
-    This section is still in its early stages of development, but the key takeaway is that: for a code with GPU offloading we simply want to measure the GPU utilisation/occupation. These terms can be used interchangeably, and so here we mean what proportion of the GPU's hardware does the code approximately use.
+    This section is still in its early stages of development, but the key takeaway is that: for a code with GPU offloading we simply want to measure the GPU work rate i.e. FLOPS/s.
 \end{wip}
+
+Similarly to the core performance, the GPU analysis examines how efficiently your code harnesses the GPU.
+Our analysis evaluates how effectively your implementation takes advantage of the extreme parallelism of the GPU's capabilities.
+
+To capture GPU behaviour at this high level, we want to measure the peak performance relative to the hardware's capabilities.
+Similarly to core performance, the tools can draw us towards more detailed metrics and models, but to minimise distractions and clarify our analysis we restrict this rubric to the peak performance percentage.
 
 \subsection{Benchmark preparation}
 
 t.b.d.
+
+For HPC workloads, do we expect a setup which is large enough that it must move through GPU memory? Not necessarily?
+We do need a setup that is larger than the GPU caches so it will move through cache.
+If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
 
 \subsection{Data Collection}
 
@@ -35,7 +47,7 @@ t.b.d.
 \subsection{Evaluation}
 
 \begin{performancemetric}
- The proportion of the GPU hardware used by the computational kernels. This is typically referred to as GPU occupancy.
+ The percentage of the theoretical maximum GPU FLOPS/s throughput achieved by the computational kernels. This is typically referred to as GPU peak-performance-percentage.
 \end{performancemetric}
 
 \begin{center}
