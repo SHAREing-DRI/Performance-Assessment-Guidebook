@@ -32,7 +32,7 @@ The guidebook proposes a straightforward four-step assessment workflow:
 \end{enumerate}
 
 
-\paragraph{Goals}
+\section{Goals}
 
 
 The phased process is built around three core principles.
@@ -54,7 +54,7 @@ They shape the workflow above.
 \end{itemize}
 
 \noindent
-Further to that, we introduce a few additional conventions:
+Further to that, we introduce a two additional conventions:
 
 \begin{itemize}
   \item 
@@ -63,9 +63,47 @@ Further to that, we introduce a few additional conventions:
     This means that all statements refer to the specific test setup.
     They can make statements along the lines ``this code scales poorly for this particular configuration of cores per rank'', but it is not possible to derive further, deeper insight;
     although it is obviously possible to compare the same assessments for the same code for multiple machines with each other, or to derive improved system setups from the analysis.
+  \item
+    {\bf Hypothesis-driven}. The assessment follows certain universal guidelines, but the subsequent deep dives, i.e.~the actual performance analysis is strictly hypothesis-driven.
+    Once we start to explain why a code behaves in a certain way (cf.~Section~\ref{section:terminology:what-we-do}), we start with a hypothesis, evaluate this hypothesis and then either confirm it and dive deeper or discard it and study the next hypothesis.
 \end{itemize}
 
-\paragraph{Shortcomings}
+
+\section{Criticism}
+
+\begin{assessmentcrime}
+ The roles of performance analyst and performance engineer are not carefully separated.
+\end{assessmentcrime}
+
+
+There are at least two alternative schools of thought when it comes to performance analysis.
+The the first school emphasises that constructive performance improvements can only result from a dialogue between performance expert and code owner.
+They point out that performance assessment or analysis is difficult if not impossible if there's no context on the code's structure, algorithms, data sets, objectives, and so forth.
+
+Our strategy appreciates the need for a feedback cycle, but is anxious of the bias introduced by a very close collaboration.
+We have seen multiple cases, where code owners almost expected the performance analysis to ``tell me what I want to hear'':
+they did steer the analysis down a certain route, and expected instructions how to improve the code parts they had been interested anyway rather than an objective assessment of the overall ``product''.
+
+This is the reason why our document advocates for a strict separation of the role of the assessor and the code expert.
+That does not mean that the assessor may not know anything of the code and should not speak to the code owner.
+It also does not mean that these two roles always have to be separate people. 
+One person can switch hats.
+It however does ask for a strict separation and the attempt to avoid that any code knowledge influences the assessment.
+Again, the analogy to a GP helps:
+A good GP will always ask the patient where it hurts, but they will be very critical when they are told about self-diagonses (guided by Google).
+
+A second school of thought is strongly metrics- or data-driven.
+Here, the idea is that it is key to gather as many metrics as possible initially and to distill hypotheses and eventually insights from these data.
+The approach is popular with tool developers.
+
+Our document advocates for a hypothesis-driven workflow, where a hypotheses or metric of interest determine what data is of interest.
+Once this is clear, we suggest that assessors pick a tool to gather these data---often a different tool per purpose.
+Both approaches, hypothesis- and data-driven come along with pros and cons. 
+In practice, many performance analysis will employ a hybrid.
+However, we favour the workflow and sequence of hypotheses guiding what data is gathered in this write-up.
+
+
+\section{Shortcomings}
 
 
 Like any process, the current approach carries trade-offs.
