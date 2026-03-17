@@ -24,10 +24,11 @@ t.b.d.
 For HPC workloads, do we expect a setup which is large enough that it must move through GPU memory? Not necessarily?
 We do need a setup that is larger than the GPU caches so it will move through cache.
 If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
+We require the benchmark to take long enough that any OS startup overhead is negligible and the \texttt{time} command can be used.
 
 \subsection{Data Collection}
 
-t.b.d.
+
 
 \begin{instructions}{Intel VTune}
  t.b.d.
@@ -38,10 +39,12 @@ t.b.d.
 \end{instructions}
 
 \begin{instructions}{Nvidia Nsight}
- Nvidia Nsight Systems
 
- Nvidia Nsight Compute
- t.b.d.
+
+ \begin{verbatim}[breaklines=true]
+ ^[^b].*throughput\.avg\.pct_of_peak|^derived__smsp.*inst_executed_op|^smsp.*inst_executed_op_(d|f)(add|mul)|duration\.sum|cycles_elapsed\.max}
+ \end{verbatim}
+ 
 \end{instructions}
 
 \subsection{Evaluation}
