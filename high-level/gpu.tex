@@ -26,6 +26,12 @@ We do need a setup that is larger than the GPU caches so it will move through ca
 If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
 We require the benchmark to take long enough that any OS startup overhead is negligible and the \texttt{time} command can be used.
 
+Assessment crime \ref{assessmentcrime-cache-fit} also applies here.
+
+\begin{assessmentcrime}
+ We study a code that is not built against the latest version of CUDA/HIP/etc. supported by the hardware
+\end{assessmentcrime}
+
 \subsection{Data Collection}
 
 
@@ -40,17 +46,28 @@ We require the benchmark to take long enough that any OS startup overhead is neg
 
 \begin{instructions}{Nvidia Nsight}
 
-
- \begin{verbatim}[breaklines=true]
- ^[^b].*throughput\.avg\.pct_of_peak|^derived__smsp.*inst_executed_op|^smsp.*inst_executed_op_(d|f)(add|mul)|duration\.sum|cycles_elapsed\.max}
+ Metrics required:
+ \begin{verbatim}
+    gpc__cycles_elapsed.max
+    smsp__sass_thread_inst_executed_op_dadd_pred_on.sum.per_cycle_elapsed
+    smsp__sass_thread_inst_executed_op_dfma_pred_on.sum.per_cycle_elapsed
+    smsp__sass_thread_inst_executed_op_dmul_pred_on.sum.per_cycle_elapsed
+    smsp__sass_thread_inst_executed_op_fadd_pred_on.sum.per_cycle_elapsed
+    smsp__sass_thread_inst_executed_op_ffma_pred_on.sum.per_cycle_elapsed
+    smsp__sass_thread_inst_executed_op_fmul_pred_on.sum.per_cycle_elapsed
  \end{verbatim}
+
+ 
+
+ % Regex to paste into GUI to filter to these
+ % ^smsp.*inst_executed_op_(d|f)(add|mul|fma)|duration\.sum|cycles_elapsed\.max
  
 \end{instructions}
 
 \subsection{Evaluation}
 
 \begin{performancemetric}
- The percentage of the theoretical maximum GPU FLOPS/s throughput achieved by the computational kernels. This is typically referred to as GPU peak-performance-percentage.
+ The percentage of the theoretical maximum GPU FLOPS/s throughput achieved by the computational kernels. This may also be referred to as GPU peak-performance-percentage.
 \end{performancemetric}
 
 \begin{center}
