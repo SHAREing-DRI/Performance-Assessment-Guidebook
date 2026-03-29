@@ -11,6 +11,15 @@ If work is imbalanced, some cores will idle at one point.
 If we do not exploit all cores all the time, we cannot expect to squeeze out all of the performance of the node.
 
 
+\subsection{Model}
+
+\begin{performancemetric}
+  In line with all other metrics, we consider a code phase or loop reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point in time.
+  If we underrun this threshold, the code is not super balanced.
+\end{performancemetric}
+
+
+
 \subsection{Data collection}
 
 Most profilers have quite an extensive support to identify ill-balancing.
@@ -37,14 +46,21 @@ After all, this is the most obvious, ultimative, original sin of non-scaling.
 
 \subsection{Evaluation}
 
-\begin{enumerate}
-  \item[$\boxtimes$] In line with all other metrics, we consider a code phase or loop reasonably balanced, if it is able to exploit around 80\% of the available compute resources at any point in time.
-  \item[$\boxtimes$] If we underrun this threshold, the code is not super balanced.
+
+\begin{enumerate}[noitemsep]
+  \item[$\boxtimes$] The work is perfectly balanced, but the performance remains poor.
+    \begin{itemize}[noitemsep]
+      \item[$\Rightarrow $] Study the average task size and investigate whether these tasks can be split up further (Section~\ref{xxxx}).
+    \end{itemize}
+  \item[$\boxtimes$] The work is not perfectly balanced.
+    \begin{itemize}[noitemsep]
+      \item[$\Rightarrow $] 
+Natural performance optimisations are switching to smaller grain sizes (iteration space chunks) or to enable dynamic scheduling if the individual chunks have largely varying runtimes.
+However, these are already code tweaks, i.e.~beyond the scope of this handbook.
+    \end{itemize}
 \end{enumerate}
 
 
-Natural performance optimisations are switching to smaller grain sizes (iteration space chunks) or to enable dynamic scheduling if the individual chunks have largely varying runtimes.
-However, these are already code tweaks, i.e.~beyond the scope of this handbook.
 
 
 \paragraph*{How it works}

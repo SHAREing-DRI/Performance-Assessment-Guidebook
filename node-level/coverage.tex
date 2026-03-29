@@ -186,20 +186,22 @@ Otherwise, we will continue to dive into the code anyway.
     Even though the code is parallelised, it effectively serialises major parts of the code. 
     In many cases, this can result from ill-balancing or excessive synchronisation.
     \begin{itemize}
-      \item Look into the balancing (Section~\ref{section:node-level:balancing}). And imbalanced load distribution leads to an increased pseudo-serial code fraction. 
-      \item Look into the synchronisation flaws (Section~\ref{xxxx}). Excessive synchronisation also serialises the code. 
+      \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}). And imbalanced load distribution leads to an increased pseudo-serial code fraction. 
+%      \item[$\Rightarrow $] Look into the synchronisation flaws (Section~\ref{xxxx}). Excessive synchronisation also serialises the code. 
     \end{itemize}
   \item[$\boxtimes$] The model fits, but $f_{\text{intra}} \geq 0.2$ and major code parts are not captured by the parallel regions.
     Significant parts of the code are not parallelised.
-  \item[$\boxtimes$] The model fits up to a certain core count, but then plateus.
-    In many cases, this is a result from too small loop ranges, a limited number of domain subpartitions, or hard-coded grain sizes.
-    If possible, the assessment should zoom into the profile and name the bad guys. 
-    Things are slightly different for task-based codes, where additional profiling steps are necessary.
+  \item[$\boxtimes$] The model fits up to a certain core count, but then plateaus.
     \begin{itemize}
-      \item Look into the balancing (Section~\ref{section:node-level:balancing}). And imbalanced load distribution leads to an increased pseudo-serial code fraction. 
-      \item Look into the synchronisation flaws (Section~\ref{xxxx}). Excessive synchronisation also serialises the code. 
+%      \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}). And imbalanced load distribution leads to an increased pseudo-serial code fraction. 
+      \item[$\Rightarrow $] Ensure that the code's concurrency level is sufficiently high, i.e.~that there should, in theory, be enough parallel work (Section~\ref{section:node-level:concurrency}).
     \end{itemize}
 \end{enumerate}
+
+
+%     In many cases, this is a result from too small loop ranges, a limited number of domain subpartitions, or hard-coded grain sizes.
+%     If possible, the assessment should zoom into the profile and name the bad guys. 
+%     Things are slightly different for task-based codes, where additional profiling steps are necessary.
 
 
 

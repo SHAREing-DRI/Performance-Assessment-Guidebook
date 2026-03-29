@@ -1,93 +1,93 @@
 \section{Redundant (administrative) work}
 \label{section:node-level:redundant-admin}
 
-
-We have checked that
-
-\begin{itemize}
-  \item all of our source code is covered by parallelism;
-  \item the workload is reasonably well-balanced;
-  \item there is not much tasking overhead;
-  \item the tasks are relatively long.
-\end{itemize}
-
-
-\noindent
-If the code still does not scale particularly well, we may assume that something is flawed with the per-task/per-parallel region overhead:
-
-\begin{hypothesis}
- Each task or parallel region, respectively, introduces some overhead which is constant.
- As the number of tasks increases, this overhead increases, too.
-\end{hypothesis}
-
-
-\noindent
-Such an arrangement would materialise in an quasi-sequential program fraction $(1-f_{\text{intra}})$ in \eqref{equation:intra-node:performance-model}:
-The code is parallelised, but this overhead scales with $p_{\text{threads}}$.
-It therefore feeds into the sequential part of the scaling formula, i.e.~it is redundant work which we could also have done once outside of the parallel region.
-
-
-\paragraph{Data collection}
-
-If our hypothesis holds, then the measured $f_{\text{intra}}$ should decrease as we add more and more threads.
-This might be an almost negligible effect. However, 
-we should also see that the ratio of scientifically relevant calculations (cmp.~Section~\ref{section:preparation:labelling}) should decrease, while the remaining routines gain relative weight.
-This means that we succeed in splitting up the scientifically relevant calculations among the threads, but the code increases in return the total amount of compute spent on administrative tasks.
-
-
-
-\begin{instructions}{\vtune}
-Run two standard hotspot analyses for two different thread counts.
-Filter into the phase of interest and study the Bottom-up profile where you switch the Effective Time column into percentage.
-The relative contribution of the most expensive (scientific) routines will be the lower the higher the thread count.
-The effect typically becomes more pronounced if you narrow the filter down to one thread.   
-\end{instructions}
-
-
-\paragraph{Evaluation}
-
-If you observe that the scientific compute time scales almost perfectly, i.e.~it relative fraction halves whenever you double the core count, but the runtime of the top ten routines does not reduce significantly, we can consider our hypothesis to hold.
-We can apply our 80:20 rule:
-
-
-Make two measurements with $p_{\text{threads}}$ and $2p_{\text{threads}}$.
-The $2p_{\text{threads}}$ measurement should cover the setup of interest in line with Section~\ref{section:node-level:preparation}.
-Let $T_{\text{science}}^{(rel)}$ be the percentage of an approximation of the scientific compute time, i.e.~the sum over the percentages of the top-ten routines that contribute towards the science outcome.
-$T_{\text{science}}^{(abs)}$ is the absolute timing within the program phase of interest.
-If the condition
-
-\begin{eqnarray*}
-  0.8\ T_{\text{science}}^{(rel)}(p_{\text{threads}}) & \leq & T_{\text{science}}^{(rel)}(2p_{\text{threads}}) \leq 1.2\ T_{\text{science}}^{(rel)}(p_{\text{threads}}) \qquad \wedge \\
-  \frac{0.8}{2}\ T_{\text{science}}^{(abs)}(p_{\text{threads}}) & \leq & T_{\text{science}}^{(abs)}(2p_{\text{threads}}) \leq \frac{1.2}{2}\ T_{\text{science}}^{(abs)}(p_{\text{threads}})
-\end{eqnarray*}
-
-\noindent
-holds, your code is fine, i.e.~the hypothesis can be discarded.
-The second line is the validation that the code scales reasonably and the first line tells us that the distribution between science core routines and remainder stays within reasonable bounds. 
-However, if the condition is violated, there's good reason to believe there is a flaw.
-
-
-
-\paragraph{Optimisation and follow-up steps}
-
-If you suffer from the present flaw, 
-
-\begin{itemize}
-  \item move some redundant work out of the parallel sections. While this might introduce a load balancing issue (Section~\ref{section:node-level:balancing}), it might free resources for other computations (if the node is oversubscribed, i.e.~hosts more tasks than it has threads) and hence reduce the time to solution;
-  \item propose to introduce lookup tables to speed up the administrative work;
-  \item dive deeper into a single core analysis of the repetitive work.    
-\end{itemize}
-
-
-\paragraph*{How it works}
-
-\begin{itemize}[noitemsep]
-  \item[$\boxplus$] Validate that the administrative (non-science) fraction of the code scales with the scientific core calculations.
-\end{itemize}
-
-
-\paragraph*{How it does not work}
-
-\begin{itemize}[noitemsep]
-  \item[$\boxminus$] The administrative overhead will always increase relatively, so an increase in itself is not a flaw. An extraordinary increase coupled with limited scalability however is.
-\end{itemize}
+% 
+% We have checked that
+% 
+% \begin{itemize}
+%   \item all of our source code is covered by parallelism;
+%   \item the workload is reasonably well-balanced;
+%   \item there is not much tasking overhead;
+%   \item the tasks are relatively long.
+% \end{itemize}
+% 
+% 
+% \noindent
+% If the code still does not scale particularly well, we may assume that something is flawed with the per-task/per-parallel region overhead:
+% 
+% \begin{hypothesis}
+%  Each task or parallel region, respectively, introduces some overhead which is constant.
+%  As the number of tasks increases, this overhead increases, too.
+% \end{hypothesis}
+% 
+% 
+% \noindent
+% Such an arrangement would materialise in an quasi-sequential program fraction $(1-f_{\text{intra}})$ in \eqref{equation:intra-node:performance-model}:
+% The code is parallelised, but this overhead scales with $p_{\text{threads}}$.
+% It therefore feeds into the sequential part of the scaling formula, i.e.~it is redundant work which we could also have done once outside of the parallel region.
+% 
+% 
+% \paragraph{Data collection}
+% 
+% If our hypothesis holds, then the measured $f_{\text{intra}}$ should decrease as we add more and more threads.
+% This might be an almost negligible effect. However, 
+% we should also see that the ratio of scientifically relevant calculations (cmp.~Section~\ref{section:preparation:labelling}) should decrease, while the remaining routines gain relative weight.
+% This means that we succeed in splitting up the scientifically relevant calculations among the threads, but the code increases in return the total amount of compute spent on administrative tasks.
+% 
+% 
+% 
+% \begin{instructions}{\vtune}
+% Run two standard hotspot analyses for two different thread counts.
+% Filter into the phase of interest and study the Bottom-up profile where you switch the Effective Time column into percentage.
+% The relative contribution of the most expensive (scientific) routines will be the lower the higher the thread count.
+% The effect typically becomes more pronounced if you narrow the filter down to one thread.   
+% \end{instructions}
+% 
+% 
+% \paragraph{Evaluation}
+% 
+% If you observe that the scientific compute time scales almost perfectly, i.e.~it relative fraction halves whenever you double the core count, but the runtime of the top ten routines does not reduce significantly, we can consider our hypothesis to hold.
+% We can apply our 80:20 rule:
+% 
+% 
+% Make two measurements with $p_{\text{threads}}$ and $2p_{\text{threads}}$.
+% The $2p_{\text{threads}}$ measurement should cover the setup of interest in line with Section~\ref{section:node-level:preparation}.
+% Let $T_{\text{science}}^{(rel)}$ be the percentage of an approximation of the scientific compute time, i.e.~the sum over the percentages of the top-ten routines that contribute towards the science outcome.
+% $T_{\text{science}}^{(abs)}$ is the absolute timing within the program phase of interest.
+% If the condition
+% 
+% \begin{eqnarray*}
+%   0.8\ T_{\text{science}}^{(rel)}(p_{\text{threads}}) & \leq & T_{\text{science}}^{(rel)}(2p_{\text{threads}}) \leq 1.2\ T_{\text{science}}^{(rel)}(p_{\text{threads}}) \qquad \wedge \\
+%   \frac{0.8}{2}\ T_{\text{science}}^{(abs)}(p_{\text{threads}}) & \leq & T_{\text{science}}^{(abs)}(2p_{\text{threads}}) \leq \frac{1.2}{2}\ T_{\text{science}}^{(abs)}(p_{\text{threads}})
+% \end{eqnarray*}
+% 
+% \noindent
+% holds, your code is fine, i.e.~the hypothesis can be discarded.
+% The second line is the validation that the code scales reasonably and the first line tells us that the distribution between science core routines and remainder stays within reasonable bounds. 
+% However, if the condition is violated, there's good reason to believe there is a flaw.
+% 
+% 
+% 
+% \paragraph{Optimisation and follow-up steps}
+% 
+% If you suffer from the present flaw, 
+% 
+% \begin{itemize}
+%   \item move some redundant work out of the parallel sections. While this might introduce a load balancing issue (Section~\ref{section:node-level:balancing}), it might free resources for other computations (if the node is oversubscribed, i.e.~hosts more tasks than it has threads) and hence reduce the time to solution;
+%   \item propose to introduce lookup tables to speed up the administrative work;
+%   \item dive deeper into a single core analysis of the repetitive work.    
+% \end{itemize}
+% 
+% 
+% \paragraph*{How it works}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxplus$] Validate that the administrative (non-science) fraction of the code scales with the scientific core calculations.
+% \end{itemize}
+% 
+% 
+% \paragraph*{How it does not work}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxminus$] The administrative overhead will always increase relatively, so an increase in itself is not a flaw. An extraordinary increase coupled with limited scalability however is.
+% \end{itemize}

@@ -11,6 +11,17 @@ The speedup as introduced from \eqref{equation:hpc-terms:speedup} is poor as we 
 We leave a lot of potential compute capability unused.
 
 
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[width=0.65\textwidth]{node-level/decision-graph.pdf}
+ \end{center}
+  \caption{
+   Decision graph for inter-node analysis.
+   \label{figure:core:decision-graph}
+  }
+\end{figure}
+
+
 Our deep dive starts from an analysis if there is enough concurrency in principle to exploit all cores.
 If there are not enough concurrent operations, further analysis is not required. 
 The code can be returned immediately to the developers.
@@ -45,9 +56,7 @@ These are the setups (turning points) on which we should focus most of the time.
 Do not try to study any other setup, as you'll most likely be swamped with data
 that is not relevant or difficult to interpret!
 
-%   \item[$\boxplus$] Use Amdahl's law to characterise your code. If it fits to
-%   the law, i.e.~there is an $f_{\text{intra}}$ such that
-%   \eqref{equation:amdahl:speedup}.
+
 
 \paragraph*{How it works}
 
@@ -62,61 +71,3 @@ that is not relevant or difficult to interpret!
   \item[$\boxminus$] Start with a full-node run right from the start and hope that you spot interesting trends in the data.
 \end{itemize}
 
-
-\subsection*{Decision graph}
-
-
-% \begin{figure}[htb]
- \begin{center}
-  \includegraphics[width=0.65\textwidth]{node-level/decision-graph.pdf}
- \end{center}
-%  \caption{
-%   Decision graph for inter-node analysis.
-%   \label{figure:core:decision-graph}
-%  }
-% \end{figure}
-
-
-% \subsection*{Overview}
-% 
-% 
-% \begin{center}
-%  \begin{tabular}{p{0.75\textwidth}|r}
-%   Flaw & Section \\
-%   \hline
-%   Determine code fraction covered by parallelism 
-%   &
-%   \ref{section:node-level:coverage} \\
-%   Is the code well-balanced?
-%   &
-%   \ref{section:node-level:balancing} \\
-%   Limited concurrency: Do we have enough tasks?
-%   & 
-%   \ref{section:node-level:concurrency} \\
-%   NUMA effects
-%   & 
-%   \ref{section:node-level:numa} \\
-%   Too small tasks/granularity
-%   & 
-%   \ref{section:node-level:task-size} \\
-%   Synchronisation
-%   & 
-%   \ref{section:node-level:synchronisation} \\
-%   Data dependencies
-%   & 
-%   \ref{section:node-level:data-dependencies} \\
-%   Redundant (administrative) computations
-%   & 
-%   \ref{section:node-level:redundant-admin} \\
-%   Number of tasks
-%   & 
-%   \ref{section:node-level:task-count} \\
-%   Homogeneous task duration
-%   & 
-%   \ref{section:node-level:homogeneous-duration} \\
-%   Can we introduce further hierarchical decomposition?
-%   & 
-%   \ref{section:node-level:hierarchical-decomposition} \\
-%   \hline
-%  \end{tabular}
-% \end{center}

@@ -1,0 +1,64 @@
+\section{Task size/granularity}
+\label{section:node-level:task-size}
+
+% If tasks (or parallel sections) are too small, we pay an excessive overhead.
+% The concurrency level might be brilliant, but that does not help us if we have too much task creation and task clean-up overhead.
+% 
+% \begin{hypothesis}
+%  There are enough tasks and they are not excessively synchronising each other, but they are just too small and hence create too much administration overhead.
+% \end{hypothesis}
+% 
+% 
+% \noindent
+% Too many tiny tasks will manifest in a lot of time spent in the actual tasking runtime.
+% Differen to excessive synchronisation (Section~\ref{section:node-level:synchronisation}), we however barely will see locks or spinning unless we start to profile our task runtime itself.
+% 
+% \paragraph{Data collection}
+% 
+% \begin{instructions}{\otter}
+%  to be written
+% \end{instructions}
+% 
+% 
+% \begin{instructions}{\vtune}
+%  to be written
+% \end{instructions}
+% 
+% 
+% \paragraph{Evaluation}
+% 
+% The extreme case of tiny tasks are empty tasks which some codes use to model dependencies, i.e.~to synchronise sets of tasks in a task graph.
+% Another reason for tiny tasks is the classic CUDA-style mapping, where a task loop is bigger than the number of tasks and the loop body is then embedded into one big \texttt{if} statement.
+% 
+% 
+% 
+% \paragraph{Optimisation and follow-up steps}
+% 
+% There are two different strategies to get rid of too small tasks.
+% On the one hand, we can try to avoid that small tasks are created in the first place.
+% For data-parallel regions (e.g.~OpenMP's \texttt{parallel for}), we can use the minimal chunk/grain size to ensure that a loop is not cut down into tiny segments.
+% On the other hand, we can stick to small tasks and fuse them later into bigger ones.
+% This approach is also sometimes called batching (in the linear algebra world).
+% 
+% 
+% This second approach usually requires some more coding work, i.e.~while it is easy to restrict the chunk size of a parallel loop, it is not trivial to fuse tasks once they are generated. 
+% Actually, no mainstream tasking backend supports this.
+% Our code has to provide means to package multiple logical tasks into one physical task.
+% 
+% 
+% Once we alter the grain sizes, it is mandatory to return to the overall assessment.
+% It is not unlikely that we harm the balancing (Section~\ref{section:node-level:balancing}) and have to balance carefully between a good balancing and concurrency level on the side and limited overhead o the other.
+% 
+% 
+% \paragraph*{How it works}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxplus$] Validate that the administrative (non-science) fraction of the code scales with the scientific core calculations.
+% \end{itemize}
+% 
+% 
+% \paragraph*{How it does not work}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxminus$] The administrative overhead will always increase relatively, so an increase in itself is not a flaw. An extraordinary increase coupled with limited scalability however is.
+% \end{itemize}
