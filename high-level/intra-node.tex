@@ -112,7 +112,7 @@ Using \slurm, we do not have to set environment variables ourselves, instead \sl
  
 #SBATCH -c 2
  
-./my_exec
+./code
 \end{verbatim}
 or equivalently use \texttt{\#SBATCH --cpus-per-task 2}.
 
@@ -123,7 +123,7 @@ or equivalently use \texttt{\#SBATCH --cpus-per-task 2}.
 The one thing that works always is using 
 
 \begin{verbatim}
-taskset -c 0-3 ./myexec
+taskset -c 0-3 ./code
 \end{verbatim}
 
 \noindent
