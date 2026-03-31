@@ -21,16 +21,18 @@ Similarly to core performance, the tools can draw us towards more detailed metri
 
 t.b.d.
 
-For HPC workloads, do we expect a setup which is large enough that it must move through GPU memory? Not necessarily?
-We do need a setup that is larger than the GPU caches so it will move through cache.
-If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
-We require the benchmark to take long enough that any OS startup overhead is negligible and the \texttt{time} command can be used.
+% For HPC workloads, do we expect a setup which is large enough that it must move through GPU memory? Not necessarily?
+% We do need a setup that is larger than the GPU caches so it will move through cache.
+% If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
+% We require the benchmark to take long enough that any OS startup overhead is negligible and the \texttt{time} command can be used.
 
-Assessment crime \ref{assessmentcrime-cache-fit} also applies here.
+We want to ensure that the data we collect about the code is a reliable and accurate representation of the performance of the code on a single GPU. To this end, we require that the code is built for the specific GPU architecture, and that the benchmark is larger than the GPU cache - see assessment crime \ref{assessmentcrime-cache-fit}.
 
 \begin{assessmentcrime}
  We study a code that is not built against the latest version of CUDA/HIP/etc. supported by the hardware
 \end{assessmentcrime}
+
+To check these properties, 
 
 \subsection{Data Collection}
 
@@ -46,16 +48,26 @@ Assessment crime \ref{assessmentcrime-cache-fit} also applies here.
 
 \begin{instructions}{Nvidia Nsight}
 
- Metrics required:
+Nvidia nsight compute provides tools to collect specific metrics during program runtime.
+In order to calculate the FLOPS/s, we need to collect the following metrics:
+
  \begin{verbatim}
-    gpc__cycles_elapsed.max
-    smsp__sass_thread_inst_executed_op_dadd_pred_on.sum.per_cycle_elapsed
-    smsp__sass_thread_inst_executed_op_dfma_pred_on.sum.per_cycle_elapsed
-    smsp__sass_thread_inst_executed_op_dmul_pred_on.sum.per_cycle_elapsed
-    smsp__sass_thread_inst_executed_op_fadd_pred_on.sum.per_cycle_elapsed
-    smsp__sass_thread_inst_executed_op_ffma_pred_on.sum.per_cycle_elapsed
-    smsp__sass_thread_inst_executed_op_fmul_pred_on.sum.per_cycle_elapsed
+    sm__sass_thread_inst_executed_op_dadd_pred_on.sum
+    sm__sass_thread_inst_executed_op_dfma_pred_on.sum
+    sm__sass_thread_inst_executed_op_dmul_pred_on.sum
+    sm__sass_thread_inst_executed_op_fadd_pred_on.sum
+    sm__sass_thread_inst_executed_op_ffma_pred_on.sum
+    sm__sass_thread_inst_executed_op_fmul_pred_on.sum
+    sm__sass_thread_inst_executed_op_hadd_pred_on.sum
+    sm__sass_thread_inst_executed_op_hfma_pred_on.sum
+    sm__sass_thread_inst_executed_op_hmul_pred_on.sum
  \end{verbatim}
+
+We can request this set of metrics using a regex, and so profile the program with
+\begin{verbatim}
+ncu --metrics "regex:^sm_.*d_op_(d|f[^p]|h).*\\.sum$" --csv \
+    --log-file out.csv ./code
+\end{verbatim}
 
  
 
