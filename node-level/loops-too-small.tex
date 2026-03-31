@@ -1,0 +1,35 @@
+\section{Loop segments are too small}
+\label{section:node-level:loop-segments-too-small}
+
+
+
+% Loops auch mit dazu
+
+% \begin{enumerate}[noitemsep]
+%   \item[$\boxtimes$] There is simply not enough work and some cores idle.
+%     \begin{itemize}[noitemsep]
+%       \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}) if a code relies on classic data parallelism (parallel loops).
+%       \item[$\Rightarrow $] Study the average task size and investigate whether these tasks can be split up further (Section~\ref{xxxx}).
+%     \end{itemize}
+
+
+
+
+
+% \paragraph{Optimisation and follow-up steps}
+% 
+% There are two different strategies to get rid of too small tasks.
+% On the one hand, we can try to avoid that small tasks are created in the first place.
+% For data-parallel regions (e.g.~OpenMP's \texttt{parallel for}), we can use the minimal chunk/grain size to ensure that a loop is not cut down into tiny segments.
+% On the other hand, we can stick to small tasks and fuse them later into bigger ones.
+% This approach is also sometimes called batching (in the linear algebra world).
+% 
+% 
+% This second approach usually requires some more coding work, i.e.~while it is easy to restrict the chunk size of a parallel loop, it is not trivial to fuse tasks once they are generated. 
+% Actually, no mainstream tasking backend supports this.
+% Our code has to provide means to package multiple logical tasks into one physical task.
+% 
+% 
+% Once we alter the grain sizes, it is mandatory to return to the overall assessment.
+% It is not unlikely that we harm the balancing (Section~\ref{section:node-level:balancing}) and have to balance carefully between a good balancing and concurrency level on the side and limited overhead o the other.
+

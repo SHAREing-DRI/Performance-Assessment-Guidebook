@@ -43,7 +43,7 @@ Here, insufficient concurrency
 
 \begin{enumerate}[noitemsep]
   \item[$\boxtimes$] There is simply not enough work and some cores idle.
-    \begin{itemize}[noitemsep]
+    \begin{itemize}[noitemsep] 
       \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}) if a code relies on classic data parallelism (parallel loops).
       \item[$\Rightarrow $] Study the average task size and investigate whether these tasks can be split up further (Section~\ref{xxxx}).
     \end{itemize}
@@ -61,7 +61,8 @@ Here, insufficient concurrency
     \end{wip}
   \item[$\boxtimes$] The concurrency level is high all the time. Nevertheless, the performance remains poor.
     \begin{itemize}[noitemsep]
-      \item[$\Rightarrow $] The tasks might be too small (Section~\ref{section:node-level:tasks-too-small}).
+      \item[$\Rightarrow $] The parallel loop segments might be too small (Section~\ref{section:node-level:loop-segments-too-small}).
+      \item[$\Rightarrow $] The tasks might be too small in a task-based parallelisation (Section~\ref{section:node-level:tasks-too-small}).
     \end{itemize}
 \end{enumerate}
 
