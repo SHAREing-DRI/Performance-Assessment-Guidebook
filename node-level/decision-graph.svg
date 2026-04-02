@@ -35,7 +35,7 @@
      inkscape:window-x="66"
      inkscape:window-y="32"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g911-3" />
+     inkscape:current-layer="g468-5" />
   <defs
      id="defs568">
     <marker
@@ -97,7 +97,7 @@
     </marker>
     <marker
        style="overflow:visible"
-       id="TriangleStart-3-3"
+       id="TriangleStart-5"
        refX="0"
        refY="0"
        orient="auto-start-reverse"
@@ -112,7 +112,7 @@
          transform="scale(0.5)"
          style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
          d="M 5.77,0 -2.88,5 V -5 Z"
-         id="path135-6-6" />
+         id="path135-62" />
     </marker>
   </defs>
   <g
@@ -223,13 +223,17 @@
          d="m 111.88962,87.07889 c 7.7308,0.333703 7.7308,0.333703 7.7308,0.333703"
          id="path690" />
       <path
+         style="fill:none;stroke:#000000;stroke-width:0.665;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart-5)"
+         d="m 157.74154,86.796043 c 7.7308,0.333703 7.7308,0.333703 7.7308,0.333703"
+         id="path690-91" />
+      <path
          style="fill:none;stroke:#000000;stroke-width:0.665;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart-7)"
          d="m 94.115407,95.472333 0.05562,5.339257"
          id="path690-9"
          sodipodi:nodetypes="cc" />
       <g
          id="g1-3-7"
-         transform="translate(94.17329,31.944841)">
+         transform="translate(84.050952,-27.231907)">
         <g
            id="g468-5"
            transform="translate(-0.21454803)">
@@ -244,24 +248,50 @@
              xml:space="preserve"
              style="font-size:3.175px;fill:#000000;stroke:none;stroke-width:0.264999"
              x="94.760651"
-             y="88.705406"
+             y="86.588737"
              id="text2-5-7-56"><tspan
+               sodipodi:role="line"
+               x="94.760651"
+               y="86.588737"
+               style="text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.265"
+               id="tspan411-1">Tasks serialise</tspan><tspan
+               sodipodi:role="line"
+               x="94.760651"
+               y="90.557487"
+               style="text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.265"
+               id="tspan672">each other</tspan></text>
+        </g>
+      </g>
+      <g
+         id="g1-3-7-3"
+         transform="translate(91.448649,0.24301217)">
+        <g
+           id="g468-5-6"
+           transform="translate(-0.21454803)">
+          <rect
+             style="fill:#ffffff;stroke:#000000;stroke-width:0.625484;stroke-linecap:round;stroke-linejoin:bevel;paint-order:fill markers stroke"
+             id="rect1-6-3-7"
+             width="35.434116"
+             height="15.455831"
+             x="76.570877"
+             y="79.886604" />
+          <text
+             xml:space="preserve"
+             style="font-size:3.175px;fill:#000000;stroke:none;stroke-width:0.264999"
+             x="94.760651"
+             y="88.705406"
+             id="text2-5-7-56-5"><tspan
                sodipodi:role="line"
                x="94.760651"
                y="88.705406"
                style="text-align:center;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.265"
-               id="tspan411-1">Tasks are too small</tspan></text>
+               id="tspan411-1-3">Tasks are too small</tspan></text>
         </g>
       </g>
       <path
          style="fill:none;stroke:#000000;stroke-width:0.665;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart-3)"
-         d="m 157.67257,95.085273 11.17906,14.682947"
+         d="m 155.89282,79.623679 3.61511,-9.454937"
          id="path690-2"
-         sodipodi:nodetypes="cc" />
-      <path
-         style="fill:none;stroke:#000000;stroke-width:0.665;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#TriangleStart-3-3)"
-         d="m 112.22433,110.60052 55.89532,7.7864"
-         id="path690-2-0"
          sodipodi:nodetypes="cc" />
     </g>
   </g>

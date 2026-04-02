@@ -63,6 +63,7 @@ Here, insufficient concurrency
     \begin{itemize}[noitemsep]
       \item[$\Rightarrow $] The parallel loop segments might be too small (Section~\ref{section:node-level:loop-segments-too-small}).
       \item[$\Rightarrow $] The tasks might be too small in a task-based parallelisation (Section~\ref{section:node-level:tasks-too-small}).
+      \item[$\Rightarrow $] Tasks might lock each other out all the time, but only for a very brief duration (e.g., short call inside a loop). So it looks as if things ran in parallel, but they do not really do (Section~\ref{section:node-level:fine-granular-task-synchronisation}).
     \end{itemize}
 \end{enumerate}
 
