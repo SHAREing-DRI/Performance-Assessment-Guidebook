@@ -32,7 +32,14 @@ We want to ensure that the data we collect about the code is a reliable and accu
  We study a code that is not built against the latest version of CUDA/HIP/etc. supported by the hardware
 \end{assessmentcrime}
 
-To check these properties, 
+For example, if you are working with an NVidia H200 GPU, which supports CUDA compute capability 9.0, you must use a cuda toolkit version of at least 11.8 and specify \verb|-code=sm_90|.
+
+% To check that you are using sufficient GPU memory, you can use nvidia-smi:
+% \begin{verbatim}
+% $ nvidia-smi --loop-ms=10 --query-gpu=memory.used --format=csv --filename=gpu_mem_usage.csv & nvidia_smi_pid=$!
+% $ # test run...
+% $ kill $nvidia_smi_pid
+% \end{verbatim}
 
 \subsection{Data Collection}
 
