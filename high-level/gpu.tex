@@ -19,14 +19,12 @@ Similarly to core performance, the tools can draw us towards more detailed metri
 
 \subsection{Benchmark preparation}
 
-t.b.d.
-
 % For HPC workloads, do we expect a setup which is large enough that it must move through GPU memory? Not necessarily?
 % We do need a setup that is larger than the GPU caches so it will move through cache.
 % If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
 % We require the benchmark to take long enough that any OS startup overhead is negligible and the \texttt{time} command can be used.
 
-We want to ensure that the data we collect about the code is a reliable and accurate representation of the performance of the code on a single GPU. To this end, we require that the code is built for the specific GPU architecture, and that the benchmark is larger than the GPU cache - see assessment crime \ref{assessmentcrime-cache-fit}.
+We want to ensure that the data we collect about the code is a reliable and accurate representation of the performance of the code on a single GPU. To this end, we require that the code is built for the specific GPU architecture, and that the benchmark is larger than the GPU cache - see assessment crime \ref{assessmentcrime-cache-fit}. You should measure the memory footprint of your benchmark on the GPU in order to verify that the benchmark is large enough.
 
 \begin{assessmentcrime}
  We study a code that is not built against the latest version of CUDA/HIP/etc. supported by the hardware
@@ -55,33 +53,33 @@ For example, if you are working with an NVidia H200 GPU, which supports CUDA com
 
 \begin{instructions}{Nvidia Nsight}
 
-Nvidia nsight compute provides tools to collect specific metrics during program runtime.
-In order to calculate the FLOPS/s, we need to collect the following metrics:
+Nvidia Nsight Compute provides tools to collect specific metrics during program runtime.
+In order to calculate the FLOPS/s, we need to collect metrics of the total number of floating point operations executed. These are in the format
+\verb|sm__sass_thread_inst_executed_op_METRIC_pred_on.sum|,
+where \verb|METRIC| is \verb|dfma|, \verb|dadd|, \verb|dmul|, \verb|ffma|, \verb|fadd|, \verb|fmul|, \verb|hfma|, \verb|hadd|, and \verb|hmul|.
 
- \begin{verbatim}
-    sm__sass_thread_inst_executed_op_dadd_pred_on.sum
-    sm__sass_thread_inst_executed_op_dfma_pred_on.sum
-    sm__sass_thread_inst_executed_op_dmul_pred_on.sum
-    sm__sass_thread_inst_executed_op_fadd_pred_on.sum
-    sm__sass_thread_inst_executed_op_ffma_pred_on.sum
-    sm__sass_thread_inst_executed_op_fmul_pred_on.sum
-    sm__sass_thread_inst_executed_op_hadd_pred_on.sum
-    sm__sass_thread_inst_executed_op_hfma_pred_on.sum
-    sm__sass_thread_inst_executed_op_hmul_pred_on.sum
- \end{verbatim}
-
-We can request this set of metrics using a regex, and so profile the program with
+We can request this set of metrics using a regex, and so profile the program:
 \begin{verbatim}
 ncu --metrics "regex:^sm_.*d_op_(d|f[^p]|h).*\\.sum$" --csv \
     --log-file out.csv ./code
 \end{verbatim}
 
- 
+
 
  % Regex to paste into GUI to filter to these
  % ^smsp.*inst_executed_op_(d|f)(add|mul|fma)|duration\.sum|cycles_elapsed\.max
  
 \end{instructions}
+
+We also need to measure the execution time of the program without the profiler attached - here we make the assumption that the number of operations executed is the same in every run regardless of execution time.
+
+% Rule of thumb this?
+Where multiple different precisions are used, they will run at different rates on the hardware, but we need a single number to compare against the theoretical performance of the GPU. We therefore count each double-precision instruction (those beginning with \verb|d|) for double the number of operations, and each half-precision instruction (those beginning with \verb|h|) for half the number of operations. Additionally, because each \verb|fma| (fused multiply-add) does two operations in one instruction, we further double the number of operations these instructions count for.
+
+We finally calculate the observed work rate:
+\begin{equation}
+    R_{\texttt{observed,FLOPS/s}} = \frac{\sum N_\texttt{opers}}{T_\texttt{exec}}
+\end{equation}
 
 \subsection{Evaluation}
 
@@ -89,18 +87,23 @@ ncu --metrics "regex:^sm_.*d_op_(d|f[^p]|h).*\\.sum$" --csv \
  The percentage of the theoretical maximum GPU FLOPS/s throughput achieved by the computational kernels. This may also be referred to as GPU peak-performance-percentage.
 \end{performancemetric}
 
+We calculate the peak performance ratio as
+\begin{equation}
+    C_\texttt{GPU} = \frac{R_\texttt{observed}}{R_\texttt{theoretical}}
+\end{equation}
+
 \begin{center}
  \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
-  GPU Occupation & Description \\
+  GPU peak performance ratio & Description \\
   \hline
   $C_{\text{GPU}} \geq 0.8$
-   & \cellcolor{green!25} The GPU is well occupied with work.
+   & \cellcolor{green!25} GPU compute performance is good
   \\
   $0.6 \leq C_{\text{GPU}} < 0.8$
-   & \cellcolor{yellow!25} The GPU is not being occupied with work well, this could become a significant issue with other GPUs including newer generations.
+   & \cellcolor{yellow!25} GPU compute performance is not particularly good. This could become a significant issue with other GPUs including newer generations.
   \\
   $C_{\text{GPU}} < 0.6$
-   & \cellcolor{red!25} The GPU is not being significantly under utilised.
+   & \cellcolor{red!25} GPU compute performance is poor.
  \end{tabular}
 \end{center}
 

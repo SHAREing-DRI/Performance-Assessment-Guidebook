@@ -63,13 +63,13 @@ Two more properties are important:
 If a setup is too small---notably if it fits into the local caches---we will not obtain realistic data, as critical system components that quickly develop into bottlenecks are not used.
 We provide remarks on machine properties in Section~\ref{section:preparation:machine}.
 If a setup is too big however, we again run risk that there is not enough slack for tools to run additional statistics on a program run.
-A memory footpring of 20\%--80\% of the main memory is reasonable.
-Attempting to keep the runtime down, we typically operate closer to 20\%, as long as this is significantly more than the L3 cache and significantly more than the GPU's local memory.  
+A memory footprint of 20\%--80\% of the main memory is reasonable.
+Attempting to keep the runtime down, we typically operate closer to 20\%, as long as this is significantly more than the L3 cache and significantly more than the GPU's largest cache.  
 While the ways to extract system properties are discussed in the aforementioned Section~\ref{section:preparation:machine}, there are different tools to record a code's memory consumption:
 
 
 \begin{instructions}{\linux}
- Linux's \texttt{/usr/bin/time} offers the option to track the maximum memory usage\footnote{Typically does not work if you use only \texttt{time}, i.e.~a call without the absolute path.}.
+ Linux's \texttt{/usr/bin/time} offers the option to track the maximum memory usage\footnote{Typically does not work if you use the terminal builtin \texttt{time}, i.e.~a call without the absolute path.}.
  Adding the \texttt{-v} flag yields additional information which delivers, depending on the system configuration, information on the maximum memory envelope.
  The quantity \texttt{Maximum resident set size} is the quantity of interest.
 \end{instructions}
