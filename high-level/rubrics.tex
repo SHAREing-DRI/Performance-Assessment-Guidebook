@@ -4,11 +4,11 @@
 We classify codes along five different rubrics:
 
 \begin{enumerate}
-  \item core performance,
-  \item intra node,
-  \item inter node,
-  \item GPUs, and
-  \item input/output.
+  \item core,
+  \item GPU,
+  \item input/output,
+  \item intra node, and
+  \item inter node.
 \end{enumerate}
 
 \noindent
@@ -23,21 +23,23 @@ It is convenient to present the overall data via a spiderweb diagram (below for 
 
 
 \noindent
-The idea to look at the five different performance dimensions separately is natural yet not does come along without shortcomings.
+The idea to look at the five different performance dimensions separately is natural yet does not come along without shortcomings.
 Many performance issues within a code affect multiple dimensions.
 Think about a poor GPU utilisation that materialises in bad load balancing as well.
 When we dig down recursively into finer and finer metrics later on, we have to take such cross-influence into account.
 Eventually, we might have to return to our highest level of assessment again and again.
 
+%% I think this paragraph is outdated now
 
-We propose to use different benchmarks for the individual rubrics.
-Each benchmark will follow the recommendations from Section~\ref{section:preparation:benchmarks}, but we will tailor the benchmark characteristics to the effect we want to study, such that the effects of interest are most pronounced while others are less dominant.
-Notably, we will disable I/O for all studies unless we study I/O itself (cmp.~Section~\ref{section:preparation:io}).
-This implies that the final picture might not reflect the real behaviour of a science run. 
+%We propose to use different benchmarks for the individual rubrics.
+%Each benchmark will follow the recommendations from Section~\ref{section:preparation:benchmarks}, but we will tailor the benchmark characteristics to the effect we want to study, such that the effects of interest are most pronounced while others are less dominant.
+%Notably, we will disable I/O for all studies unless we study I/O itself (cmp.~Section~\ref{section:preparation:io}).
+%This implies that the final picture might not reflect the real behaviour of a science run. 
 
+We take a characteristic benchmark which is representative of a typical code workflow and are inkeeping with recommendations from Section~\ref{section:preparation:benchmarks}. Typically this means we have a benchmark that demonstrates the parallel behaviour of the code and characteristic I/O. Since we treat the code as a block at this stage, we give no thought to the setup of the benchmark. We receive a benchmark configuration from a developer directly, or we follow recommendations from the documentation.
 
 As we analyse the dimensions of performance characteristics independently, and the order of the analyses therefore does not really make a difference.
-As flagged throughout Section~\ref{chapter:process}, this approach helps to manage complexity but has intrinscial weaknesses in itself.
+As flagged throughout Section~\ref{chapter:process}, this approach helps to manage complexity but has intrinsic weaknesses in itself.
 
 
 \paragraph*{How it works}

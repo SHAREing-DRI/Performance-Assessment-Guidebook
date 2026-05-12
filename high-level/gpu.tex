@@ -26,11 +26,12 @@ Similarly to core performance, the tools can draw us towards more detailed metri
 
 We want to ensure that the data we collect about the code is a reliable and accurate representation of the performance of the code on a single GPU. To this end, we require that the code is built for the specific GPU architecture, and that the benchmark is larger than the GPU cache - see assessment crime \ref{assessmentcrime-cache-fit}. You should measure the memory footprint of your benchmark on the GPU in order to verify that the benchmark is large enough.
 
+% CRIMECRIME
 \begin{assessmentcrime}
  We study a code that is not built against the latest version of CUDA/HIP/etc. supported by the hardware
 \end{assessmentcrime}
 
-For example, if you are working with an NVidia H200 GPU, which supports CUDA compute capability 9.0, you must use a cuda toolkit version of at least 11.8 and specify \verb|-code=sm_90|.
+For example, if you are working with an Nvidia H200 GPU, which supports CUDA compute capability 9.0, you must use a cuda toolkit version of at least 11.8 and specify \verb|-code=sm_90|.
 
 % To check that you are using sufficient GPU memory, you can use nvidia-smi:
 % \begin{verbatim}
@@ -41,21 +42,35 @@ For example, if you are working with an NVidia H200 GPU, which supports CUDA com
 
 \subsection{Data Collection}
 
+Each manufacturer of GPUs provides their own management software suite, which is capable of collecting similar but slightly different sets of metrics. Below are some instructions for the Big 3 (Intel, AMD, and Nvidia) to extract those metrics necessary for the high-level assessment.
+However, if you are using other types of accelerators or accelerators from other manufacturers the software suite required to collect these data may be significantly different or incapable of providing the recommended metric.
 
+In order to calculate the FLOPS/s, we generally need to collect metrics of the total number of floating point operations executed.
 
 \begin{instructions}{Intel VTune}
  t.b.d.
 \end{instructions}
 
 \begin{instructions}{AMD rocprofiler-system}
- t.b.d.
+% rocprofv3 --pmc TOTAL_32_OPS,SQ_INSTS_VALU_INT32 -- ./<exe>
+% sqlite3 -csv -header <results.db> "SELECT dispatch_id,kernel_name,counter_name,value FROM counters_collection;"
+On AMD GPUs, we recommend using the latest version of rocprofiler - \verb|rocprofv3|. This version of the software provides a sum of all operations of each precision - 16, 32, and 64 bit - as well as granular FMA (fused multiply-add), MUL, ADD, INT and TRANS (which I assume to be translating between precisions) operations counts. Since we are interested in floating point instructions only for the time being, we may either subtract the integer operation count from the total operation count for each precision, or collect counts for each operation type and sum as detailed below.
+
+The metric options are in the form \verb|TOTAL_{PRECISION}_OPS| and \verb|SQ_INSTS_VALU_{METRIC}_F{PRECISION}|, where \verb|PRECISION| is 16, 36, or 64, and \verb|METRIC| is \verb|FMA|, \verb|MUL|, \verb|ADD|, or \verb|TRANS|, and \verb|SQ_INSTS_VALU_INT32|.
+Additionally, AMD GPUS separately count matrix operations done on the vector ALU with the matrix-fused-multiply-add instruction - this metric is called \verb|SQ_INSTS_MFMA_MOPS_{PRECISION}| where \verb|PRECISION| is \verb|BF16|, \verb|F32|, or \verb|F64| (note the B for the 16-bit variant).
+
+
+
+\begin{verbatim}
+rocprofv3 --pmc \
+    
+    -- ./code
+\end{verbatim}
 \end{instructions}
 
-\begin{instructions}{Nvidia Nsight}
-
-Nvidia Nsight Compute provides tools to collect specific metrics during program runtime.
-In order to calculate the FLOPS/s, we need to collect metrics of the total number of floating point operations executed. These are in the format
-\verb|sm__sass_thread_inst_executed_op_METRIC_pred_on.sum|,
+\begin{instructions}{Nvidia NSight}
+On Nvidia GPUs using Nvidia NSight Compute (\verb|ncu|), the metrics required are in the format
+\verb|sm__sass_thread_inst_executed_op_{METRIC}_pred_on.sum|,
 where \verb|METRIC| is \verb|dfma|, \verb|dadd|, \verb|dmul|, \verb|ffma|, \verb|fadd|, \verb|fmul|, \verb|hfma|, \verb|hadd|, and \verb|hmul|.
 
 We can request this set of metrics using a regex, and so profile the program:
@@ -63,8 +78,6 @@ We can request this set of metrics using a regex, and so profile the program:
 ncu --metrics "regex:^sm_.*d_op_(d|f[^p]|h).*\\.sum$" --csv \
     --log-file out.csv ./code
 \end{verbatim}
-
-
 
  % Regex to paste into GUI to filter to these
  % ^smsp.*inst_executed_op_(d|f)(add|mul|fma)|duration\.sum|cycles_elapsed\.max
@@ -110,14 +123,17 @@ We calculate the peak performance ratio as
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] t.b.d.
+  \item[$\boxplus$] Compile your code with the latest version of CUDA/HIP etc. supported by your GPU's architecture
+  \item[$\boxplus$] Normalise the floating point operations for programs where multiple precisions are used
 \end{itemize}
 
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] t.b.d.
+  \item[$\boxminus$] Run a benchmark that is smaller than the GPU's cache
+  \item[$\boxminus$] Dive into other metrics recommended by the analysis tools
+  \item[$\boxminus$] Focus on GPU performance without evaluating the other relevant metrics in the high-level rubric
 \end{itemize}
 
 %\subsection{Draft ideas:}

@@ -8,36 +8,30 @@
 \end{wip}
 
 
+
+
+String operations are excessively expensive.
+Hence, where possible, string operations should be minimised by the code's developers, and our assessments should use a version of the code which does as few string operations as necessary.
+In this context, it is important that there's no console I/O.
+We don't want to study complex outputs; we are busy enough with handling the output of performance analysis tools.
+
 \begin{assessmentcrime}
  The code writes a lot of information to the terminal. 
 \end{assessmentcrime}
 
-String operations are excessively expensive.
-
-
-\begin{checklist}
- \item Your benchmark does {\bf not} write (a lot of) files.
- \item Your benchmark does {\bf not} write a lot of information to the terminal.
-\end{checklist}
-
-
-In this context, it is important that there's no I/O.
-We don't want to study complex outputs; we are busy enough with handling the output of performance analysis tools.
+More importantly, if our code writes excessive amounts of data, we almost certainly profile the I/O efficiency rather than the runtime behaviour.
+Unless we want to explicitly study I/O, we are well-advised to switch off any file outputs, database outputs, and also excessive file reads which will not compromise the benchmark being representative of a normal run.
+A log file alone can become problematic when these files become suddenly huge or are updated frequently.
+In the best case, a performance assessment benchmark writes and reads barely any data at all, i.e.~it is largely hard-coded and silent.
 
 \begin{assessmentcrime}
  The code reads or write to files excessively. 
 \end{assessmentcrime}
 
-\noindent
-More importantly, if our code writes excessive amounts of data, we
-    almost certainly profile the I/O efficiency rather than the runtime
-    behaviour. Unless we want to explicitly study I/O, we are well-advised to
-    switch off any file outputs, database outputs, but also excessive file
-    reads.
- A log file alone can become problematic when these files become suddenly huge or are updated frequently.
- In the best case, a performance assessment benchmark writes and reads barely any data at all, i.e.~it largely hard-coded and silent.
-
-
+\begin{checklist}
+ \item Your benchmark does {\bf not} write (a lot of) files.
+ \item Your benchmark does {\bf not} write a lot of information to the terminal.
+\end{checklist}
 
 \paragraph*{How it works}
 

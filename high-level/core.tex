@@ -14,28 +14,31 @@ Are we memory-bound?
 Today's chips come equipped with powerful vector computing capabilities and sophisticated cache and streaming features designed to move data smoothly between memory and compute registers. 
 Our analysis evaluates how effectively your implementation takes advantage of these capabilities.
 
-To capture core behaviour at a high-level we simply want to measure the code's peak performance relative to the maximum of the hardware. Tools can tempt us to reach immediately for a roofline model, or potentially even more detailed metrics around cache misses, vectorisation ratios, etc. These topics are relevant to a core performance analysis, but we want to start high-level or we otherwise risk focusing on an individual metric which obfuscates or distractes our analysis. By focusing simply on peak performance, our initial core performance investigation should sit us somewhere in the `traffic light' table below.
+To capture core behaviour at a high-level we simply want to measure the code's peak performance relative to the maximum of the hardware. Tools can tempt us to reach immediately for a roofline model, or potentially even more detailed metrics around cache misses, vectorisation ratios, etc. These topics are relevant to a core performance analysis, but we want to start high-level or we otherwise risk focusing on an individual metric which obfuscates or distracts our analysis. By focusing simply on peak performance, our initial core performance investigation should sit us somewhere in the `traffic light' table below.
 
 \subsection{Benchmark preparation}
 
 
-Before beginning our data collection we want to ensure that our data is a reliable and accurate respresentation of the peak, single-core performance of the code.
+Before beginning our data collection we want to ensure that our data is a reliable and accurate representation of the peak, single-core performance of the code.
 
 \begin{assessmentcrime}\label{assessmentcrime-cache-fit}
  We assess a setup that fits completely into one of the caches.
 \end{assessmentcrime}
 
+%% so we remove this because we actuall just inherit compile flags from the submitter at this stage...
 
-\begin{assessmentcrime}
- We study a code that is not translated with the most aggressive compiler optimisation for the particular architecture that we study. 
-\end{assessmentcrime}
+%\begin{assessmentcrime}
+ %We study a code that is not translated with the most aggressive compiler optimisation for the particular architecture that we study. 
+%\end{assessmentcrime}
 
 \noindent
-Both properties are easy to check: 
+%Both properties are easy to check: 
 Measure the total memory footprint of your code and ensure that the working set exceeds the largest cache you find on your system (cmp.~remarks on caches below); techniques for making these measurements are given in Section~\ref{section:preparation:benchmarks}.
-Further to that, check your compiler's manual and ensure you use a bespoke code version for your target system---something that the \texttt{-march} or \texttt{-xarch} as well as the highest compiler optimisations (\texttt{-O3}) for example give you; greater details for these checks are given in Section~\ref{section:preparation:compiler-settings}. 
 
+%% removing this as we are moving compiler optimisatoins to lower level
+%Further to that, check your compiler's manual and ensure you use a bespoke code version for your target system---something that the \texttt{-march} or \texttt{-xarch} as well as the highest compiler optimisations (\texttt{-O3}) for example give you; greater details for these checks are given in Section~\ref{section:preparation:compiler-settings}. 
 
+Not all benchmarks have a single-core implementation, and indeed in some cases a single-core run is not useful. For example, some benchmarks are implemented to be `full node'. Hence, we again can use an indicative run of the code, e.g., if the code submitter has suggested a `full node' run then we can perform a high-level analysis averaged across all cores. We will cover the details of this practice in the next section.
 
 
 To some degree, the argument holds the other way round for the cores:
@@ -54,6 +57,12 @@ Once we have prepared our benchmark we are now ready to begin making measurement
 \item The maximum single-core, peak performance of the hardware
 \item The obtained single-core, peak performance of our executable
 \end{itemize}
+As mentioned above we can do this either by using a single-core run or by using a parallel run and taking the average of these values across the cores. 
+
+As we are only making one observation, it is advised to use exclusive compute resources (i.e., an exclusive node here) to get the most reliable data that is not impacted by other job allocations.
+
+% discuss affinity here?
+
 To make these measurements, we must turn to a performance tool. Multiple performance tools are able to make these measurements, and we list below basic instructions of how to perform these measurements with some of our `go to' tools.
 
 \begin{instructions}{\likwid}
@@ -62,7 +71,6 @@ To measure the peak performance of a hardware example with \likwid\, it is only 
 \begin{verbatim}
 likwid-bench -t peakflops -w S0:16kB:1
 \end{verbatim}
-   
    
 \noindent
 %The Stream Triad \cite{mccalpin1995} benchmark is a brilliant starting point to obtain realistic throughput bounds.
@@ -94,15 +102,16 @@ likwid-perfctr -f -C 0 -g FLOPS_DP ./code
 which provides you with the information relevant, although the exact names of the groups might differ from system to system.
 \end{instructions}
 
+%% I suggest we move other potential tools to an appendix...? What are we wanting to touch on here: I guess the Likwid intro forces us to talk a little bit more about caches, pinning and the data collection more specifically...?
 
-\begin{instructions}{\amplifier}
- t.b.d.
-\end{instructions}
+%\begin{instructions}{\amplifier}
+% t.b.d.
+%\end{instructions}
 
 
-\begin{instructions}{\map}
- t.b.d.
-\end{instructions}
+%begin{instructions}{\map}
+% t.b.d.
+%\end{instructions}
 
 
  
@@ -186,37 +195,15 @@ If $C_{\text{peak}} \geq 0.8$, the code uses the compute capabilities
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] Run a standard benchmark to determine a realistic maximum throughput (bandwidth) and peak performance for a single core.
-  \item[$\boxplus$] Assess your code to find out if it makes sufficient use of the available bandwidth and compute units.
+  \item[$\boxplus$] Run a standard benchmark to determine a realistic maximum peak performance per core.
+  \item[$\boxplus$] Assess your code to find out if it makes sufficient use of the available compute units.
 \end{itemize}
 
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Apply some performance counters as a black box without a focus on bandwidth and peak performance.
-  \item[$\boxminus$] Jump straight for a tool with gives significant data on vectorisation, cache misses, etc.
+  \item[$\boxminus$] Apply some performance counters as a black box without a focus on  peak performance.
+  \item[$\boxminus$] Jump straight for a tool which gives significant data on vectorisation, cache misses, etc.
   \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
 \end{itemize}
-
-
-%\begin{center}
-% \begin{tabular}{r|p{0.22\textwidth}p{0.22\textwidth}p{0.22\textwidth}}
-%  & $C_{\text{bw}}\geq 0.8$ & $0.8 > C_{\text{bw}}\geq 0.6$ & $0.6 > C_{\text{bw}}$ \\
-%  \hline
-%  $C_{\text{peak}} \geq 0.8$
-%   & \cellcolor{green!25}
-%   & \cellcolor{green!25} perfect
-%   & \cellcolor{orange!25}
-%  \\
-%  $0.8 > C_{\text{peak}} \geq 0.6$
-%   & \cellcolor{green!25}
-%   & \cellcolor{orange!25} 
-%   & \cellcolor{orange!25} flaw
-%  \\
-%  $0.6 > C_{\text{peak}}$
-%   & \cellcolor{red!25}
-%   & \cellcolor{red!25} severe flaw
-%   & \cellcolor{red!25} 
-% \end{tabular}
-%\end{center}

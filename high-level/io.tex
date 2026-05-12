@@ -13,11 +13,11 @@
 \subsection{Benchmark preparation}
 % there are clear questions here of how this metric conflicts with the note that we want to 'turn off I/O'
 
-When preparing the benchmark for core, intra-node, inter-node and GPU analysis, we advised turning off I/O as this can make some of the measurements unreliable. However, I/O performance is crucial for some codes and so here we advise turning on some example of typical I/O load, which again can be information provided by the code's developers.
+When preparing the benchmark for core, intra-node, inter-node and GPU analysis, we advised turning off I/O where possible as this can make some of the measurements unreliable. However, I/O performance is crucial for some codes and in some cases necessary for the code to run. When benchmarking I/O, or benchmarking with I/O enabled, we advise using a benchmark with a typical I/O load - this should be verified by the code's developers.
 
 \subsection{Data Collection}
 
-t.b.d.
+There are relatively few tools which are easily able to collect the metric we are interested in of 'runtime spent doing I/O operations'.
 
 \begin{instructions}{Darshan}
 For a dynamic runtime analysis we setup Darshan with
@@ -29,14 +29,16 @@ export DARSHAN_LOGDIR=./darshan_logs
 mpiexec -genv LD_PRELOAD ${DARSHAN_DIR}/lib/libdarshan.so
 -np 4 ./code
 \end{verbatim}
-the logging environment variable name can be different so make sure to run
+The logging environment variable name can be different so make sure to run
 \begin{verbatim}
     darshan-config --log-path
 \end{verbatim}
-to find the name on your system. Once this has created a \texttt{*.darshan} binary this can analysed via
+to find the name on your system.
+Once this has created a \texttt{*.darshan} binary file this can analysed via
 \begin{verbatim}
     darshan-parser --total my_log.darshan 
 \end{verbatim}
+
 The relevant metrics from this output are in the form
 \begin{verbatim}
 STDIO_F_*_TIME: cumulative time spent in different 
