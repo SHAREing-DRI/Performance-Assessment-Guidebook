@@ -52,20 +52,22 @@ In order to calculate the FLOPS/s, we generally need to collect metrics of the t
 \end{instructions}
 
 \begin{instructions}{AMD rocprofiler-system}
+ t.b.d.
 % rocprofv3 --pmc TOTAL_32_OPS,SQ_INSTS_VALU_INT32 -- ./<exe>
 % sqlite3 -csv -header <results.db> "SELECT dispatch_id,kernel_name,counter_name,value FROM counters_collection;"
-On AMD GPUs, we recommend using the latest version of rocprofiler - \verb|rocprofv3|. This version of the software provides a sum of all operations of each precision - 16, 32, and 64 bit - as well as granular FMA (fused multiply-add), MUL, ADD, INT and TRANS (which I assume to be translating between precisions) operations counts. Since we are interested in floating point instructions only for the time being, we may either subtract the integer operation count from the total operation count for each precision, or collect counts for each operation type and sum as detailed below.
 
-The metric options are in the form \verb|TOTAL_{PRECISION}_OPS| and \verb|SQ_INSTS_VALU_{METRIC}_F{PRECISION}|, where \verb|PRECISION| is 16, 36, or 64, and \verb|METRIC| is \verb|FMA|, \verb|MUL|, \verb|ADD|, or \verb|TRANS|, and \verb|SQ_INSTS_VALU_INT32|.
-Additionally, AMD GPUS separately count matrix operations done on the vector ALU with the matrix-fused-multiply-add instruction - this metric is called \verb|SQ_INSTS_MFMA_MOPS_{PRECISION}| where \verb|PRECISION| is \verb|BF16|, \verb|F32|, or \verb|F64| (note the B for the 16-bit variant).
+% On AMD GPUs, we recommend using the latest version of rocprofiler - \verb|rocprofv3|. This version of the software provides a sum of all operations of each precision - 16, 32, and 64 bit - as well as granular FMA (fused multiply-add), MUL, ADD, INT and TRANS (which I assume to be translating between precisions) operations counts. Since we are interested in floating point instructions only for the time being, we may either subtract the integer operation count from the total operation count for each precision, or collect counts for each operation type and sum as detailed below.
+
+% The metric options are in the form \verb|TOTAL_{PRECISION}_OPS| and \newline \verb|SQ_INSTS_VALU_{METRIC}_F{PRECISION}|, where \verb|PRECISION| is 16, 36, or 64, and \verb|METRIC| is \verb|FMA|, \verb|MUL|, \verb|ADD|, or \verb|TRANS|, and \verb|SQ_INSTS_VALU_INT32|.
+% Additionally, AMD GPUS separately count matrix operations done on the vector ALU with the matrix-fused-multiply-add instruction - this metric is called \verb|SQ_INSTS_MFMA_MOPS_{PRECISION}| where \verb|PRECISION| is \verb|BF16|, \verb|F32|, or \verb|F64| (note the B for the 16-bit variant).
 
 
 
-\begin{verbatim}
-rocprofv3 --pmc \
-    
-    -- ./code
-\end{verbatim}
+% \begin{verbatim}
+% rocprofv3 --pmc \
+%     
+%     -- ./code
+% \end{verbatim}
 \end{instructions}
 
 \begin{instructions}{Nvidia NSight}
