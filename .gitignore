@@ -1,0 +1,19 @@
+# Ignoring VSCode project files for anyone using it
+.vscode
+
+# Ignore build files
+**/*.aux
+**/*.bbl
+**/*.blg
+**/*latexmk
+**/*.fls
+**/*.idx
+**/*.ilg
+**/*.ind
+**/*.log
+**/*.out
+**/*.synctex.gz
+**/*.toc
+
+# Ignoring generated PDF
+**/*.pdf
