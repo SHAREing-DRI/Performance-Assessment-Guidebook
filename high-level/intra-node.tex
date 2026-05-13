@@ -1,0 +1,275 @@
+\section{Intra-node (node-level) performance}
+\label{section:high-level:intra-node}
+
+\begin{summary}
+ We consider a code to make good use of the cores on a system if it can use more than 80\% of its cores with more than 80\% of (strong scaling) efficiency.
+ We consider a code to make reasonable use of the cores if it can use more than 60\% of the total core counts with more than 80\% efficiency.
+\end{summary}
+
+
+On an individual node, our first goal has to be that we use all the hardware threads efficiently.
+Some people prefer the term cores or speak only of threads (even though we might want to distinguish the logical from the physical thread concept).
+The term intra-node hence means all those cores sharing one memory.
+Hereby it does not matter if we have a code using MPI or a genuine multithreading language:
+We assess the runtime characteristics for a code physically sharing its memory.
+It might be written logically in a distributed memory fashion.
+
+
+Our method of choice to argue about node-level performance is strong scaling.
+In principle, we ask ourselves ``what would happen if we had only one core on our
+node'' (we use the term core and hardware thread as synonyms from hereon).
+If our code needs 80 cores on one node, then we would expect that it only needs 40 cores
+on two, and 20 cores on four.
+This is obviously an artificial question to ask:
+Why would we not use all the node? 
+Despite the fact that we have the cores available anyway and therefore might want to use
+them, finding an answer to the ``what if'' questions helps us to uncover
+inefficiencies.
+How much performance do we leave on the way as we use more and more cores?
+How much more computation should we be able to squeeze out of the machine?
+
+
+The underlying performance model is called Amdahl's law, and we will return to
+this law in a future chapter. %Chapter~\ref{section:node-level:amdahls-law}.
+For the time being, we can abstract from any performance model or law, and
+simply focus on the scaling behaviour over cores, as we have defined it in
+Section~\ref{section:terminology:hpc-terms:core-terms}:
+We alter the number of cores available to our code until we have reached all the
+cores available, i.e.~use the whole machine, and track the time to solution
+dependence on core counts.
+
+
+
+\subsection{Benchmark preparation}
+
+Throughout this assessment, we use one fixed problem setup.
+The setup has to be chosen such that we can compute it on a single core if necessary.
+However, it also has to be reasonably big such that it makes sense to exploit all threads of a node.
+
+
+\begin{assessmentcrime}
+ We start an intra-node assessment with a code which only uses a tiny fraction of the main memory.
+\end{assessmentcrime}
+
+\noindent
+We may assume that a node and its memory are somehow balanced.
+If we don't use a reasonable amount of this memory for a test run, then there is simply not enough work to do to utilise all cores.
+We can barely blame the code.
+Along with previous recommmendations, we should have a memory footprint which is at least 20\% of the total RAM available on the whole node (cf.~Section~\ref{section:preparation:benchmarks}).
+
+
+\subsection{Data collection}
+
+For the data collection, we first run the simulation without any parallelisation, which is, trivially, a single-core run.  
+This gives us $t_{\text{serial}}$.
+After that, we switch to the parallel code version and vary the core count $p_{\text{intra}}$. 
+This gives us $t_{\text{intra}}(p_{\text{intra}})$.
+
+\begin{assessmentcrime}
+ Use a code base that is relatively inefficient on a single core and use this as baseline for any scaling claims.
+\end{assessmentcrime}
+
+\noindent
+It is important that we question the code developers on different code variants prior to the assessment:
+If they offer, for example, quite sophisticated task-based parallelism for shared memory, we still should calibrate all runtime against a serial code without these tasks.
+That is a fair benchmark that avoids any tasking overhead where it is not needed.
+
+Consequently, $t_{\text{serial}} \not= t_{\text{intra}}(1)$ since we use different executables---once compiled with support for shared memory and once without.
+The two measurements will differ and we can assume $t_{\text{serial}} \leq t_{\text{intra}}(1)$.
+If the code is not available without any parallelisation, use $t_{\text{serial}} = t_{\text{intra}}(1)$.
+After that, we collect the remaining $t_{\text{intra}}(p_{\text{intra}})$ with the parallel code variant.
+
+\begin{assessmentcrime}
+    We do not use the compute resources exclusively. For example in SLURM, clusters often have exclusive queues, or the \texttt{--exclusive} flag can be passed.
+\end{assessmentcrime}
+
+
+\begin{instructions}{\openmp}
+ In OpenMP, we can simply set \texttt{OMP\_NUM\_THREADS} to achieve this.
+ After that, we run our code and should automatically get the correct core
+ count.
+ Depending on your system's configuration, you might want to set some additional
+ command line variables such as 
+ \begin{verbatim}
+export OMP_PROC_BIND=close 
+ \end{verbatim}
+ or similar to ensure that the operating system does not swap your threads
+ around, i.e.~decide at one point to migrate a thread to a different core.
+ This never gives good performance.
+ Be careful as well with setting the \openmp\ threads manually while using
+ another core specification technique such as Slurm's configs or tasksets (both
+ below):
+ If you do so, you might force all the \openmp\ threads onto a few cores only,
+ i.e.~accidentally over- or undersubscribing the testbed.
+\end{instructions}
+
+
+\begin{instructions}{\slurm}
+
+Using \slurm, we do not have to set environment variables ourselves, instead \slurm manages resources and so we can request a quantity of cores with the \texttt{-c} flag, e.g.,
+\begin{verbatim}
+#!/bin/bash
+ 
+#SBATCH -c 2
+ 
+./code
+\end{verbatim}
+or equivalently use \texttt{\#SBATCH --cpus-per-task 2}.
+
+\end{instructions}
+
+
+\begin{instructions}{\linux}
+The one thing that works always is using 
+
+\begin{verbatim}
+taskset -c 0-3 ./code
+\end{verbatim}
+
+\noindent
+to employ, e.g., the first four cores only.
+However, you should be careful when you use this in combination with \slurm~or
+\openmp~which also make choices on cores.
+You might end up with competing or contradictory settings and end up with a
+suboptimal system usage.
+We also faced some issues with TBB using this approach. 
+\end{instructions}
+
+
+
+\begin{instructions}{\mpi}
+If we have a code base which employs MPI only, we set the number of ranks per
+node through the \texttt{mpirun} call or the scheduler (Slurm) environment.
+
+For hybrid MPI+X codes, we have a certain freedom:
+We can use an arbitrary number of MPI ranks---indeed our analysis also works for pure MPI codes as long as we stick to one node---and use threads on top such that we exploit all $p_{\text{threads}}$ hardware threads of interest.
+Picking one rank and four threads is, logically, equivalent to picking two ranks and two threads each.
+It is part of the assessment to play around with these degrees of freedom.
+Once again: If we spot sudden runtime jumps (yellow dots in example sketch) and if these jumps coincide with a NUMA domain or socket, then this might be a strong indicator that we should use MPI instead of threading.
+However, one might argue that this is already part of an in-depth analysis rather than a high-level overview.
+
+We recommend that for a code of this form: when working with a researcher or developer, it best to request a typical configuration that they may use. They may be able to advise on their experiences, and from there we can then perturb about this configuration.
+\end{instructions}
+
+\begin{instructions}{\likwid}
+Likwid has the in-built \texttt{likwid-pin} tool for handling thread-affinity for a specified number of cores. 
+Cores can be requested explicitly, i.e., specific NUMA domains, sockets, etc. can be requested. 
+This gives the analyst great flexibility in the choice of cores across the node.
+The \likwid~call typically resembles
+\begin{verbatim}
+likwid-pin -c 0-...
+\end{verbatim}
+but you can also provide a comma-separated list of specific cores.
+Using \likwid's pinning with OpenMP means that there's no need to set \texttt{OMP\_NUM\_THREADS} anymore---the pinning yields properly set OpenMP settings implicitly.
+\end{instructions}
+
+\noindent
+ If you have the opportunity to mask out the initialisation time and to focus
+ only on the ``real'' runtime of your benchmark code, use it at this point.
+ Notably when you work with very short execution times, the initialisation
+ overhead might otherwise dominate your measurements.
+
+
+\subsection{Evaluation}
+
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{high-level/intra-node.pdf}
+  \end{center}
+  \caption{
+   A scatter plot tracking the (strong) scaling data feeding into our intra-node analysis.
+   The red node is the code's runtime without any parallelisation enabled, while the green and yellow measurements stem from the parallelised code over various cores.
+   For our high-level analysis, we are interested at which point (core count) the resulting parallel efficiency falls below an acceptable threshold.
+   \label{figure:intra-node}
+  }
+\end{figure}
+
+
+\index{Speedup}
+\index{Efficiency}
+Our roadmap to determine how good the shared memory behaviour is, i.e.~our strategy to come up with a single number, is straightforward.
+First, we calculate the code's parallel efficiency.
+We use a slightly modified version as compared to
+Equations \eqref{equation:hpc-terms:speedup} and \eqref{equation:hpc-terms:efficiency},
+where we calibrate the runtimes against the serial code runtime:
+
+\[
+E_{\text{intra}}(p_{\text{intra}}) =
+\frac{t_{\text{serial}}}{t(p_{\text{intra}}) \cdot p_{\text{intra}}}
+\]
+
+\noindent
+is normalised against the serial runtime without any parallelism support.
+We track how much we sacrifice by introducing the parallelism in the first place, which is typically a better indicator for inter-node performance flaws than the textbook efficiency definition. % do we inter or intra-node here?
+
+
+Second, we determine the number of cores for which our parallel efficiency falls below the thresholds 80\% or 60\% respectively (Figure~\ref{figure:intra-node}):
+
+
+\begin{eqnarray*}
+ p_{\text{critical,intra}}^{\text{80\%}} & = & \argmax _{p_{\text{intra}}} \{ E_{\text{intra}}(p_{\text{intra}}) \geq 0.8 \} \\
+ p_{\text{critical,intra}}^{\text{60\%}} & = & \argmax _{p_{\text{intra}}} \{ E_{\text{intra}}(p_{\text{intra}}) \geq 0.6 \}.
+\end{eqnarray*}
+
+
+\noindent
+It is not unheard of that codes yield data where the runtime starts to raise again once we exceed a certain core count (yellow dots in Figure~\ref{figure:intra-node}).
+This means that the speedup deteriorates completely.
+The above metric tries to flag early if we run into such a regime or also into one that leads to a stagnation of the runtime and hence to an efficiency decline.
+
+
+Finally, we introduce our performance metric.
+It normalises the critical thresholds against the maximum number of cores or threads $p_{\text{max,intra}}$ that we have on our system.
+ 
+\begin{performancemetric}
+ We evaluate 
+ \[
+  C_{\text{intra}}^{\text{80\%}} = \frac{ p_{\text{critical,intra}}^{\text{80\%}} }{ p_{\text{max,intra}} }
+  \qquad
+  \text{and}
+  \qquad
+  C_{\text{intra}}^{\text{60\%}} = \frac{ p_{\text{critical,intra}}^{\text{60\%}} }{ p_{\text{max,intra}} }
+ \]
+ \noindent
+ to determine how well the code scales over a given node.
+\end{performancemetric}
+
+\noindent
+We use the two metrics to determine if we consider the code to have an intra-node
+flaw.
+
+\begin{center}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  Efficiency & Description \\
+  \hline
+  $C_{\text{intra}}^{\text{80\%}} \geq 0.8$
+   & \cellcolor{green!25} Shared memory scaling is good.
+  \\
+  $C_{\text{intra}}^{\text{80\%}} < 0.8$ $\wedge $
+  $C_{\text{intra}}^{\text{60\%}} \geq 0.6$
+   & \cellcolor{yellow!25} Shared memory scaling is not particularly good, and
+   we notably might run into problems with the next generation of chips where
+   the core count will increase.
+  \\
+  otherwise
+   & \cellcolor{red!25} Shared memory scaling is poor.
+ \end{tabular}
+\end{center}
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Compile your code without multithreading/parallel support and compare its performance to a code without any parallelisation to determine the overhead of the parallel implementation.
+  \item[$\boxplus$] Run a strong scaling study and compare the efficiency to prescribed thresholds how many cores you want to the system to use reasonably efficiently. 
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Skip intra-node scalability studies, as the code is ``only'' MPI. If a code is only MPI, you should still do strong scaling tests on a single node, where MPI physically uses shared memory.
+  \item[$\boxminus$] Perform a sole strong scalability study without taking the implementation penalty into account.
+  \item[$\boxminus$] Jump straight into a further ``in-depth'' analysis without evaluating the other high-level metrics.
+\end{itemize}

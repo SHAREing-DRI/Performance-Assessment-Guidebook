@@ -1,0 +1,87 @@
+\chapter{How to read}
+
+As with any workbook --- i.e.~a book that's there to guide actual work not to teach a
+big subject --- there are numerous ways to read the text. 
+You can read the manuscript chapter by chapter, but this is unlikely to be the
+most fun experience.
+Below, we collect some ideas on how to substructure the reading:
+
+
+\section*{Context}
+
+% broad overview
+This document is part of an ongoing body work of designing and implementing a structured performance analysis methodology with the future aim of building a performance assessment service.
+
+The work presented here is a precursor to a far more detailed text which will include a structured methodology for conducting performance assessments. In this iteration we introduce: relevant terminology for High-Performance Computing (HPC) and performance analysis; preparing for an assessment; and finally how to begin an assessment from a high-level. 
+
+\section*{Current state of manuscript}
+
+Both Chapter~\ref{chapter:terminology} and \ref{chapter:preparation} are predominantly complete though with notable exceptions such as Section~\ref{section:preparation:complexity} which are yet to be completed, and are labelled as `t.b.d'. 
+
+Within Chapter~\ref{chapter:high-level}, the first three sections are largely finished and have been written in conjunction with implementing these methodologies during recent performance analysis workshops. Section~\ref{section:high-level:inter-node} has been started but the ending of this section still needs significant work. We want to implement more of this `inter-node' assessment before making recommendations that are unfounded. Sections~\ref{section:high-level:gpu} and \ref{section:high-level:io} are yet to be worked through, though Section~\ref{section:high-level:localisation} is mostly complete. 
+
+Clearly sections labelled as `complete' may also need to be extended as further work is done, as the content may become insufficient. Note however that some forward references may link to topics to come in future versions of this manuscript, e.g.~discussions of tools, performance assessment service, etc. 
+
+Finally, Chapter~\ref{chapter:summary} will not be part of the final document (as with this section and the previous) but recaps the current progress of this document whilst also discussing the content to come in the next iteration of this document. 
+
+\section*{First-time assessment}
+
+We recommend to run through the preparatory remarks in
+Chapter~\ref{chapter:preparation} first and to complete all the checkboxes (dos)
+there.
+Once completed, it is time to run through the high-level assessment remarks in
+Chapter~\ref{chapter:high-level}.
+With most codes, it is highly unlikely that a code will only show one kind of
+flaw in the high-level analysis. 
+
+We propose to run through the detailed analysis step by step afterwards.
+Per step, it makes sense to consult the tools summary
+(Chapter~\ref{chapter:tools}) and notably to try out different things.
+Where appropriate, the reader might prefer to read through one of the case
+studies in Part~\ref{part:case-studies}, just to get some inspiration on what tools
+and approaches to try out and how to report outcomes.
+
+
+
+\section*{Assessment}
+
+If you have already completed numerous assessments, then the manuscript is
+mainly a reference document.
+You'd start with the high-level assessment in Chapter~\ref{chapter:high-level},
+before you dig into the various subchapters depending on the initial assessment
+outcome.
+The case studies are not of particular relevance (anymore), as you have already
+completed you own case studies.
+
+
+\section*{Feedback}
+
+The quintessential objective of any assessment is to give feedback to developers.
+Once they make changes to their source code, it is important to re-start the 
+assessment from scratch.
+There is always this temptation to return to the particular characteristics of interest that have led to a report, to see how the code changes by the development team have altered these characteristics, and then to continue from there.
+
+
+It is important to reassess the ``flaw'' metrics.
+However, this should only be a validation that something has changed.
+After that, we have to start from scratch, as performance optimisation is a complicated process where one change might introduce flaws, improvement or character changes in a completely different part of the code or affect a completely different flavour of the performance.
+If we alter a particular code part that makes the scaling deteriorate for example, this might have a severe knock on effect on the core performance.
+If we improve the core performance, the GPU offloading might all of a sudden run into data transfer issues.
+There are numerous examples for these side-effects.
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Conduct a performance assessment which both covers all aspects of the code (cmp.~Chapter~\ref{chapter:high-level}) plus goes in-depth all the way through for all flaws identified.
+  \item[$\boxplus$] Hand this completed assessment back to the developers to address the flaws.
+  \item[$\boxplus$] Restart the assessment from scratch top-down, i.e.~starting with the high-level assessment covering all code runtime nuances.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Mix code optimisation and performance assessment workflows.
+  \item[$\boxminus$] Restart the assessment from the place where you stopped when you reported a flaw and continue digging through the assessment decision metrics without redoing a high-level, overarching assessment.
+\end{itemize}

@@ -1,0 +1,129 @@
+\section{Set up the benchmarks}
+\label{section:preparation:benchmarks}
+
+Before we start a performance assessment, we need to agree on what type of measurements to perform:
+There has to be one well-defined benchmark. 
+If we are given a set of different setups and try to compare them, this will make our task complicated. 
+We run the risk of comparing different characteristics produced by different code parts.
+
+\begin{itemize}
+  \item This one benchmark has to run without any user interaction. In the
+    normal case, the sponsor has to provide a script which builds and runs the
+    whole benchmark ``as a black-box''.
+  \item It has to be very easy to scale that benchmark up and down, i.e.~to make the problem solved bigger or smaller\footnote{
+   For classic PDE solvers or molecular dynamcis simulations, this is easy: 
+   you increase or decrease the mesh points or particles, respectively.
+   For AI workloads, we can manipulate batch sizes for example.
+   There are simulations, where the problem size is invariantly tied to the problem to be solved, i.e.~we cannot simply make it slightly bigger or smaller.
+   In this case, this item has to be taken with a pinch of salt and corresponding metrics and measurements have to be adopted or skipped. 
+  }. 
+  \item The benchmark has to be a simulation run which is representative of a real-world run.
+    It might be significantly smaller and shorter, but it should reflect the core characteristics.
+    If the benchmark does so is domain knowledge, i.e.~an assessor has to rely on community and expert feedback to ensure this property holds.
+  \item The benchmark may not run for too long, and it may not terminate too early. ``Good'' runs are often 3--5 minutes, so we get a good coverage of performance characteristics, but we do not wait for ages.
+%  \item The benchmark has to represent performance characteristics.
+\end{itemize}
+
+\noindent
+None of the properties are surprising:
+We need a well-defined toy setup, and we have to be able to modify its size to make statements on its scalability.
+In this context, it is important that we know exactly how changes of input sizes affect the compute workload (Section~\ref{section:preparation:complexity}).
+
+
+If domain experts tell us afterwards, i.e.~after we have completed our assessment---they will always do that afterwards
+    when they are unhappy with the outcome---that this particular run is not
+    characteristic for larger runs, as it lacks a feature or does not really use a particular routine
+    heavily, our whole assessment exercise is corrupted.
+And with it the whole assessment will be a big disappointment. 
+It is their job to pick a setup that represents what we are interested in and is nevertheless reasonably small.
+
+
+Having a ``small'' setup that completes in reasonable time is important since some performance analysis
+    tools induce significant overheads, i.e.~make the code significantly slower.
+    If our vanilla run already needs more than an hour, we will never get an
+    answer on time. Furthermore, a lot of tools gather significant amounts of
+    data per second. Long-running simulations thus run the risk that our analysis
+    tools fail to handle the amount of data collected.
+Training material from VI-HPS, e.g., recommends around 10 minutes, and it the precise value is up to (the patience of) the assessor.
+When colleagues submit their code, they typically provide a reference configuration using more than one core.
+We will later reduce the available resources artificially to obtain insight into the code's behaviour.
+If the baseline already runs for 10 minutes and we take a quarter of the resources, such experiments quickly become infeasible.
+
+
+Two more properties are important: 
+
+
+\begin{itemize}
+  \item It has to be clear how to disable I/O for the benchmark. This topic is covered by Section~\ref{section:preparation:io}.
+  \item The baseline configuration has to consume a reasonable amount of memory, but may not fill out the whole memory either.
+\end{itemize}
+
+
+\noindent
+If a setup is too small---notably if it fits into the local caches---we will not obtain realistic data, as critical system components that quickly develop into bottlenecks are not used.
+We provide remarks on machine properties in Section~\ref{section:preparation:machine}.
+If a setup is too big however, we again run risk that there is not enough slack for tools to run additional statistics on a program run.
+A memory footprint of 20\%--80\% of the main memory is reasonable.
+Attempting to keep the runtime down, we typically operate closer to 20\%, as long as this is significantly more than the L3 cache and significantly more than the GPU's largest cache.  
+While the ways to extract system properties are discussed in the aforementioned Section~\ref{section:preparation:machine}, there are different tools to record a code's memory consumption:
+
+
+\begin{instructions}{\linux}
+ Linux's \texttt{/usr/bin/time} offers the option to track the maximum memory usage\footnote{Typically does not work if you use the terminal builtin \texttt{time}, i.e.~a call without the absolute path.}.
+ Adding the \texttt{-v} flag yields additional information which delivers, depending on the system configuration, information on the maximum memory envelope.
+ The quantity \texttt{Maximum resident set size} is the quantity of interest.
+\end{instructions}
+
+
+\begin{instructions}{\linux}
+ Linux comes along with different on-board tools to track the memory consumption of a code, so assessors can validate any statement on the actual memory footprint.
+ A simple \texttt{top} displays the memory usage and can be used to extract all relevant information (there are more sophisticated variants such as \texttt{atop} or \texttt{htop}, but \texttt{top} is available on each and every system).
+ \begin{itemize}
+   \item Log into the compute node of interest, i.e.~the node on which a code runs. With \slurm, \texttt{squeue} provides you with the node name, while your admin team has to allow \texttt{ssh} into the node.
+   \item Combine the call with \texttt{-b -d <duration>} to run \texttt{top} in sampling mode.
+   \item Pipe the outcome into a text file.
+ \end{itemize}
+\end{instructions}
+
+
+\begin{instructions}{\valgrind}
+ The \valgrind~tools perhaps provide the gold solution to monitor memory usage.
+ They can be used a simple prefix to the program call:
+ \begin{verbatim}
+ valgrind --tool=massif ./code
+ \end{verbatim}
+ 
+ \noindent
+ yields all the data require to get an overview of a code's memory needs.
+ Different to \texttt{top} and \texttt{time} it however introduces (potentially massive) runtime overhead.
+ At this point, a simpler monitoring call might be more appropriate.
+\end{instructions}
+
+
+\begin{checklist}
+ \item Your benchmark compiles as a black box, i.e.~you can give it to another person together with a \texttt{README} file and there might be a few instructions that they have to copy-n-paste into their terminal, but other than that there's no other preparatory work to be completed.
+ \item Your benchmark runs without any user interaction.
+ \item Your benchmark finishes within less than ten minutes on a single core.\footnote{To analyse different aspects of the code, we do not need to rely on the same benchmark. For example, when conducting scaling analyses, there may be performance characteristics that are only revealed at high core counts. Hence, for some codes we may set up our benchmark to have runtimes exceeding 10~minutes at low core counts, such that the problem size is large enough to see high core count scaling effects. However, at high core counts we would expect to see this benchmark runtime sit within this 10~minute upper bound.}
+\end{checklist}
+
+No matter how we create this setup, we have to be able to run all experiments with absolutely minimal user interaction. %(cmp.~Section~\ref{section:behaviour:automate}).
+If we have to run through a complex pipeline for each individual experiment, we will not be able to measure anything productively.
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Ask the code owner (``assessment customer'') to provide you with a ready-to-use benchmark. 
+  \item[$\boxplus$] Validate that this benchmark meets the criteria outlined in this section. Otherwise, return it immediately.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Try to make a code run and design a benchmark yourself. This is the job of a domain/code expert.
+  \item[$\boxminus$] Expect insight from benchmarks that somebody without domain expertise has chosen.
+\end{itemize}
+
+

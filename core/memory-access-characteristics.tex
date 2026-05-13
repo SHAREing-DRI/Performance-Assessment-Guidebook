@@ -1,0 +1,35 @@
+\section{Memory access characteristics}
+\label{section:core:memory-access-characteristics}
+
+
+\paragraph{Hypothesis}
+
+If memory bandwidth used is low and the MFlops rate is low, too, we often have a
+situation where the code issues many scattered memory accesses all over the
+place all the time.
+Every time we miss a cache, we have to access the main memory and pay for the
+latency. 
+We will never be able to saturate its theoretical bandwidth even though we
+access the memory all the time.
+Along the same lines, we will never be able to exploit our compute capabilities,
+as we never get the data into the registers quickly enough.
+
+
+
+\begin{assessmentcrime}
+ 80\% of the runtime might be spent on 20\% of the code.
+ For the performance analysis, it is not appropriate to focus on this 20\% of
+ the code only.
+ Instead, you have to focus on all code that does not do any science if this
+ code share is too big.
+\end{assessmentcrime}
+
+Too big means more than 20\%. Flame graphs helfen also gar net. Sie sind sogar
+counter-productive bzgl Outcome. 
+Wie passt die Aussage eben zu der Tatsache, dass wir nix ueber den Code wissen
+sollten.
+Developer muss Black/white List schicken.  Aber eben net ``was wird gebraucht''
+sondern nur ``wo wird gerechnet''.
+
+
+

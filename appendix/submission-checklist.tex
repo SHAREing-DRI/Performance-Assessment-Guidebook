@@ -1,0 +1,121 @@
+\chapter{Submission checklist}
+\label{appendix:submission-checklist}
+
+This chapter hosts a set of checkpoints that groups might introduce \emph{before} they start to conduct assessments and analyses.
+They form kind of a common sense contract between the code owner and the person conducting a review and ensure that some typical hiccoughs and problems are avoided.
+As it has this legal flair, we call the parties involved the code \emph{owner} vs.~the code \emph{analyst}, even though these roles in practice might be blurred and taken up by code developers themselves. 
+The checklists complement the aspects and checklists discussed in Chapter~\ref{chapter:preparation}.
+While Chapter~\ref{chapter:preparation} is written from an analysis/assessment point of view and hence targets predominantly the analyst, 
+the checklists here are more owner-focused and notably highlight the interaction between analysts and owners.
+
+
+\section{Code submission}
+
+Before we accept a piece of code for the assessment and analysis, it is important to identify what we expect from the owner submitting the code.
+This covers first of all the artefact itself:
+
+\begin{checklisttitled}{Code}
+ \item There is a central archive with all files required to run the code. The archive is self-contained.
+ \item This archive is frozen, i.e.~no one changes the object of an assessment while the assessment is going on.
+ \item There is a well-defined, characteristic run of the code which the analyst can use to study performance of the software. This benchmark should not take `too long'; for further details please see the \href{https://shareing-dri.github.io/assets/pdfs/shareing-benchmark-guide.pdf}{SHAREing benchmark guidelines}.
+\end{checklisttitled}
+
+\noindent
+The second point is obviously once written down, but deserves to be highlighted:
+If an object of study changes as we try to assess it, it is virtually impossible to get the big picture right.
+Obviously, continuous benchmarking and performance analysis can and should be part of professional scientific software development.
+However, if we try to conduct an objective assessment, we have to work with a fixed object of study.
+That means, we should freeze the development for the time being or at least work on a stable (release) branch. For example, the owner can create a \emph{tag} within the repository. Tags are often used to annotate specific code release versions, but here we can also tag the repository at a specific point for assessment. This can be achieved simply via the \texttt{git tag} command. If a code does not (yet) support all dimensions of an assessment (cmp.~Chapter~\ref{chapter:high-level}) or some dimensions are not yet stable, this is the time to flag this, so we can exclude them from the analysis.
+
+Submitting a characteristic run means that the owner describes how we can start such a run on the reference system ourself.
+This is the litmus test:
+If we cannot (even) start a baseline run, then the code/submission is obviously not yet in a shape to be assessed and we have to stop immediately. 
+
+The attribute ``characteristic'' requires the owner to doublecheck if the setting handed over makes sense.
+Both parties want the outcomes of the benchmarking and analysis to be meaningful.
+We assume that the owner wants to learn something about the code from an objective analyst, while the analyst wants to know right from the start that their work is relevant.
+We want to avoid a situation where we are told afterwards that the analysis' results are meaningless because ``in the real world, we would use a completely different setup''.
+This has happened to us before. 
+
+Further to the mere artefact submission, we also require more detailed information from the owner. We begin by outlining the required documentation that we expect from the owner:
+
+\begin{checklisttitled}{Documentation}
+    \item Software dependencies, e.g., libraries such as FFTW, LINPACK, etc. preferably with versions if known.
+    \item Compilers, preferably with version if known, along with the typical compile flags.
+    \item Parallel libraries/models, e.g., MPI, hybrid parallelism with MPI+X, CUDA, OpenMP, etc.
+    \item Detailed build instructions.
+    \item Run instructions, i.e., the necessary run commands including any relevant details of the command line interface for passing arguments to the executable.
+\end{checklisttitled}
+
+This required documentation we see as necessary for an analyst to start by cloning the repository, and almost without thinking, produce a correct executable for the ``characteristic'' code run. Though we treat the code as a black box, the parallel model is requested to guide the analyst to which aspects of a software's performance can be analysed, i.e., clearly a code which supports MPI only cannot have its GPU performance analysed.
+
+With this information an analyst should be able to build the executable and so next we request typical resource allocations for the software such that the analyst can begin to define job scripts and plan out the assessment. The requested resource allocation information is listed as:
+
+\begin{checklisttitled}{Resources}
+    \item The owner should, if known, state some example runtimes of the characteristic benchmark along with the hardware examples and configurations that were used.
+    \item The owner should submit example configurations of the parallel resources used. For example, if CUDA+MPI is used then how many ranks are assigned per GPU? If using OpenMP+MPI then how many threads are typically assigned per rank.
+\end{checklisttitled}
+
+This information is to direct the analyst towards `typical' job and resource allocations. For example, some hybrid parallel MPI+OpenMP codes use quite specific allocations of ranks per node and threads per rank, and it is not feasible to explore all combinations. Hence, requesting an example job setup, preferrably in the form a job script, can direct the analyst and make the performance report more relevant to the owner. Furthermore, knowledge of typical runtimes along with job setups can be useful for the analyst to sanity check results and support that the benchmark configuration is in keeping with the guidelines touched on in \Cref{section:preparation:benchmarks}.
+
+Having built the executable and designed the relavent job scripts, we finally request information on benchmark configuration:
+
+\begin{checklisttitled}{Configuration}
+    \item The owner should describe how to vary the benchmark, i.e., which flags can be varied including typical value ranges for these parameters.
+    \item The owner should supply details of how the benchmark scales with the input parameters.
+    \item The owner should describe how, if possible, the I/O of the benchmark can be switched off or on.
+\end{checklisttitled}
+
+The questions on configuration --- at least for the high-level assessment --- are mainly for a weak scaling analysis, because this is likely the only point in which the analyst is straying away from the example benchmark. Therefore, the analyst needs to understand how to scale the benchmark both from an interface standpoint of how do we vary the input parameters, but also how does the algorithm scale. Put simply: how do we vary the input parameters to, e.g., double the problem size? 
+
+The final question on I/O is that when not studying I/O performance, it can be beneficial for the analyst to be able to switch this off and avoid I/O skewing performance measurements.
+
+All of the requested information above is to aid the analyst to be able to perform our high-level assessment as just ``turning the handle''. However, technical documentation of a code is not all that is required for a performance assessment service; professional conduct and managing expectations.
+
+\section{Code of conduct}
+
+Above we discussed the importance of defining characteristic benchmarks to avoid (from experience) performance reports being disregarded as not indicative of ``real world'' runs. Along the lines of ``this has happened to us before'', we here write down some simple principles how to behave regarding the analysis:
+
+\begin{checklist}
+ \item The owner is available to the analyst for questions around the code while the assessment project is going on, and try to answer questions re code usage and setups quickly and constructively.
+ \item The owner will refrain from challenging the assessment methodology.
+ \item The owner commits to acknowledge all. 
+\end{checklist}
+
+\noindent
+The first item can be subject of debate. 
+
+\begin{wip}
+    Greater context needs to be added here. 
+\end{wip}
+
+%% We need to also consider that our code of conduct distinguishes us from a consultancy; we produce assessments.
+
+\section{Outcomes}
+
+It is important to sort out what happens with any outcomes before the assessment starts.
+The two items below can be subject of debate, but they align with principles of open, fair and reproducible science:
+
+\begin{checklist}
+ \item The owner grants the analyst the right to publish their review. 
+ \item The analyst commits to an objective assessments which refrains from ``blaming'' a code for certain behaviour. 
+\end{checklist}
+
+\noindent
+This sounds defensive and it is defensive, but we have observed numerous situations where developers reacted annoyed up to angry when they read assessments.
+Scientists tend to develop emotional attachment to their codes, and are not amused if an independent analysis highlights shortcomings.
+It is important to acknowledge that this is exactly the purpose of an analysis.
+It is not there to confirm how exceptionally great some piece of code is already, but should inform future development.
+
+%\section{Agreed objectives}
+
+%\begin{wip}
+%I am not convinced that this section is needed anymore, I will comment it out for now.
+%\end{wip}
+
+%\begin{checklist}
+% \item The owner specifies what alternative/target architectures they have in mind for production runs.
+% \item The owner specifies their target configuration, i.e.~how many nodes/GPUs they intend to use for production runs.
+% \item The owner specifies their target setup, i.e.~how bit the problem size will be for production runs.
+% \item The owner specifies how much data their target configuration will likely write for production runs. 
+%\end{checklist}

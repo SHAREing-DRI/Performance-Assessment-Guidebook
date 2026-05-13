@@ -1,0 +1,221 @@
+\section{Coverage}
+\label{section:node-level:coverage}
+
+
+\begin{hypothesis}
+ If only a fraction of the code is parallelised and if this fraction is too small, this becomes the reason for poor (strong) scaling.
+\end{hypothesis}
+
+
+To follow up on our working hypothesis, we analyse how much of a code is covered by parallelism, i.e.~could in theory run in parallel.
+Our strategy to follow-up on the hypothesis that there might not be enough concurrency in a code covers studies along different dimensions.
+On the one hand, we can use a standard strong scaling model and fit it to measurement.
+If it fits, it yields an abstract metric of how much of the code is serial. 
+We can then make follow-up decisions based upon this outcome.
+If it doesn't fit, this also provides us with intelligence.
+Parallel to that, we can employ tools and measure the observed parallelism (which is not the same as the theoretical concurrency).
+Again, this provides us with insight on the degree of code that is covered by parallel constructs and should spread out over cores.
+
+
+\subsection{A simple performance law}
+
+One of the simplest off-the-shelf models for parallel code is Amdahl's law \cite{amdahl1967}.
+It assumes that the runtime of a code is given by
+
+\begin{equation}
+ \label{equation:intra-node:performance-model}
+ t(p_{\text{threads}}) =
+  t(1)
+ \left(
+ f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right).
+\end{equation}
+
+\noindent
+from which it argus on the obtained speedup or efficiency,
+respectively
+
+\begin{eqnarray}
+  S(p_{\text{threads}}) & = & \frac{t(1)}{t(p_{\text{threads}})} 
+    \nonumber
+    \\
+  & = & \frac{t(1)}{t(1)
+ \left(
+ f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right))} 
+    \nonumber
+    \\
+  & = & \left(
+ f_{\text{intra}}/p_{\text{threads}} + (1-f_{\text{intra}}) \right))^{-1}
+    \label{equation:amdahl:speedup}
+\end{eqnarray}
+
+\noindent
+In this model, we assume that the time $t(p_{\text{threads}})$ for a code to
+finish the calculation of one fixed setup on $p_{\text{threads}}$ threads
+depends only only on one variable that is specific to our code:
+There is a part (fraction) $0 \leq f_{\text{intra}} \leq 1$ of the code that
+benefits as we add more and more hardware threads.
+It scales perfectly.
+The other code fraction $1- f_{\text{intra}}$ however runs
+serially and hence does not benefit from additional cores.
+If we want to know how long a code fitting onto one thread would need on
+$p_{\text{threads}}$ threads, we take the fraction of time that scales and
+divide it by the number of threads.
+After that, we add the serial part, which stays invariant.
+
+
+On top of this vanilla model, we have already implicitly used an
+additional penalty variable $0 < C_{\text{intra}} \leq 1$ in
+Section~\ref{section:high-level:intra-node}.
+It quantifies how much slower the code runs as we enable our multithreading
+implementation.
+It quantifies the sole parallelisation overhead.
+Adding this calibration into the model arising from \eqref{equation:amdahl:speedup} is straightforward.
+
+
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[width=0.7\textwidth]{node-level/strong-scaling-plot.pdf}
+ \end{center}
+ \caption{
+  Scaling plots for different solvers for two different mesh sizes $h$.
+  \label{figure:node-level:coverage}
+ }
+\end{figure}
+
+\begin{assessmentcrime}
+ Amdahl's law is used to derive statements on strong scalability using a handful of sample points without sanity
+ checks if the model accurately describes the strong scaling behaviour overall.
+\end{assessmentcrime}
+
+
+\paragraph{Calibration}
+
+With the performance model in place, we can measure the actual performance and reconstruct $f_{\text{intra}}$.
+We can calibrate the equation to observed data (Figure~\ref{figure:node-level:coverage}).
+There are, broadly speaking, three different outcomes:
+
+\begin{enumerate}
+  \item The model fits, and $f_{\text{intra}} \ll 0.2$.
+  \item The model fits, but $f_{\text{intra}} \geq 0.2$.
+  \item The model does not fits.
+\end{enumerate}
+
+In the example in Figure~\ref{figure:node-level:coverage}, the yellow line obeyes Amdahl's law albeit with a rather large $f_{\text{intra}}$ value.
+The other plots ``suddenly'' plateau and hence do not fit the simplistic performance law.
+
+
+\paragraph{Contextualisation}
+
+Intra-node analysis' ultimate goal is to assess and provide guidance on a code's behaviour on a given system, i.e.~for a given core count.
+In that sense, it seems weird to rely on an upscaling model.
+However, the upscaling model provides us with important insight that we can use to narrow down the search for performance flaws.
+
+
+\subsection{Code coverage}
+
+As follow-up to the symptomatic studies, we can dive into the code and analyse how much of it is actually covered by parallel constructs.
+Studying the code to see how many lines are covered by an OpenMP pragma for example is an option to gather intelligence.
+Far more effective is using a tool that measures how much code is run in parallel.
+Using a tool also has the advantage that it provides weights to the lines: 
+A line that is executed only once might not have to run in parallel, while instructions that are executed thousands of time make the runtime potentially deteriorate. 
+Knowing interesting sample points, using a tool becomes feasible, as we do not have to study all potential core counts.
+
+
+\begin{instructions}{\vtune}
+ \vtune~can provide you coverage analysis through its Flame Graphs:
+ \begin{center}
+   \includegraphics[width=0.5\textwidth]{node-level/vtune-flame-graph-concurrency.png}
+ \end{center}
+ In the example above, the OpenMP core routines are clearly visible and provide information that all parts of this code are covered properly by OpenMP parallel regions.
+ In this example, the concurrency level is, in principle, high.
+\end{instructions}
+
+
+\subsection{Extensions of Amdahl's law}
+
+
+There are a couple of issues with this model which make it often struggle to
+represent real-world data:
+
+\begin{itemize}
+  \item The formula assumes that we have either sections that are parallel or
+  sections that are sequential. In real codes, we often have sections that use
+  some tasks or small loops. These do not scale with $p_{\text{threads}}$ which
+  the model will fail to capture. 
+  \item If a code is heavy on semaphores and critical sections, it will have to
+  serialise some parts of the code. They cannot run in-parallel. This will lead
+  to a blurred parallelism---maybe even non-deterministic.
+  \item Every parallelisation induces overhead to manage threads, realise
+  dependencies or synchronise parts of the code. This overhead grows as the
+  number of threads grows.
+\end{itemize}
+
+
+
+\noindent
+Due to these effects, many codes will yield data where the runtime starts to
+raise again once we exceed a certain core count (yellow dots in Figure~\ref{figure:intra-node}).
+This could be modelled by an additional penalty term $C_{\text{penalty}} \cdot p_{\text{threads}} $ added to \eqref{equation:intra-node:performance-model}.
+In other cases, we would have to add a noise term depending upon
+$p_{\text{threads}}$.
+Anyway, we note that a measured $f_{\text{intra}}$ is an effective parallel
+fraction, i.e.~something we see. 
+It does not mean that the code really is a simple sequence of loops which all
+scale brilliantly, while the parts in-between can be accurately quantified by
+$1-f_{\text{intra}}$.
+
+
+Despite all of its shortcomings, we can use the model and actually turn the
+argument around:
+If we can use Amdahl's law \eqref{equation:amdahl:speedup} to model a code
+accurately and if the resulting $f_{\text{intra}}$ is sufficiently big, then we
+are on track to deliver a code which is of high intra-node efficiency.
+Otherwise, we will continue to dive into the code anyway.
+
+
+
+\subsection{Evaluation}
+
+\begin{enumerate}
+  \item[$\boxtimes$] If the strong scaling model fits and $f_{\text{intra}} \ll 0.2$, the code should in principle scale. 
+    It is not likely that it has a strong scaling issue. 
+    However, it might be appropriate to play around with different rank per node settings, i.e.~to increase the number of MPI ranks mapped onto one node such that each rank has effectively fewer cores to employ. 
+    This way, the serial fraction $f_{\text{intra}}$ would affect the efficiency less significantly.  
+  \item[$\boxtimes$] The model fits, but $f_{\text{intra}} \geq 0.2$ despite the fact that the concurrency analysis suggests that all code parts are parallelised.
+    Even though the code is parallelised, it effectively serialises major parts of the code. 
+    In many cases, this can result from ill-balancing or excessive synchronisation.
+    \begin{itemize}
+      \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}). And imbalanced load distribution leads to an increased pseudo-serial code fraction. 
+%      \item[$\Rightarrow $] Look into the synchronisation flaws (Section~\ref{xxxx}). Excessive synchronisation also serialises the code. 
+    \end{itemize}
+  \item[$\boxtimes$] The model fits, but $f_{\text{intra}} \geq 0.2$ and major code parts are not captured by the parallel regions.
+    Significant parts of the code are not parallelised.
+  \item[$\boxtimes$] The model fits up to a certain core count, but then plateaus.
+    \begin{itemize}
+%      \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}). And imbalanced load distribution leads to an increased pseudo-serial code fraction. 
+      \item[$\Rightarrow $] Ensure that the code's concurrency level is sufficiently high, i.e.~that there should, in theory, be enough parallel work (Section~\ref{section:node-level:concurrency}).
+    \end{itemize}
+\end{enumerate}
+
+
+%     In many cases, this is a result from too small loop ranges, a limited number of domain subpartitions, or hard-coded grain sizes.
+%     If possible, the assessment should zoom into the profile and name the bad guys. 
+%     Things are slightly different for task-based codes, where additional profiling steps are necessary.
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Use Amdahl's formula to find out if your code follows the simplistic scaling law qualitatively and quantitatively.
+  \item[$\boxplus$] Employ a tool to validate sufficient code coverage.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Run a few arbitrary experiments, determine $f_{\text{intra}}$ through regression, and draw general conclusions about your code.
+\end{itemize}
+

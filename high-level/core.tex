@@ -1,0 +1,209 @@
+\section{Core performance}
+
+
+\begin{summary}
+ We consider a code to make efficient use of a compute core's capabilities if it uses more than 80\% of the compute facilities that an artificial benchmark would be able to exploit.
+ We consider a code to make reasonable use of a compute core's capabilities if it uses more than 60\%.
+\end{summary}
+
+For the core-level analysis, we examine how efficiently your code harnesses the chip's microarchitecture. 
+Does your code leverage the most advanced instruction sets available?
+Are we maybe even compute-bound? 
+Does it properly utilise the memory interconnect? 
+Are we memory-bound?
+Today's chips come equipped with powerful vector computing capabilities and sophisticated cache and streaming features designed to move data smoothly between memory and compute registers. 
+Our analysis evaluates how effectively your implementation takes advantage of these capabilities.
+
+To capture core behaviour at a high-level we simply want to measure the code's peak performance relative to the maximum of the hardware. Tools can tempt us to reach immediately for a roofline model, or potentially even more detailed metrics around cache misses, vectorisation ratios, etc. These topics are relevant to a core performance analysis, but we want to start high-level or we otherwise risk focusing on an individual metric which obfuscates or distracts our analysis. By focusing simply on peak performance, our initial core performance investigation should sit us somewhere in the `traffic light' table below.
+
+\subsection{Benchmark preparation}
+
+
+Before beginning our data collection we want to ensure that our data is a reliable and accurate representation of the peak, single-core performance of the code.
+
+\begin{assessmentcrime}\label{assessmentcrime-cache-fit}
+ We assess a setup that fits completely into one of the caches.
+\end{assessmentcrime}
+
+%% so we remove this because we actuall just inherit compile flags from the submitter at this stage...
+
+%\begin{assessmentcrime}
+ %We study a code that is not translated with the most aggressive compiler optimisation for the particular architecture that we study. 
+%\end{assessmentcrime}
+
+\noindent
+%Both properties are easy to check: 
+Measure the total memory footprint of your code and ensure that the working set exceeds the largest cache you find on your system (cmp.~remarks on caches below); techniques for making these measurements are given in Section~\ref{section:preparation:benchmarks}.
+
+%% removing this as we are moving compiler optimisatoins to lower level
+%Further to that, check your compiler's manual and ensure you use a bespoke code version for your target system---something that the \texttt{-march} or \texttt{-xarch} as well as the highest compiler optimisations (\texttt{-O3}) for example give you; greater details for these checks are given in Section~\ref{section:preparation:compiler-settings}. 
+
+Not all benchmarks have a single-core implementation, and indeed in some cases a single-core run is not useful. For example, some benchmarks are implemented to be `full node'. Hence, we again can use an indicative run of the code, e.g., if the code submitter has suggested a `full node' run then we can perform a high-level analysis averaged across all cores. We will cover the details of this practice in the next section.
+
+
+To some degree, the argument holds the other way round for the cores:
+Modern chips are often not capable of cooling all of their cores if all of them
+run at full compute capacity.
+They therefore downclock the system when they encounter lots of compute-intense
+operations.
+As we only assess scalar peak performance in this first exercise, this
+effect should not arise or be negligible. 
+You might however want to double-check.
+
+\subsection{Data Collection}
+
+Once we have prepared our benchmark we are now ready to begin making measurements, and the data we need for this metric are:
+\begin{itemize}
+\item The maximum single-core, peak performance of the hardware
+\item The obtained single-core, peak performance of our executable
+\end{itemize}
+As mentioned above we can do this either by using a single-core run or by using a parallel run and taking the average of these values across the cores. 
+
+As we are only making one observation, it is advised to use exclusive compute resources (i.e., an exclusive node here) to get the most reliable data that is not impacted by other job allocations.
+
+% discuss affinity here?
+
+To make these measurements, we must turn to a performance tool. Multiple performance tools are able to make these measurements, and we list below basic instructions of how to perform these measurements with some of our `go to' tools.
+
+\begin{instructions}{\likwid}
+To measure the peak performance of a hardware example with \likwid\, it is only a few lines
+
+\begin{verbatim}
+likwid-bench -t peakflops -w S0:16kB:1
+\end{verbatim}
+   
+\noindent
+%The Stream Triad \cite{mccalpin1995} benchmark is a brilliant starting point to obtain realistic throughput bounds.
+%As we are not (yet) interested in explanations of how well caches are used, it is important to pick a reasonably big setup that exceeds all caches.
+%2GByte should be plenty.
+%It depends on our measurement strategy if we assess the single core bandwidth or
+%take the whole node's (here with 128 threads) throughput and re-calibrate it accordingly.
+
+This command pins the \texttt{peakflops} microbenchmark to a single core on the first socket (labelled \texttt{S0} here), to ensure maximum thread affinity. We use a convention advised by the Likwid developers in which the \texttt{peakflops} microbenchmark is performed with an input dataset half the size of the L1 cache \cite{}. For example, in the commands above we use a 16kB input which is half the size of a 32kB L1 cache (which we can find by running the \texttt{likwid-topology} command). As we scale the \texttt{peakflops} microbenchmark across a node, we scale up this data input size by the number of cores, e.g., if want to run this analysis across 128 cores we use an input of $128\times16\text{kB}$, giving
+\begin{verbatim}
+likwid-bench -t peakflops -w N:128*16kB:128
+\end{verbatim}
+though we stick to just single-core performance for now.
+ 
+The instruction set usage is something we can evaluate per core.
+Depending on the character of the code, we might want to pick a more advanced instruction set (e.g.~\texttt{peakflops\_sse} or \texttt{peakflops\_avx\_fma}).
+As long as we argue about the overall code performance, we find the plain peak performance to be absolutely sufficient. 
+Being within 80\% of that one for the total program execution is typically a good sign.
+
+
+Once we have the thresholds, the code's performance itself can again be used by multiple tools.
+Again, likwid is our personal favourite:
+
+\begin{verbatim}
+likwid-perfctr -f -C 0 -g FLOPS_DP ./code
+\end{verbatim}
+
+\noindent
+which provides you with the information relevant, although the exact names of the groups might differ from system to system.
+\end{instructions}
+
+%% I suggest we move other potential tools to an appendix...? What are we wanting to touch on here: I guess the Likwid intro forces us to talk a little bit more about caches, pinning and the data collection more specifically...?
+
+%\begin{instructions}{\amplifier}
+% t.b.d.
+%\end{instructions}
+
+
+%begin{instructions}{\map}
+% t.b.d.
+%\end{instructions}
+
+
+ 
+\subsection{Evaluation}
+
+Once we know the maximum performance and the obtained performance, we can compute
+their ratio, i.e., the normalised peak $C_{\text{peak}}$.
+This metric is a little bit weird (and we will revise it later), as we typically
+normalise against the scalar peak performance.
+This is surprising given that all mainstream CPUs support vectorisation and hence
+can deliver several times more than that.
+However, we empirically found that starting with a comparison against the
+baseline is a good starting point:
+Few codes spend all of their runtime exclusively in very compute-heavy routines.
+Therefore, there will always be code parts which do not exploit vectorisation.
+If those that are compute-heavy do so and hence lift the average total peak into
+the regime of the scalar peak, this is already an overall efficient code.
+
+
+\index{Peak performance}
+\index{MFlops/s}
+\begin{performancemetric}
+ The delivered MFlops/s normalised against the scalar peak is a good high-level
+ indicator for the compute efficiency.
+\end{performancemetric}
+
+
+%index{Memory bandwidth}
+%\begin{performancemetric}
+ %The used bandwidth normalised against the memory bandwidth is a good high-level indicator for the compute efficiency.
+%\end{performancemetric}
+
+%\noindent
+%It is not clear whether normalising against the memory bandwidth is
+%reasonable given that modern CPUs feature vast caches.
+%The comparison furthermore is biased as we measure a single core but compare it
+%to a value taken from the whole system divided by the core count.
+%We however think that this normalisation nevertheless delivers a good
+%initial high-level metric for a code, even though it favours the real code.
+
+
+%Following Section~\ref{section:related-work:bottom-up}, we might introduce
+%a multiplicative or additive metric over the two quantities to come up with a
+%first assessment.
+%As a matter of simplicity (and as we use both quantities later on), we use a
+%third variant here:  
+%an and-based correlation of the two metrics.
+
+
+\begin{center}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  Peak FLOPS proportion & Description \\
+  \hline
+  $C_{\text{peak}} \geq 0.8$
+   & \cellcolor{green!25} Core compute performance is good.
+  \\
+  $0.8 > C_{\text{peak}} \geq 0.6$
+   & \cellcolor{yellow!25} Core compute performance is not effectively using the hardware to its maximum potential. 
+  \\
+  $0.6 > C_{\text{peak}}$
+   & \cellcolor{red!25} Core compute performance is poor.
+ \end{tabular}
+\end{center}
+
+\noindent
+If $C_{\text{peak}} \geq 0.8$, the code uses the compute capabilities
+(very) efficiently.
+%However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional space to improve the throughput and to speed up the code. 
+ If $0.6 \leq C_{\text{peak}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
+ %However, if $C_{\text{bw}} \geq 0.8$, the problem might be inherently
+ %memory-bound (to be checked), in which case there might be limited potential to optimise further.
+
+%%TAFlynn - not sure why the following paragraph was commented out, seems ok to me. Maybe we just leave it out of the first iteration of the document anyway
+
+% It is very clear that these rules as well as the measurements themselves are a little vague and misleading:
+% Code might appear to be memory-bound if we just sum up the individual bandwidth needs, but once we get a mix of memory access patterns, it might not be that bad.
+% Complex algorithms might also change their character from time to time, and this might not be captured by a single benchmark.
+% Finally, even bandwidth-bound code in this case might provide plenty of space to optimise further, if we manage to exploit caches properly. 
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Run a standard benchmark to determine a realistic maximum peak performance per core.
+  \item[$\boxplus$] Assess your code to find out if it makes sufficient use of the available compute units.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Apply some performance counters as a black box without a focus on  peak performance.
+  \item[$\boxminus$] Jump straight for a tool which gives significant data on vectorisation, cache misses, etc.
+  \item[$\boxminus$] Immediately dig into any performance flaw without evaluating the other four rubrics first.
+\end{itemize}

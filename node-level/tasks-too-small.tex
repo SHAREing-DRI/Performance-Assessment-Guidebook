@@ -1,0 +1,85 @@
+\section{Tasks are too small}
+\label{section:node-level:tasks-too-small}
+
+
+If tasks (or parallel sections) are too small, we pay an excessive overhead.
+The concurrency level might be brilliant, but that does not help us if we have too much task creation and task clean-up overhead.
+
+\begin{hypothesis}
+ There are enough tasks and they are not excessively synchronising each other, i.e.~there are not that many dependencies, but they are just too small and hence create too much administration overhead.
+\end{hypothesis}
+
+
+There is not really a definition of a ``too small task''.
+However, we can use rule of thumbs from parallel loop segments and consult popular developer platforms and read about the recommendation that a reasonable task should at least run for tens of microseconds.
+The extreme case of tiny tasks are empty tasks which some codes use to model dependencies, i.e.~to synchronise sets of tasks in a task graph.
+If we have too many of those guys, the fine granular decomposition of a problem into a task graph becomes a performance problem in its own right.
+
+
+\subsection{Data collection}
+
+Different to excessive synchronisation (Section~\ref{section:node-level:synchronisation}), spotting too small tasks is often challenging.
+Either, we do not see locks or excessive spinning at all, or we see these but within the task runtime itself.
+After all, small tasks lead to a low overhead from a user code's point of view, as the overhead is typically attributed to the task runtime.
+
+A plain profile is difficult to assess as well, as very short task functions do not appear high up on the list either.
+They might have a very high call number, but the combination low runtime plus high call number also implies that they are often hard to distinguish from sole helper functions.
+
+Due to the fact that this flaw is not trivial to spot, it does not come as a surprise that many task-based codes bring along their own task tracing.
+The present manuscript cannot and should not cover these bespoke solutions, but rather advocates for a symptomatic analysis or, if possible, measurements through a runtime's tool interface.
+
+
+\subsubsection{Symptom analysis with \openmp}
+For systems employing \openmp, very small tasks materialise in a lot of time spent in \texttt{\_\_kmp\_fork\_barrier}.
+When we open up the trace, we see that this function is called by \texttt{\_\_kmp\_launch\_thread}.
+So all the overhead arises from \texttt{libiomp5.so} or similar.
+
+
+
+\begin{instructions}{\vtune}
+ In \vtune's hotspot analysis, you see in the summary a very high overhead time.
+ Indeed, studies of the timeline confirm that we see that all the time is burn in spin and overhead. 
+ 
+ In \vtune's Threading analysis as well as the HPC Performance Charaterization, we are informed on the summary page that the Effective CPU (or physical core) Utilization is low.
+ Low here implies less than 80\%.
+ Unfortunately, all the tools claim that the \openmp~region with the biggest potential gain is something similar to
+ \texttt{unknown\$omp\$parallel}, and if we zoom into the area of interest, the threading analysis quickly tells use that there is no data to display.
+\end{instructions}
+
+
+
+\begin{wip}
+ I haven't yet found a way to find out which tasks are too cheap. 
+\end{wip}
+
+\subsection{Evaluation}
+
+
+\begin{enumerate}[noitemsep]
+  \item[$\boxtimes$] There are too many tiny tasks modelled as real tasks.
+    \begin{itemize}[noitemsep]
+      \item[$\Rightarrow $] Inline tasks, i.e.~call the tasks as functions rather than spawning them as real tasks.
+      \item[$\Rightarrow $] Randomise task creation and therefore throttle the task production.
+    \end{itemize}
+\end{enumerate}
+
+
+\noindent
+In \openmp, ensuring that logical tasks are not mapped onto physical tasks is very simple.
+You can add a \texttt{if (xxx)} annotation to the pragma that switches it on or off depending on a boolean predicate.
+
+
+% \paragraph*{How it works}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxplus$] Validate that the administrative (non-science) fraction of the code scales with the scientific core calculations.
+% \end{itemize}
+% 
+% 
+% \paragraph*{How it does not work}
+% 
+% \begin{itemize}[noitemsep]
+%   \item[$\boxminus$] The administrative overhead will always increase relatively, so an increase in itself is not a flaw. An extraordinary increase coupled with limited scalability however is.
+% \end{itemize}
+
+

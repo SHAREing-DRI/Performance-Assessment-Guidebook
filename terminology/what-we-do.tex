@@ -1,0 +1,66 @@
+\section{What we do}
+\label{section:terminology:what-we-do}
+
+From hereon, we rely on a few key assumptions:
+
+\begin{enumerate}
+\item We assume that the person studying the code has \emph{limited knowledge} of the code's internals, the application domain, and the algorithms used.
+\item We evaluate \emph{how} a code performs and whether certain characteristics deserve closer examination.
+\item We are interested in the code's behavior on \emph{one particular machine} for \emph{one particular experimental setup} or a closely defined set of experiments.
+\item Whenever we explain \emph{why} a code performs as it does, this
+explanation comes from a machine's point of view: It does not argue about the
+algorithm or science case.
+\end{enumerate}
+
+
+\begin{doctrine}
+ \emph{Performance Assessment} documents code behaviour from an outsider's point of view. It captures what we see (benchmarking).
+ \emph{Performance Analysis} explains why a code behaves the way it does.
+ \emph{Performance Engineering} improves the performance.
+\end{doctrine}
+
+\noindent
+The three steps typically build up on each other.
+Performance assessment is a little bit like a health screening in medicine.
+We run a couple of standard benchmarks (similar to blood pressure, oxygen saturation and pulse for example). 
+If some metrics are not in the region where we want them to be, we issue further tests, i.e.~we switch to the analysis part.
+
+The skills we need first and foremost are to know what tests we should conduct or commission, and we have to be able to read the outcomes.
+If the test metrics are not what they should be, we eventually transfer the patient (code) to a specialist and run further tests.
+Based upon these tests, we finally start the treatment. 
+
+\begin{readerguide}
+ This text starts with a performance assessment before it switches to some performance analysis.
+ It does not cover aspects of performance engineering.
+\end{readerguide}
+
+\noindent
+Our working assumption is that performance engineering requires inevitably domain or code experise which we cannot/might not have as generalists.
+However, we also assume that there is value in and a need for indepenent, unbiased analysis before someone dives into a code.
+More rationale are subject of discussion Chapter~\ref{chapter:process}.
+
+
+\begin{assessmentcrime}
+ Developers tend to skip the assessment part (sometimes even the analysis) and dive straight into performance tweaking.
+\end{assessmentcrime} 
+
+\noindent
+They want to get their hands dirty and improve the code.
+However, this is deeply unscientific and unreasonable without a proper assessment and triggers lots of follow-up complications.
+Systematic work on performance always follows the sequence assessment--analysis--improvement (engineering).
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Ignore everything you know nothing about the code and focus on the data you measure. 
+  \item[$\boxplus$] Stop any development while you assess and analyse.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Start with the attitude ``I want to fix a flaw''.
+  \item[$\boxminus$] Skip assessment steps, as you already know what's going on.
+\end{itemize}
+

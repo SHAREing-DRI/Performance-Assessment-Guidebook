@@ -1,0 +1,484 @@
+\documentclass{book}
+
+\input{packages}
+\input{definitions}
+
+\input{titlepage}
+
+\usepackage{makeidx}         % allows index generation
+\makeindex
+
+\begin{document}
+\maketitle
+
+\input{preface}
+
+\tableofcontents
+
+\part{Introduction}
+\label{part:introduction}
+
+\input{how-to-read/how-to-read}
+
+\input{terminology/terminology}
+\input{terminology/what-we-do}
+\input{terminology/development-workflow}
+\input{terminology/hpc-terms}
+\input{terminology/bottom-up}
+\input{terminology/symptoms}
+
+\part{High Level Overview}
+\label{part:high-level}
+
+\input{process/process.tex}
+
+\input{preparation/preparation.tex}
+\input{preparation/benchmarks.tex}
+\input{preparation/environment.tex}
+\input{preparation/compiler-settings}
+\input{preparation/complexity.tex}
+\input{preparation/io.tex}
+\input{preparation/machine.tex}
+\input{preparation/labelling.tex}
+\input{preparation/optimisations.tex}
+
+\input{high-level/high-level}
+\input{high-level/rubrics}
+\input{high-level/core}
+\input{high-level/gpu}
+\input{high-level/io}
+\input{high-level/intra-node}
+\input{high-level/inter-node}
+\input{high-level/wrap-up}
+
+\part{Deep Dive}
+\label{part:performance-assessment}
+
+\input{workflow/workflow}
+\input{workflow/localisation}
+\input{workflow/navigation}
+
+\input{core/core}
+\input{core/compiler-optimisations}
+%\input{core/overhead}
+%\input{core/memory-access-characteristics}
+ 
+\input{node-level/node-level}
+\input{node-level/coverage}
+\input{node-level/balancing}
+\input{node-level/concurrency}
+\input{node-level/tasks-too-small}
+\input{node-level/loops-too-small}
+\input{node-level/tasks-too-big}
+\input{node-level/numa}
+\input{node-level/synchronisation}
+\input{node-level/dependencies}
+\input{node-level/redundant-admin}
+\input{node-level/homogeneous-duration}
+\input{node-level/hierarchical-decomposition}
+\input{node-level/fine-granular-task-serialisation}
+
+\part{Resources}
+\label{part:resources}
+
+\input{tools/tools}
+\input{tools/gprof}
+\input{tools/python}
+\input{tools/aps}
+\input{tools/vtune}
+\input{tools/scorep}
+\input{tools/map}
+\input{tools/maqao}
+\input{tools/amplifier}
+ 
+
+% \input{outcome}
+% 
+% \part{Assessments within an organisation}
+% 
+% \input{communication/communication.tex}
+% \input{communication/team-dynamics.tex}
+% 
+% \input{service/service}
+% \input{service/interface}
+% 
+% \section{Related work is missing}
+% 
+% \section{Old stuff---do not read}
+% \input{reproducibility-analysis}
+% 
+% \section{Performance crimes}
+% 
+% 
+% I have made good experiences with starting with a very high-level definition of
+% \emph{performance crimes}, i.e.~things that are to be blamed for bad
+% performance:
+% 
+% \begin{enumerate}
+%   \item The work is unfairly distributed.
+%   \item We move too much data around. 
+%   \item Our code does not use the machine features properly.
+% \end{enumerate}
+% 
+% 
+% \noindent
+% Each crime can be phrased more precisely over the four machine parts
+% (Figure~\ref{figure:performance-assessment:machine-parts}).
+% It is important that this does not mean that we look at a crime in an isolated
+% fashion: A poor work distribution on a node often leads to a poor load
+% distribution between nodes, too.
+% We look at the crime and evaluate over all machine parts appropriate.
+% If the crime arises for a single machine part, we should dig into it.
+% For this, we again might have to take the whole machine into account and not
+% only the part where we found it. 
+
+
+%
+% It is also a crime if people use only a fraction of hte main memory. This happened
+% apparently when the NR guys were thrown onto Cosma, where they had so much RAM.
+%
+%
+
+% 
+% 
+% 
+% \section{Crime \#1: Unfair work distribution}
+% 
+% Unfair, imbalanced work distribution will manifest in some kind of idling.
+% Some compute resources will have to wait for others.
+% This idling might not be idling in a technical sense.
+% Notably when components poll another component for ``are you done'', they do not
+% appear to idle. 
+% However, they are not productive, i.e.~idle in logical sense.
+% 
+% 
+% 
+% 
+% \section{Crime \#2: Too much data movement}
+% 
+% There are different ways to obtain an estimate for or measurements of data
+% movements.
+% I do recommend to use monitoring tools.
+% In line with the previous section, we have too much data movements if the
+% normalised metric for one of the four machine parts exceeds our threshold. 
+% 
+% \paragraph*{Inter-node}
+% 
+% In-between nodes, the bandwidth of the interconnects is the speed of light: If
+% we shovel more data from one node to another than the network can cope, we have
+% an issue.
+% Without loss of generality, we refer to message passing (MPI) when we speak
+% about the realisation of inter-node data transfer from hereon.
+% 
+% 
+% There are multiple benchmarks on the table to measure the bandwidth of
+% a system. 
+% A reasonable one is the ``effective bandwidth"
+% benchmark \cite{Rabenseifner:2024:EffectiveMPIBandwidth}.
+% It yields our speed of light quantity $sol_{\text{inter-node}}$.
+% 
+% 
+% We can then measure the real bandwidth our simulation obtains from the network. 
+% Again, there are different tools to measure this. 
+% Intel's performance snapshot tool is one way.
+% We combine the measured bandwidth $bw_{\text{inter-node}}$ with the theoretical
+% one into one metric as
+% 
+% \begin{equation}
+% m^{\text{(data mov)}}_{\text{inter-node}} = \frac{bw_{\text{inter-node}} }{
+% sol_{\text{inter-node}} } \leq 0.8.
+%   \label{equation:performance-assessment:mpi-bandwidth}
+% \end{equation}
+% 
+% 
+% \noindent
+% A data movement crime is observed if the metric violates this constraint,
+% i.e.~if we use more than 80\% of the available bandwidth.
+% 
+% 
+% \paragraph*{Intra-node}
+% 
+% On current HPC architectures, the cores of a node share their memory. 
+% Too much data movement hence materialises in high traffic between the last level
+% cache and the main memory.
+% It is the memory bandwidth which defines the speed of light inside a node.
+% 
+% 
+% The mainstream way to quantify the memory bandwidth is the Stream TRIAD
+% benchmark \cite{McCalpin:2024:Stream}.
+% When you build it, ensure that the problem size is large enough to exceed our
+% last level cache (typically level 3), and that you employ all cores, i.e.~all
+% cores stress the memory subsystem. 
+% Stream provides OpenMP support for this.
+% 
+% 
+% The actual bandwidth used by your code can directly be measured via performance
+% counters on modern chips. 
+% There is a standard interface, PAPI, that allows you to read out these counters,
+% but the counter semantics can change from machine to machine and machine
+% generation to machine generation.
+% They also provide only low-level metrics.
+% It is more convenient to use a tool such as Likwid \cite{Treibig:2024:Likwid} to
+% obtain the quantities of interest.
+% In this case, the metric is memory bandwidth.
+% 
+% We end up with the metric
+% 
+% \begin{equation}
+% m^{\text{(data mov)}}_{\text{intra-node}} = \frac{bw_{\text{mem bw}} }{
+% sol_{\text{mem bw}} } \leq 0.8.
+%   \label{equation:performance-assessment:memory-bandwidth}
+% \end{equation}
+% 
+% 
+% 
+% \paragraph*{Core}
+% 
+% Cores typically have their own set of caches, while they share some caches with
+% the other cores. 
+% The metric of interest here are therefore the cache hits into the last cache
+% which is still core-local.
+% This depends on the system, but most system today have a shared level 3 cache
+% and a level 2 cache per core.
+% 
+% 
+% The level 3 cache mitigates bandwidth penalties arising from memory accesses
+% (see previous metric), while the level 2 mainly ensures that cores don't
+% interfere with each other too much.
+% We hence use the level 2 cache misses as metric to identify core problems:
+% If less than 80\% of your level 2 cache accesses cannot be served by this cache
+% (cache misses), we flag this as a performance crime.
+% 
+% 
+% \paragraph*{GPU}
+% 
+% GPUs are designed to stream a lot of data through their processing units at
+% comparatively low cost.
+% Naturally, you can stress the interconnects between the GPU's processing units
+% and its memory and hence stop the GPU from unfolding its potential, but this is
+% not the type of performance crime that we are interested at this point, where
+% we work more high level.
+% 
+% 
+% In a first step, we focus on data movements to and from the GPU, or, on modern
+% superchips with integrated memory, the access of non-local (host) memory by the
+% accelerator.
+% To track the data transfers, tools such as NSight-Systems can provide valuable
+% insight. 
+% However, simple runtime profiling is sufficient, as it is, on NVidia hardware,
+% enabled by setting \texttt{NVCOMPILER\_ACC\_TIME=1}.
+% 
+% 
+% For the crime, we relate the data transfer time per kernel
+% $t_{\text{cpu}\leftrightarrow \text{gpu}}$ to the total kernel execution time
+% $t_{\texttt{gpu}}$:
+% 
+% \[
+%   m^{\text{(data mov)}}_{\text{gpu}} = \frac{t_{\text{cpu}\leftrightarrow
+%   \text{gpu}}}{t_{\texttt{gpu}}} \leq 0.2,
+% \]
+% 
+% \noindent
+% defines the constraint that we don't want to violate.
+% If we do, we consider this to be a performance crime.
+% 
+% 
+% \section{Crime \#3: Inappropriate hardware feature usage}
+% 
+% 
+% \paragraph*{Inter-node}
+% 
+% Our data movement crime has put an exclusive focus on bandwidth.
+% The second major characteristics of a network is its latency.
+% Latency penalties arise from too many small messages.
+% An algorithmic latency arises from too many messages that arrive unexpectedly,
+% such that the software side has to invest a lot of cycles to match messages.
+% This list is not comprehensive.
+% 
+% 
+% It is not easy to identify such issues in a black-box manner, i.e.~without
+% digging into the code.
+% However, we can employ the bandwidth metric
+% (\ref{equation:performance-assessment:mpi-bandwidth}) once again:
+% 
+% \[
+% m^{\text{(data mov)}}_{\text{inter-node}} = \frac{bw_{\text{inter-node}} }{
+% sol_{\text{inter-node}} } \geq 0.2.
+% \]
+% 
+% 
+% \noindent
+% Previously, we used high bandwidth requirements to flag data movement crimes.
+% In return, we can define that an effective bandwidth under 20\% hints at a poor
+% usage of MPI; for whatever reason.
+% 
+% 
+% \paragraph*{Intra-node}
+% 
+% Even though we have excluded excessive memory bandwidth usage and poor load
+% balancing, there are again many potential execution patterns on a node which
+% lead to poor performance:
+% Cache clashes are probably the most prominent ones.
+% 
+% 
+% \[
+% m^{\text{(data mov)}}_{\text{intra-node}} = \frac{bw_{\text{mem bw}} }{
+% sol_{\text{mem bw}} } \geq 0.2.
+% \]
+% 
+% 
+% \noindent
+% In line with the discussion above and
+% (\ref{equation:performance-assessment:memory-bandwidth}), we again struggle to dig into those in a black-box fashion.
+% However, we can once again assume that exploiting less than 20\% of the
+% potential bandwidth is an indicator that we struggle to use the node
+% architecture in a way it is means to be used.
+% 
+% 
+% \paragraph*{Core}
+% 
+% Processors today support typical instruction sets or classes of instructions.
+% We are interested in the most aggressive floating-point instructions for our
+% work: 
+% In an ideal world, the processor would be busy all the time with handling
+% computations, and these computations are all piped through the processor's
+% vector units.
+% 
+% Our speed of light hence is that all floating-point units are from the highest
+% instruction set type.
+% On modern processors, this is AVX512.
+% We can count these instructions either at runtime or statically over the
+% executable.
+% 
+% 
+% Before we devise a metric, we have to calibrate the number of vector
+% instructions properly.
+% If our vector width is 8 for example (AVX512 with double precision), we multiply
+% the number of AVX instructions by eight.
+% After that, we can divide the result by the number of total instructions.
+% A value bigger than 80\% indicates that vectorisation has been used
+% successfully.
+% Intel's Application Performance Snapshot tool or scripts around PAPI such as
+% Likwid deliver you the quantities of interest.
+% 
+% 
+% It is important to take all instructions into account:
+% If a code suffers from a lot integer (index) manipulations, we clearly have
+% committed a crime in the sense of the present metric.
+% In contrast, relating the number of vector instructions to the runtime is not
+% helpful, as stalls could arise from poor memory usage.
+% We have already taken that into account, and should not double count here.
+% 
+% 
+% 
+% 
+% % An 80\% threshold might be too ambitious for this goal.
+% % The threshold here is something that has to be agreed upon carefully.
+% 
+% 
+% \paragraph*{GPU}
+% 
+% On the GPU, we focus on two problematic phenomena when we speak of an
+% inappropriate usage of the machinery:
+% register spilling and kernel overhead.
+% Register spilling occurs if a code fragment needs too many local variables,
+% cannot hold them in the register, has to swap them out, and consequently fails
+% to stream the actual computation through the core, as it notably is penalised
+% from switching between workgroups.
+% Kernel launch overhead means that the compute kernel does not really fit to the
+% GPU, i.e.~is too small, too fine granular, and so forth.
+% Both phenomena manifest in low effective occupancy compared to the theoretical
+% occupancy on the machine.
+% 
+% 
+% Tool such as NSight-Systems allow you to measure the occupancy.
+% They even normalise the data appropriately.
+% We aim for an occupancy above 80\%.
+% Otherwise, we face a hardware usage crime.
+% 
+% 
+% 
+% \section{Shortcomings of methodology}
+% 
+% Performance crimes only provide a starting point where to search throughout an
+% in-depth performance analysis. 
+% While the previous sections break down the metrics over the hardware parts, I
+% found it useful only to argue about the aggregate metrics per crime:
+% Moving around too much memory on a node can lead to situations where the
+% bandwidth over the network is not saturated.
+% Arguing however that a fix of this intra-node ``crime'' would eliminate the
+% data movement issues, i.e.~restricting is to a piece of the hardware,
+% can be premature:
+% Next, network bandwidth issues might arise.
+% 
+% 
+% Another fundamental issue arises from the fact that all crime metrics
+% are time-averaged. 
+% They do not take bursts into account: A code might not exploit all bandwidth all the time, but there might
+% still be phases, where it is totally bandwidth-bound. 
+% If you recognise temporal patterns, it can be reasonable to break the search for
+% crimes down into program phases and to argue separately over them.
+% The length of the phases then provides a natural indicator if a crime is
+% considered to be serious or a minor one---you can basically work with a weighted
+% sum over the metrics.
+% 
+% 
+% We finally note that some crime flavours are not actually detrimental to
+% performance:
+% Data movements per se are nothing problematic on modern hardware, as long as we
+% can hide the data transfer behind computations.
+% This is again a temporal dimension to the data, which we struggle to cover with
+% the high-level metrics here.
+% We have to take reported crimes with a pinch of salt.
+% 
+% 
+% \section{Next steps}
+% 
+% Once you have identified crimes, it is time to start a proper performance
+% analysis which relates the observations to more in-depth code studies.
+% 
+% 
+% For any type of parallel performance, the groups behind the POP review
+% methodology have developed an extensive set of tools.
+% Software such as Scalasca can help the performance analyst to dive into the
+% reason behind poor scalability.
+% It can spot local and temporal instabilities, distinguish point-to-point from
+% collective operations, but also unfortunate realisations such as too late or too
+% early sends and receives.
+% 
+% 
+% For the core performance, a lack of AVX instructions for example can result from
+% many things: 
+% There might be a lack of compute work, 
+% data access might be scattered or non-coalesced,
+% the compiler might decide that switching instruction sets is too expensive, 
+% and so forth.
+% Tools such as MAQAO \cite{MAQAO} can provide valuable insight what is happening
+% under the hood.
+% 
+% 
+% When it comes to GPUs, developers are best advised to consult the software stack
+% of ``their'' vendor. 
+% However, the analysis tools for parallel performance start to integrate more and
+% more GPU-capabilities into their software stack.
+% 
+% \input{intro}
+
+\part{Case Studies}
+
+\input{case-studies/case-studies-intro}
+
+
+\part{Appendix}
+\appendix
+
+\input{acknowledgements}
+\input{appendix/submission-checklist}
+\input{appendix/metric-choice}
+
+\bibliographystyle{unsrt}
+\bibliography{book}
+
+\printindex
+
+\end{document}

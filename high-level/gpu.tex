@@ -1,0 +1,156 @@
+\section{GPU performance}
+\label{section:high-level:gpu}
+
+\begin{summary}
+ We consider a code to make efficient use of the GPUs if it 
+ achieves more than 80\% of the theoretical peak performance of the GPU. We consider
+ a code to make reasonable use of the GPUs if it achieves more than 60\%. 
+\end{summary}
+
+\begin{wip}
+    This section is still in its early stages of development, but the key takeaway is that: for a code with GPU offloading we simply want to measure the GPU work rate i.e. FLOPS/s.
+\end{wip}
+
+Similarly to the core performance, the GPU analysis examines how efficiently your code harnesses the GPU.
+Our analysis evaluates how effectively your implementation takes advantage of the extreme parallelism of the GPU's capabilities.
+
+To capture GPU behaviour at this high level, we want to measure the peak performance relative to the hardware's capabilities.
+Similarly to core performance, the tools can draw us towards more detailed metrics and models, but to minimise distractions and clarify our analysis we restrict this rubric to the peak performance percentage.
+
+\subsection{Benchmark preparation}
+
+% For HPC workloads, do we expect a setup which is large enough that it must move through GPU memory? Not necessarily?
+% We do need a setup that is larger than the GPU caches so it will move through cache.
+% If your typical workload is larger than GPU memory, then we need a setup which is larger than GPU memory.
+% We require the benchmark to take long enough that any OS startup overhead is negligible and the \texttt{time} command can be used.
+
+We want to ensure that the data we collect about the code is a reliable and accurate representation of the performance of the code on a single GPU. To this end, we require that the code is built for the specific GPU architecture, and that the benchmark is larger than the GPU cache - see assessment crime \ref{assessmentcrime-cache-fit}. You should measure the memory footprint of your benchmark on the GPU in order to verify that the benchmark is large enough.
+
+% CRIMECRIME
+\begin{assessmentcrime}
+ We study a code that is not built against the latest version of CUDA/HIP/etc. supported by the hardware
+\end{assessmentcrime}
+
+For example, if you are working with an Nvidia H200 GPU, which supports CUDA compute capability 9.0, you must use a cuda toolkit version of at least 11.8 and specify \verb|-code=sm_90|.
+
+% To check that you are using sufficient GPU memory, you can use nvidia-smi:
+% \begin{verbatim}
+% $ nvidia-smi --loop-ms=10 --query-gpu=memory.used --format=csv --filename=gpu_mem_usage.csv & nvidia_smi_pid=$!
+% $ # test run...
+% $ kill $nvidia_smi_pid
+% \end{verbatim}
+
+\subsection{Data Collection}
+
+Each manufacturer of GPUs provides their own management software suite, which is capable of collecting similar but slightly different sets of metrics. Below are some instructions for the Big 3 (Intel, AMD, and Nvidia) to extract those metrics necessary for the high-level assessment.
+However, if you are using other types of accelerators or accelerators from other manufacturers the software suite required to collect these data may be significantly different or incapable of providing the recommended metric.
+
+In order to calculate the FLOPS/s, we generally need to collect metrics of the total number of floating point operations executed.
+
+\begin{instructions}{Intel VTune}
+ t.b.d.
+\end{instructions}
+
+\begin{instructions}{AMD rocprofiler-system}
+% rocprofv3 --pmc TOTAL_32_OPS,SQ_INSTS_VALU_INT32 -- ./<exe>
+% sqlite3 -csv -header <results.db> "SELECT dispatch_id,kernel_name,counter_name,value FROM counters_collection;"
+On AMD GPUs, we recommend using the latest version of rocprofiler - \verb|rocprofv3|. This version of the software provides a sum of all operations of each precision - 16, 32, and 64 bit - as well as granular FMA (fused multiply-add), MUL, ADD, INT and TRANS (which I assume to be translating between precisions) operations counts. Since we are interested in floating point instructions only for the time being, we may either subtract the integer operation count from the total operation count for each precision, or collect counts for each operation type and sum as detailed below.
+
+The metric options are in the form \verb|TOTAL_{PRECISION}_OPS| and \verb|SQ_INSTS_VALU_{METRIC}_F{PRECISION}|, where \verb|PRECISION| is 16, 36, or 64, and \verb|METRIC| is \verb|FMA|, \verb|MUL|, \verb|ADD|, or \verb|TRANS|, and \verb|SQ_INSTS_VALU_INT32|.
+Additionally, AMD GPUS separately count matrix operations done on the vector ALU with the matrix-fused-multiply-add instruction - this metric is called \verb|SQ_INSTS_MFMA_MOPS_{PRECISION}| where \verb|PRECISION| is \verb|BF16|, \verb|F32|, or \verb|F64| (note the B for the 16-bit variant).
+
+
+
+\begin{verbatim}
+rocprofv3 --pmc \
+    
+    -- ./code
+\end{verbatim}
+\end{instructions}
+
+\begin{instructions}{Nvidia NSight}
+On Nvidia GPUs using Nvidia NSight Compute (\verb|ncu|), the metrics required are in the format
+\verb|sm__sass_thread_inst_executed_op_{METRIC}_pred_on.sum|,
+where \verb|METRIC| is \verb|dfma|, \verb|dadd|, \verb|dmul|, \verb|ffma|, \verb|fadd|, \verb|fmul|, \verb|hfma|, \verb|hadd|, and \verb|hmul|.
+
+We can request this set of metrics using a regex, and so profile the program:
+\begin{verbatim}
+ncu --metrics "regex:^sm_.*d_op_(d|f[^p]|h).*\\.sum$" --csv \
+    --log-file out.csv ./code
+\end{verbatim}
+
+ % Regex to paste into GUI to filter to these
+ % ^smsp.*inst_executed_op_(d|f)(add|mul|fma)|duration\.sum|cycles_elapsed\.max
+ 
+\end{instructions}
+
+We also need to measure the execution time of the program without the profiler attached - here we make the assumption that the number of operations executed is the same in every run regardless of execution time.
+
+% Rule of thumb this?
+Where multiple different precisions are used, they will run at different rates on the hardware, but we need a single number to compare against the theoretical performance of the GPU. We therefore count each double-precision instruction (those beginning with \verb|d|) for double the number of operations, and each half-precision instruction (those beginning with \verb|h|) for half the number of operations. Additionally, because each \verb|fma| (fused multiply-add) does two operations in one instruction, we further double the number of operations these instructions count for.
+
+We finally calculate the observed work rate:
+\begin{equation}
+    R_{\texttt{observed,FLOPS/s}} = \frac{\sum N_\texttt{opers}}{T_\texttt{exec}}
+\end{equation}
+
+\subsection{Evaluation}
+
+\begin{performancemetric}
+ The percentage of the theoretical maximum GPU FLOPS/s throughput achieved by the computational kernels. This may also be referred to as GPU peak-performance-percentage.
+\end{performancemetric}
+
+We calculate the peak performance ratio as
+\begin{equation}
+    C_\texttt{GPU} = \frac{R_\texttt{observed}}{R_\texttt{theoretical}}
+\end{equation}
+
+\begin{center}
+ \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
+  GPU peak performance ratio & Description \\
+  \hline
+  $C_{\text{GPU}} \geq 0.8$
+   & \cellcolor{green!25} GPU compute performance is good
+  \\
+  $0.6 \leq C_{\text{GPU}} < 0.8$
+   & \cellcolor{yellow!25} GPU compute performance is not particularly good. This could become a significant issue with other GPUs including newer generations.
+  \\
+  $C_{\text{GPU}} < 0.6$
+   & \cellcolor{red!25} GPU compute performance is poor.
+ \end{tabular}
+\end{center}
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Compile your code with the latest version of CUDA/HIP etc. supported by your GPU's architecture
+  \item[$\boxplus$] Normalise the floating point operations for programs where multiple precisions are used
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Run a benchmark that is smaller than the GPU's cache
+  \item[$\boxminus$] Dive into other metrics recommended by the analysis tools
+  \item[$\boxminus$] Focus on GPU performance without evaluating the other relevant metrics in the high-level rubric
+\end{itemize}
+
+%\subsection{Draft ideas:}
+%GPU performance issues broadly fit into two main areas: 1) significant wait times for data transfers from host to device; 2) inefficient occupation of the GPU.
+
+%Inefficient data transfers between host and device can lead to significant waiting times, similar in principle to communication inefficiencies with MPI codes. The worst offending codes rely on frequent data transfers back-and-forth between host and device.
+%Therefore, we would like to categories the ratio of GPU compute time to data transfer time. Frequent data transfers can in some cases be a product of naive porting to GPU. Many GPU ported codes rely on some form of `data transfer minimisation', i.e., the simulation is configured on the CPU until the code hits a the computationally intensive kernel for which the data is transferred onto the GPU allowing for effective use of the GPU's comptational advantages. Then, the data is transferred back to the CPU to finalise the simulation or deal with some level of I/O. In practice this model is a simplification, and indeed some algorithms may not fit well into this design pattern. In which case the developer may not have considered how their algorithm will rely on considerable data transfers and therefore the outcome of a performance assessment could imply an algorithmic redesign to move more of the processing onto the GPU.
+
+%Data transfers are only part of the potential performance problem. Running compute kernels on a GPU does not by definition mean that the compute kernels are running effectively. Poor utilisation of the GPU, e.g., low occupation of the (using the language of NVIDIA) Streaming Multiprocessors can result in poor performance. CONTINUE...
+
+%Arguably performance analysis of GPUs is the performance dimension most directly connected to tools. Inter- and intra-node performance can to some degree be investigated using scaling laws. However, GPUs can in many cases behave as `black boxes' and, are these tools are much more tied to an industry vendor than other performance dimensions. This tight connection to industry can make tools variable in maturity which then impacts further the degree that a rigorous performance analysis can probe.
+
+%Take the case of NVIDIA --- often regarded as having the most mature toolset of the major GPU vendors --- the above cases of studying data transfers and GPU occupation/usage largely fit within two main tools:
+%\begin{itemize}
+%    \item Data transfers - NVIDIA Nsight Systems
+%    \item GPU usage - NVIDIA Nsight Compute
+%\end{itemize}
+%CONTINUE...
+
+%\subsection{Is there a problem?}

@@ -1,0 +1,69 @@
+\section{Existing optimisations}
+\label{section:preparation:optimisations}
+
+\begin{readerguide}
+ Playing around with (user-driven) optimisations can become tricky and might require the assessor to communicate with developers (if you are not the same person).
+ For an initial assessment, it might be very reasonable to skip this section.
+\end{readerguide}
+
+It is rare that we work with a code that hasn't gone through a series of optimisation steps already.
+Most developers think at one point about how to make a realisation fast.
+However, optimisation steps can backfire:
+
+
+First, many code developers have no systematic training in HPC and/or do not apply rigorous performance analysis.
+Consequently, their realisation does not tackle hotspots.
+In the worst case, the resulting optimisation steps make the code more complicated than it actually has to be.
+
+
+Second, many scientific codes are old.
+They contain legacy code parts.
+If these code parts had been optimised, the optimisation steps might not be valid for today's computer architectures anymore.
+For example, compute time used to be expensive and performance engineers hence used to introduce precomputed data tables in the past.
+Today, memory bandwidth is likely the most precious resource.
+Having extensive lookup tables can actually impose additional stress on the memory interconnect, and a recomputation of values might be advantageous.
+
+
+Finally, we have to be frank with our community:
+A lot of people who consider themselves to be outstanding computational scientists actually have a very limited understanding of computer architecture.
+That's not a problem per se, as long as people are aware of their lack of knowledge.
+It is problematic when we see developers introducing or pushing for ``optimisations'' which actually are not supported by data or insight, but rather individual ``genius'' and ``expert knowledge''.
+
+
+\begin{assessmentcrime}
+ We work with a code that the developers consider to be ``highly optimised''. 
+ Due to these optimisations, we start from a code base that is actually overly complicated (thus hiding the ``real'' performance flaws) and might actual underperform \emph{due to} these optimisation steps.
+\end{assessmentcrime}
+
+
+\noindent
+Many scientific codes have not been co-designed as HPC codes.
+They have been written first and foremost with functional requirements (``the science'') in mind.
+The HPC came later.
+This is reflected in the code design:
+Optimisations are realised as add-ons wrapping around the core science (yet sometimes, unfortunately, also penetrating it).
+Therefore, we always have to keep in mind that performance has been seen as a second-class citizen in most development projects. 
+By the time a project has reached a certain maturity and people suffer from performance flaws, they will ask for a performance assessment (and then want to be told that they have already done the heavy lifting or that their science is so challenging and completely different to everything else that it is very hard to get good performance).
+They won't ask for it prior to that. 
+
+
+If possible, it is helpful to disable all of these historic optimisations.
+We can then start with the performance assessment on a green field and re-inject the optimisations one by one as we go along. 
+In an ideal world, they should make the code faster, but this has to be validated!
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Disable existing user-driven tuning options. 
+  \item[$\boxplus$] Independently validate that they actually make the code faster. 
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Assume historical performance optimisation steps to pay off on current hardware. 
+  \item[$\boxminus$] Rely on domain scientists that their optimisation has been driven by measurements (formal performance analysis) and an in-depth insight into the machine. 
+\end{itemize}
+

@@ -1,0 +1,104 @@
+\section{Code development workflows}
+
+\begin{readerguide}
+ Feel free to skip the remainder of this chapter if you are a first-time reader. 
+\end{readerguide}
+
+
+\noindent
+Systematic scientific computing typically implements an iterative approach:
+First, we measure or benchmark how a code performs and use these data to inform our performance assessment, i.e.~our reporting.
+Second, we conduct performance analysis to explain why the code exhibits the observed behaviour.
+Finally, this analysis feeds into program tuning or optimisation.
+After that, we repeat the workflow.
+
+
+
+If we take our list of activities and integrate it within the definition of the performance analysis workflow, it becomes clear that the tuning step is out-of-scope here.
+Another related technique is out-of-scope, too:
+The most advanced papers in scientific computing, particularly within high-performance computing, deliver a performance model;
+essentially a pen-and-paper assessment of what a code should be able to deliver.
+This is impossible if we adhere to the principles above: having limited
+knowledge and only explaining observed behavior rather than relating it to
+external factors (such as input data or algorithmic choices) or algorithmic
+context.
+We commit to a data-driven approach.
+Obviously, such an approach might complement an analytic, theoretical assessment
+of code, but we recommend considering this as an entirely separate cup of tea.
+
+
+
+We will inevitably face difficulties if we truly do not know the code we are evaluating:
+Explaining certain effects is so much easier with some (rudimentary)
+understanding of the code.
+However, there are three compelling reasons to treat code as a (logical) black box:
+First, performance assessment is often delegated to non-developers: colleagues
+from computing centers, centralised HPC specialists, or external service providers.
+If we want to discuss performance analysis methodology, it is counterproductive to assume in-depth code knowledge.
+Many people conducting assessments cannot be experts in every code they examine.
+Second, requiring code expertise within assessment teams would imply that core developers are always available.
+This might be an ideal in the spirit of eXtreme Programming \cite{beck1999}, where
+the customer must be accessible at all times.
+It is unrealistic in science, where PIs are busy with various tasks, developers
+frequently leave projects---as they graduate, accept new positions, or are
+reassigned---and where code components are often written by individuals and are
+so complex that only a few people understand the core parts.
+Finally (and most importantly), knowledge about a codebase tends to bias the assessment.
+
+
+
+
+Developers inevitably make assumptions about reasons for code behaviour when working on performance analysis.
+(Senior) Developers tend to ``defend'' their code, explaining any flaws as
+natural consequences of their domain's challenging nature, their awareness of future requirements, or their in-depth knowledge of other setups not covered by the present configuration.
+Simultaneously, we have frequently observed junior developers downplaying or
+challenging existing code---likely to prove themselves by pointing out ``how
+things really should work''---and consequently interpreting every piece of data
+through this lens.
+This list is not comprehensive.
+The whole team dynamics dimension deserves further discussion (in
+Section~\ref{section:communication:team-dynamics}).
+For the time being, we conclude that having emotionally invested developers
+involved in early assessment is counterproductive due to their inherent bias.
+
+
+\begin{wip}
+ The link to team dynamics is broken as this part is work in progress and not yet written.
+\end{wip}
+
+\begin{assessmentcrime}
+\label{assessmentcrime:code-expert-bias}
+People conduct assessments as code experts.
+Due to this, they deliver biased assessments since they think they already know the code's performance characteristics and its flaws without an objective assessment of its ``real'' behaviour.
+\end{assessmentcrime}
+
+
+For a high-quality assessment, it helps to step back and (pretend to) know nothing.
+This way, we avoid entering performance analysis with bias.
+Adhere strictly to the observational perspective.
+Even if it is your own code, try to detach yourself and pretend you have no prior knowledge.
+Abstract.
+
+
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Pretend you know nothing about the code. Blend out your
+  expert knowledge and start on a fresh sheet.
+  \item[$\boxplus$] Ignore what others, notably developers pretend to know or have found. This makes your assessment biased.
+  \item[$\boxplus$] Force yourself not to do any tuning before the assessment and analysis are complete (within reason). 
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Start with the attitude ``I know what this code does and
+  where there are weaknesses''.
+  \item[$\boxminus$] Involve someone who's emotionally involved in the code's
+  development into the reporting. They will always defend their brain child.
+\end{itemize}
+

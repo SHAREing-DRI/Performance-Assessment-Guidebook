@@ -1,0 +1,40 @@
+\section{Intel VTune} 
+\label{section:localisation:vtune}
+
+\index{Profiler}
+\index{Profiler!Instrumentation}
+Intel gives its VTune profiler away free of charge.
+The tool provides a fancy GUI that you can use to study your code interactively,
+but there's a button at the start screen that tells you how to invoke the
+profiler on the command line.
+Through this, you can run the profiler on a compute node without the GUI, and
+then copy the results back to your workstation for a posteriori assessment.
+Once available (on your supercomputer you'll have to load the VTune module,
+while a \texttt{source /myinteldir/setvar.sh} sets all variables on a local
+installation), a simple \texttt{vtune-gui} brings up the tools.
+
+VTune's various data collection modes are based upon sampling, and there's the
+opportunity to dive very deeply into the machine's behaviour.
+As the tool displays the code analysis over time and cores, you can zoom into
+certain runtime phases and cores manually. 
+The delivered data is more detailed on Intel machines, but the tool also is very
+useful on AMD.
+Some of the more modi require certain system priviliges.
+
+
+\paragraph*{Overview}
+ 
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Works also on non-Intel machinery.
+  \item[$\boxplus$] Very detailed node- and core-level data including
+  performance counter data.
+  \item[$\boxplus$] Can trace MPI.
+\end{itemize}
+ 
+ 
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Some in-depth features allow special system rights that
+  normal users typically don't have.
+  \item[$\boxminus$] Very easy to get lost in massive amounts of data.
+\end{itemize}
+

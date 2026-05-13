@@ -1,0 +1,27 @@
+\chapter{Choice of Metrics}
+\label{appendix:metric-choice}
+
+This appendix details some of the reasoning behind our decisions on which metrics to use for each assessment rubric.
+
+\section{GPU Metric: Occupancy or FLOPS?}
+
+In initial work on the methodology, it was thought that the average warp occupancy over program runtime might be used as a workable metric to evaluate the GPU usage of a code.
+However, as we developed the methodology and began producing example high-level analyses, we found cause to question whether this was in fact the right choice.
+The alternative proposed at this point was to use the same metric as for the CPU rubric, floating-point operations per second, a measurement of rate-of-work-done.
+
+First, rate of work is more intuitive to code owners than hardware occupancy, and reaching high rate of work compared to hardware theoretical max is correlated with occupancy in hardware utilisation terms.
+Second, rate of work is closer to what we actually care about in performance assessment.
+Third, and possibly most importantly, occupancy is not always correlated with a higher rate-of-work.
+For a basic example code, the block size was set to 256 (eight times the size of a warp), and the number of blocks was set to 400 (five times the number of streaming multiprocessors in the Tesla V100 GPU the code was tested on).
+With this configuration, the occupancy was observed to be 62.4\%, and the rate of work about 15.6 TFLOP/s. This was the highest rate of work observed in all configurations tested (although only three configurations are expanded on here).
+Increasing the number of blocks to 1600 (twenty times the number of streaming multiprocessors), the occupancy was observed at about 92\%, but the rate of work was lower at about 14.6 TFLOP/s.
+Additionally, due to the architectural specifics of GPUs, increasing the number of blocks to 401 increased occupancy to 62.6\%, and decreased rate of work to 13.1 TFLOP/s.
+
+% Original comment in Slack:
+% Should the high-level GPU performance metric to be FLOPS compared to hardware max rather than occupancy?
+% I personally think it should, for a couple of reasons I can articulate now.
+% First, rate of work feels like it is more important than hardware utilisation, and reaching high rate of work compared to hardware theoretical max is very similar to occupancy in hardware utilisation terms.
+% Second, I have just compared a simple benchmark with a varying number of blocks.
+% While it is necessary to oversubscribe the GPU (context switches are cheap, and alternative blocks can be worked on on the same warp while waiting on e.g. memory), we get negative consequences if we go too far.
+% Observing NUM\_BLOCKS=400, occupancy is about 62.4\% (yellow) and we reach about 15.6 TFLOP/s, while with NUM\_BLOCKS=1600, occupancy is about 92\% (green) but we only reach about 14.6 TFLOP/s.
+% Additionally, for architecture reasons with NUM\_BLOCKS=401, occupancy is about 62.6\% but we reach only 13.1 TFLOP/s.

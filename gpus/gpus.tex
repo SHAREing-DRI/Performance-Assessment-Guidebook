@@ -1,0 +1,14 @@
+Structural Hazards: The p2p_core function mixes different
+types of operations (floating-point calculations, shared memory
+access, conditional branching) creating resource contention, lead-
+ing to underutilization of the instruction execution pipeline; Data
+Dependency Stalls: The original PTX code contains Read-After-
+Write (RAW) dependencies between consecutive instructions, which
+introduce latencies and stall the execution pipeline; Redundant
+Computation: Threads sometimes perform unnecessary gravita-
+tional calculations beyond cutoff ranges due to late conditional
+evaluation in the process.
+
+
+
+Read after write: dazwischen noch andere Operationen machen

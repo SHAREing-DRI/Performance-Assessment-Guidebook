@@ -1,0 +1,106 @@
+\newcommand{\booktitle} {Performance Analysis and Assessment for Computational Research Software}
+
+\newcommand{\amplifier}     {Amplifier}
+\newcommand{\aps}           {Intel Performance Application Snapshot (APS)}
+\newcommand{\gdb}           {GDB}
+\newcommand{\extrae}        {extrae}
+\newcommand{\intelcompiler} {Intel compiler}
+\newcommand{\likwid}        {Likwid}
+\newcommand{\map}           {Linaro MAP}
+\newcommand{\mpi}           {MPI}
+\newcommand{\linux}         {Linux command line}
+\newcommand{\maqao}         {MAQAO}
+\newcommand{\openmp}        {OpenMP}
+\newcommand{\otter}         {Otter}
+\newcommand{\scorep}        {scorep}
+\newcommand{\scalasca}      {scalasca}
+\newcommand{\slurm}         {Slurm}
+\newcommand{\vtune}         {VTune}
+\newcommand{\valgrind}      {Valgrind}
+
+\newenvironment{instructions}[1]
+  {\begin{mdframed}[backgroundcolor=gray!10] 
+    \begin{mdframed}[backgroundcolor=blue!20] 
+      {\bf #1}
+    \end{mdframed}
+   \index{#1}
+
+
+   \noindent
+  }
+  { 
+    \end{mdframed} 
+  }
+  
+\newenvironment{readerguide}
+  {\begin{mdframed}[backgroundcolor=gray!10] 
+    \begin{mdframed}[backgroundcolor=red!20] 
+      \begin{flushright}
+        {\bf Reader's guide}
+      \end{flushright}
+    \end{mdframed}
+   \noindent
+  }
+  { 
+    \end{mdframed} 
+  }
+
+\newenvironment{summary}
+  {\begin{mdframed}[backgroundcolor=gray!10] 
+    \begin{mdframed}[backgroundcolor=gray!20] 
+      \begin{flushright}
+        {\bf Summary}
+      \end{flushright}
+    \end{mdframed}
+   \noindent
+  }
+  { 
+    \end{mdframed} 
+  }
+
+\newenvironment{checklist}
+  {\begin{mdframed}[backgroundcolor=gray!10] 
+    \begin{mdframed}[backgroundcolor=green!20] 
+      \begin{flushright}
+        {\bf Checklist}
+      \end{flushright}
+    \end{mdframed}
+   \begin{enumerate}[label=\fbox{\arabic*},noitemsep]
+  }
+  { 
+   \end{enumerate}
+    \end{mdframed} 
+  }
+
+\newenvironment{checklisttitled}[1]
+  {\begin{mdframed}[backgroundcolor=gray!10] 
+    \begin{mdframed}[backgroundcolor=green!20] 
+      \begin{flushright}
+        {\bf Checklist (#1)}
+      \end{flushright}
+    \end{mdframed}
+   \begin{enumerate}[label=\fbox{\arabic*},noitemsep]
+  }
+  { 
+   \end{enumerate}
+    \end{mdframed} 
+  }
+
+
+\newenvironment{wip}
+  {
+  \begin{mdframed}[backgroundcolor=red!20] 
+    {\bf Work in progress/todo}
+  }
+  { 
+    \end{mdframed} 
+  }
+
+
+\newtheorem{doctrine}{Doctrine}
+\newtheorem{hypothesis}{Hypothesis}
+\newtheorem{flaw}{Flaw}
+\newtheorem{assessmentcrime}{Assessment crime}
+\newtheorem{performancemetric}{Performance metric (rule of thumb)}
+\newtheorem{guidance}{Guidance to the first-time reader}
+  

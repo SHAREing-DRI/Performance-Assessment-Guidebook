@@ -1,0 +1,208 @@
+\section{Inter-node performance}
+\label{section:high-level:inter-node}
+
+\begin{summary}
+ We consider a code to make efficient use of multiple nodes if it scales weakly. 
+ In particular, we consider it to be scaling if recovers from inefficiencies (efficiency drops below 80\% or 60\%) significantly whenever we increase the problem size,
+ i.e.~``gets back'' to (almost) 100\% or 80\% efficiency, respectively.
+\end{summary}
+
+
+
+Inter-node behaviour means that the code runs over multiple physically separated nodes. 
+In an HPC context, this almost always implies that it uses MPI.
+While MPI employs a programming model which treats memory physically and logically as separate and makes them exchange data via messages,
+there are (software) solutions that pretend to the code to have one large shared memory over many nodes.
+Such virtually shared memory solutions would fall into this assessment category as well.
+Conversely, one can use message passing, i.e.~logically separate data spaces on a single node offering one physically memory.
+This would fall into the intra-node assessment rubric from Section~\ref{section:high-level:intra-node}.
+
+
+Our method of choice to argue about inter-node performance is weak scaling, but we do not really (yet) dive into a proper version of Gustafson's law \cite{gustafson1988}.
+Instead, we simply start from one reasonably big setup which would fit onto a single node and scale it up over multiple nodes.
+This setup's parallel efficiency will go down as we increase the number of nodes, as communication overheads kick in and the work per node reduces.
+Once the efficiency falls under 60\%, utilisation is really poor.
+Therefore, we increase the problem size and see if we can get the efficiency up again.
+The increase should lift the efficiency significantly over 80\% again. 
+If it does, we end up with a zig zack pattern, where we test until we hit the 60\% threshold, increase the problem size (and hence lift the efficiency above 80\%) and then increase the node count again.
+The code struggles to scale weakly, if the subsequent problem size increase improves the efficiency, but cannot push the efficiency above the 80\% efficiency threshold anymore.
+The code does not scale at all, if the problem size increases fail to keep the efficiency above 60\%.
+
+
+
+\subsection{Benchmark preparation}
+
+For weak scaling, it is absolutely key that we first identify a performance metric that is complexity-invariant:
+Let an algorithm's compute cost scale in $\mathcal{O}(n^g)$ with the problem size $n$.
+If $g=1$, the algorithm has linear complexity, for $g=2$ we have quadratic complexity.
+If we double $n$, the time we need for a computation on a given number of nodes $p_{\text{inter}}$ should double, but if and only if the algorithm is linear.
+If is quadratic, it will become four times bigger.
+As we want to compare the times (and later efficiencies) over different problem sizes, we have to calibrate accordingly.
+
+
+\index{Speedup}
+\index{Efficiency}
+
+The challenge is that the speedup formula
+
+\[
+ E_{\text{inter}}(p_{\text{inter}}) = \frac{ S_{\text{inter}}(p_{\text{inter}}) }{ p_{\text{inter}} }
+  = \frac{ t(1,n_1) }{ t(p_{\text{inter}},n_{\text{inter}}) \cdot p_{\text{inter}} }
+\]
+
+\noindent
+contains timings determined with (potentially) two different problem sizes. 
+If the algorithm's complexity is known, and as long as we assume that the runtime constants, i.e.~all the overheads incurred, are kind of invariant regarding the problem size, the calibration is easy:
+
+\begin{equation}
+ \label{equation:inter-node:efficiency}
+ E_{\text{inter}}(p_{\text{inter}})
+  = \frac{ t(1) / n_1^g }{ t(p_{\text{inter}}) / n_{\text{inter}}^g \cdot p_{\text{inter}} }.
+\end{equation}
+
+\noindent
+where the employed timings are raw timings. 
+
+
+
+\begin{assessmentcrime}
+ Benchmark assessments try to argue about a code's efficiency without knowing the code's computational complexity.
+\end{assessmentcrime}
+
+\noindent
+When preparing a benchmark for the inter-node, weak scaling analysis, a key point for the performance analyst is that we must have some understanding of how to scale the problem size,
+i.e.~how to change the simulation problem size, but also the code's complexity $g$.
+
+
+\subsection{Data collection}
+
+\subsubsection{Amending the complexity}
+
+For some codes, the code owners can easily clarify what $g$ is.
+For others, the arising $g$ might not be a sole polynomial, in which case we have to amend \eqref{equation:inter-node:efficiency}.
+It might also depend on factors that are difficult to fix a posteriori and need some output analysis:
+
+Time stepping codes sometimes amend the time step size dynamically.
+If the problem size changes, also the chosen time step sizes change, and we have to calibrate the timing accordingly:
+In this case, we are interested in some timing per time step, i.e.~the fact that a bigger setup picks more time steps should be factored out.
+
+Other codes employ dynamic mesh refinement.
+That is, the number of compute elements changes over time.
+If we increase the admissible number of elements by a factor of four, this might not necessarily lead to an exact increase of the workload by a factor of four.
+Instead, we have to parse the outcome and normalise the timings by actual cells.
+
+A final example are solvers for non-linear equation systems:
+As we change the problem size, a solver might suddenly need more or fewer iterations.
+We are interested in computational throughput here rather than mathematical efficiency, and hence once again have to parse the number of actual iterations and calibrate all measurements accordingly.
+Due to dynamic termination criteria in the underlying linear algebra, the resulting calibration might be highly non-linear.
+
+\subsubsection{Memory footprint}
+
+Another consideration for weak scaling is the actual problem size:
+
+\begin{assessmentcrime}
+ We scale up the problem such that the individual work per nodes becomes very small.
+\end{assessmentcrime}
+
+\noindent
+As a rule of thumb, we can simply track the memory footprint per rank and ensure that it stays within a certain regime such as 60\% of the available memory per node. 
+
+\subsubsection{Hybrid codes}
+
+If a code supports MPI+X with X being some kind of multithreading or has no multithreading at all, then the baseline has to be chosen such that we employ all cores of one node.
+That is, the baseline $t_{\text{inter}}(1)$ might already use more than one MPI process, as long as all of these processes are pinned to the same node.
+
+\subsubsection{Workflow}
+
+Once we have the algorithmic complexity and memory footprints under control, we can conduct the actual measurements:
+
+\begin{enumerate}
+  \item Pick a problem size $n_1$ for one node.
+  \item Measure the time $t_{\text{inter}}(1)$.
+  \item Increase the node count $n_{\text{inter}}$ and measure the timings. This is basically strong scaling in line with Section~\ref{section:high-level:intra-node}.
+  \item Compute the computational efficiency on-the-fly in line with \eqref{equation:inter-node:efficiency}.
+  \item If the efficiency $E_{\text{inter}}(p_{\text{inter}})\leq 60\%$, increase the problem size $n_{\text{inter}}$ and continue the measurements from hereon with the increased problem size.
+\end{enumerate}
+
+\noindent
+The recipe leaves it open by how much we should increase $n_{\text{inter}}$ every time.
+A rule of thumb is that we maximise the value such that the nodes still can handle the problem, and, at the same time, try to ensure that each compute node hosts local subproblems with roughly the same memory footprint that we obtained for $n_1$ on one node.
+
+
+
+\subsection{Evaluation}
+
+Our roadmap to determine how good the distributed-memory behaviour is, i.e.~our strategy to come up with a single number, is straightforward.
+First, we record all the $p$ for which we had to increase the problem size into a set $\mathbb{C}_{\text{critical,inter}}^{\text{60\%}}$.
+For these problem sizes, we only pick the timings/efficiencies for the bigger setup, i.e.~after we have increased the problem size.
+
+\begin{performancemetric}
+ We evaluate 
+ \begin{eqnarray*} 
+  C_{\text{inter}}^{\text{80\%}} = | \{
+    p \in \mathbb{C}_{\text{critical,inter}}^{\text{60\%}}: \quad
+    E_{\text{inter}}( p ) \geq 80\%
+    \}
+  |
+  \qquad
+  \text{and} \\
+  C_{\text{inter}}^{\text{60\%}} = | \{
+    p \in \mathbb{C}_{\text{critical,inter}}^{\text{60\%}}: \quad
+    80\% \geq E_{\text{inter}}( p ) \geq 60\%
+    \}
+  |,
+ \end{eqnarray*}
+ \noindent
+ to evaluate to which degree the efficiency curve remains above $60\%$ or within the corridor of $60\%-80\%$.
+\end{performancemetric}
+
+
+\begin{figure}
+  \begin{center}
+    \includegraphics[width=0.7\textwidth]{high-level/inter-node.pdf}
+  \end{center}
+  \caption{
+   Efficiency data for two codes (yellow and green).
+   At three node counts, their efficiency underruns $60\%$, so we increase the problem size before we continue.
+   The green code always recovers from the poor efficiency once we increase the problem size,
+   but we struggle to push the yellow curve above the $80\%$ mark again. 
+   \label{figure:inter-node}
+  }
+\end{figure}
+
+
+\noindent
+The assessment now evaluates if the majority of the jumps manage to push the efficiency above 80\% or at least manage to keep it consistently high (Figure~\ref{figure:inter-node}).
+Let $C_{\text{inter}} = |\mathbb{C}_{\text{critical,inter}}^{\text{60\%}}| $ count the number of jumps.
+If all jumps remain above 60\% with the majority above 80\%, the scalability is very good.
+If most jumps remain above 60\%, the scalability is acceptable.
+
+\begin{center}
+ \begin{tabular}{p{0.54\textwidth}p{0.42\textwidth}}
+  Efficiency & Description \\
+  \hline
+  $C_{\text{inter}}^{\text{80\%}} \geq 0.8 \cdot C_{\text{inter}} \ \wedge \ C_{\text{inter}}^{\text{80\%}} + C_{\text{inter}}^{\text{60\%}} = C_{\text{inter}} $
+   & \cellcolor{green!25} Distributed memory scaling is good.
+  \\
+  $C_{\text{inter}}^{\text{60\%}} \geq 0.6 \cdot C_{\text{inter}}$
+   & \cellcolor{yellow!25} Distributed memory scaling is not particularly good.
+  \\
+  otherwise
+   & \cellcolor{red!25} Distributed memory scaling is poor.
+ \end{tabular}
+\end{center}
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Run the code over an increasing number of nodes and increase the problem size every time the efficiency becomes inacceptably low.
+  \item[$\boxplus$] Study if these problem size increases help you to push the efficiency up significantly.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Run the same problem size over a few  different node counts and make statements on the code's behaviour. 
+  \item[$\boxminus$] Rely on raw timings that do not take the computational workload per setting into account. 
+\end{itemize}

@@ -1,0 +1,27 @@
+\section{Excessively fine-granular task synchronisation}
+\label{section:node-level:fine-granular-task-synchronisation}
+
+\begin{hypothesis}
+ Tasks block each other for very short periods. It looks like they ran in parallel, but they are actually sequentialising each other.
+\end{hypothesis}
+
+
+This problem arises for example if there are lots of tasks hosting a for loop 
+which in return has a very small critical section:
+The tasks lock each other out and effectively serialise each other while the 
+execution threads are interwoven into each other.
+
+\marginpar{A cartoon might help}
+
+\subsection{Diagnosis}
+
+
+If there are many critical sections following each other, this manifests in a 
+lot of spin time in the multithreading back-end.
+Performance analysis and tuning instructions recommend to increase the task 
+granularity or the scope of the data synchronisation (cited from \vtune).
+
+\begin{instructions}{\vtune}
+ The code reports significant overhead time.
+\end{instructions}
+

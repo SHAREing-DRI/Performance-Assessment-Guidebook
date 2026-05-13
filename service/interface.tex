@@ -1,0 +1,34 @@
+\section{Service Interface}
+% \setcounter{section}{0}
+\label{chapter:service-interface}
+\textbf{VERY ROUGH, JUST INFORMATION DUMP}
+
+\noindent \textbf{Chatting to Mario Wille about the hoops needed to jump through for submitting one of the Peano based codes to ChEESE and also for submitting for a POP performance report}
+
+%\section{Required Information}
+%\label{sec:required-info}
+
+Template list of required information for submission page:
+\begin{itemize}
+  \item Applicants Name
+  \item Applicants Department
+  \item Application Name
+  \item Programming Language(s), e.g., C/C++, Fortran, Julia, etc.
+  \item Programming model(s), e.g., OpenMP, OpenMP offload, CUDA, MPI, etc.
+  \item Source code - this could be either a link to a Git repo or a compressed file (e.g., *.tar.gz)
+  \begin{itemize}
+    \item Build instructions - typically in the form of a README file, the code should be supplied with information of compilers (e.g., GCC, LLVM, etc.) and libraries (e.g., BLAS, FFTW, HDF5, etc.) along with specific versioning
+    \item Test case - along with building the application the analyst would like to know a relevant use case of the software, i.e., a short test run which acts as a typical use case of the application
+    \item Run example - in conjunction with the test case, the user should give typical resources for the test case, i.e., OpenMP threads, MPI ranks, etc. or perhaps simpler would be a SLURM script
+    \item Pre/Post-processing - please include any scripts that are needed for pre or post-processing to run the test case example
+  \end{itemize}
+  \item Previous analysis - if previous optimisation and tuning analysis has been performed, then either a summary or an attached report document (e.g., from POP), would be beneficial
+\end{itemize}
+
+Overall this list is a starting point, and the more information the applicant can provide, the better. However, I think the main point of the service interface is this: \emph{I, as the analyst, should be able to follow an instructions and requirements list to run a simple test or benchmark of the submitted software}.
+
+Information (intentionally) left out:
+\begin{itemize}
+  \item License - I am concerned that the necessity of a license could put people off, however, I am aware that this could make things difficult for the service (I am going to chat with Mario about this further)
+  \item ...
+\end{itemize}

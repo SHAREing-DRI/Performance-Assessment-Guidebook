@@ -1,0 +1,48 @@
+\section{I/O}
+\label{section:preparation:io}
+
+% TAF: I agree with the wip section below that we have focused on the simple I/O points and mis 'real' I/O. I wonder if we therefore need a *benchmarking* that includes 'significant' I/O, i.e., do we always turn off I/O? Do we therefore expect the high-level assessment to be conducted with all non-standard I/O turned off and then we perform the other performance analyses, and 'if all is well' we come back to I/O? I think no...
+
+\begin{wip}
+ This section is only partially complete. We cover the terminal outputs but miss out on the ``real'' I/O.
+\end{wip}
+
+
+
+
+String operations are excessively expensive.
+Hence, where possible, string operations should be minimised by the code's developers, and our assessments should use a version of the code which does as few string operations as necessary.
+In this context, it is important that there's no console I/O.
+We don't want to study complex outputs; we are busy enough with handling the output of performance analysis tools.
+
+\begin{assessmentcrime}
+ The code writes a lot of information to the terminal. 
+\end{assessmentcrime}
+
+More importantly, if our code writes excessive amounts of data, we almost certainly profile the I/O efficiency rather than the runtime behaviour.
+Unless we want to explicitly study I/O, we are well-advised to switch off any file outputs, database outputs, and also excessive file reads which will not compromise the benchmark being representative of a normal run.
+A log file alone can become problematic when these files become suddenly huge or are updated frequently.
+In the best case, a performance assessment benchmark writes and reads barely any data at all, i.e.~it is largely hard-coded and silent.
+
+\begin{assessmentcrime}
+ The code reads or write to files excessively. 
+\end{assessmentcrime}
+
+\begin{checklist}
+ \item Your benchmark does {\bf not} write (a lot of) files.
+ \item Your benchmark does {\bf not} write a lot of information to the terminal.
+\end{checklist}
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Disable I/O, exclude reading and writing files from any assessment as far as possible (and as long as you don't want to benchmark exactly this I/O).
+  \item[$\boxplus$] Remove terminal dumps. If the developers want to preserve the output (e.g.~for validation or debugging), suggest to embed them into macros which can be compiled out of the code prior to production runs.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Start with a high-level assessment straightaway. In particular any shared memory measurement will be corrupted by excessive terminal dumps.
+\end{itemize}

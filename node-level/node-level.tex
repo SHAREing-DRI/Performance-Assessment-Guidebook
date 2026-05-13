@@ -1,0 +1,73 @@
+\chapter{Node-level (intra-node) analysis}
+\label{chapter:node-level}
+
+
+
+Once we hit this section, we know that we make no particular good use of our cores.
+This is evidenced by the fact that our intra-node scaling is not good (cmp.~Section~\ref{section:high-level:inter-node}), 
+i.e.~we measure what we get on one core and then extrapolate what our given number of cores should yield.
+But they don't:
+The speedup as introduced from \eqref{equation:hpc-terms:speedup} is poor as we increase the core count.
+We leave a lot of potential compute capability unused.
+
+
+\begin{figure}[htb]
+ \begin{center}
+  \includegraphics[width=0.65\textwidth]{node-level/decision-graph.pdf}
+ \end{center}
+  \caption{
+   Decision graph for inter-node analysis.
+   \label{figure:core:decision-graph}
+  }
+\end{figure}
+
+
+Our deep dive starts from an analysis if there is enough concurrency in principle to exploit all cores.
+If there are not enough concurrent operations, further analysis is not required. 
+The code can be returned immediately to the developers.
+Otherwise, we take it from there (Figure~\ref{figure:core:decision-graph}).
+
+
+%\includegraphics[width=0.8\textwidth]{node-level/whiteboard-intra-node.png}
+
+
+\subsection*{Preparation}
+
+Inter-node analysis is all about how efficiently we use multiple threads.
+Therefore, it focuses predominantly on relative quantities:
+How well does the code perform if we add another thread?
+However, we cannot study 128+ measurements in one go---even though modern performance analysis tools have quite powerful capabilities to compare different setups.
+We need to focus on few setups that yield interesting setup.
+
+
+
+\begin{assessmentcrime}
+ People study a whole-node run right from the start without a scalability
+ analysis beforehand.
+\end{assessmentcrime}
+
+
+
+\noindent
+It makes sense to run a strong scaling test and plot the efficiency. 
+Once completed, we can flag those areas where the gradient suddenly changes or   
+where the efficiency drops below 80\% or 60\% respectively.
+These are the setups (turning points) on which we should focus most of the time.
+Do not try to study any other setup, as you'll most likely be swamped with data
+that is not relevant or difficult to interpret!
+
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Run a strong scaling test and plot the efficiency. Narrow down the number of setups of interest, i.e.~identify regions where the efficiency apruptly changes or falls under a threshold.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Start with a full-node run right from the start and hope that you spot interesting trends in the data.
+\end{itemize}
+

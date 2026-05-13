@@ -1,0 +1,34 @@
+\chapter{High-level first glance}
+% \setcounter{section}{0}
+\label{chapter:high-level}
+
+
+There are various ways or strategies to obtain a first high-level overview and how to get started if we want to understand a code's performance better.
+Every team, every project, every scientist have their own approach, and it often changes from project to project.
+In this chapter, we propose a workflow running along few very simple principles:
+
+\begin{enumerate}
+  \item We study the performance characteristics for \emph{different machine part/aspects separately}. 
+  \item We use a simple \emph{blackbox performance metric} per dimension to find out first if there are issues or not.
+  \item We are not interested in explanations of \emph{why} we see any performance flaws. We simply document \emph{what flaws} we observe.
+\end{enumerate}
+
+
+\noindent
+Per dimension, we later break all performance flaws found down into subrubrics, and dig deeper and deeper into the code.
+Along this way, we construct working hypotheses of why the code performs poorly.
+But this comes later.
+For the time being, we focus in a bird's eye view, which is an analysis which we
+can conduct, for example, with a simple script, a few tools and
+mere timings.
+
+
+\begin{assessmentcrime}
+  Modern preformance analysis tools (e.g.~\aps~and \map) and methodologies offer a high-level overview as kind of an automatic service.
+  This is a very valuable feature, as it provides you with a quick overview of your code's characteristics.
+  While we appreciate these opportunities, we are however not sure if this is really the right starting point for performance assessment.
+  In our approach, we do not use one single run and its characterisation to get started, but we use many different runs (with different configurations) to zoom into particular feature dimensions such as intra-node scaling and see if there are issues there.
+  Instead of one global overview, we obtain a set of metrics which we combine into an application profile. 
+  We do not rely on a {\bf one run uncovers it all} approach.
+\end{assessmentcrime}
+

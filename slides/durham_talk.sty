@@ -1,0 +1,370 @@
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvidesPackage{durham_lecture}
+
+
+
+
+%
+% Usage:
+%
+% - Include package:
+%     \documentclass[8pt,t,pdflatex,notes]{beamer}
+%     \usepackage{durham_lecture}
+%
+%   Please replace the notes with nonotes if you don't want to see notes
+%
+% - Add four defines:
+%     \def\lecturetitle{Software Engineering for the Internet}
+%     \def\brieftitle{Software Engineering for the Internet}
+%     \def\session{Requirements Engineering}
+%     \def\teacher{Dr.~Weinzierl}
+%     \def\collaborators{Dr.~Weinzierl}
+%     \def\date{1/1/2013}
+%
+%
+% - After \begin{document}, insert
+%     \frame{
+%       \titlepage
+%     }
+%
+% - Use split-content if you want to have two-column layout
+%
+% - Use presentationSection instead of section
+%
+% - If you have source code or pictures within your frame, you might want to 
+%   mark it as [fragile]
+%
+% - If you have a slide with only one picture, you might want to use 
+%   \blackframe or \whiteframe. Their arguments are described below.
+%
+% - If you use the notes environment, please add either
+%     \includeversion{notes}
+%     \excludeversion{notes}
+%
+% - If you prefer 16:9, change the document style into 
+%   \documentclass[8pt,t,pdflatex,nonotes,aspectratio=169]{beamer}
+%   and add
+%   \setboolean{format169}{true}
+%
+
+\RequirePackage{helvet}
+\RequirePackage{color}
+\RequirePackage{graphicx}
+\RequirePackage{framed}
+\RequirePackage{setspace}
+\RequirePackage{hyperref}
+\RequirePackage{listings}
+\RequirePackage{verbatim}
+\RequirePackage{pdfpages}
+\RequirePackage{version}
+\RequirePackage{ifthen}
+\RequirePackage{xcolor}
+\RequirePackage{colortbl}
+
+
+
+
+\newboolean{format169}
+\setboolean{format169}{false}
+
+
+\newboolean{insertOutlineSlides}
+\setboolean{insertOutlineSlides}{false}
+
+
+
+%\definecolor{DUpalatine}{rgb}{0.48,0.18,0.47}
+% 102, 33.15, 86.7
+\definecolor{DUpalatine}{rgb}{0.40,0.13,0.43}
+\definecolor{blue}{rgb}{0.40,0.13,0.43}
+\definecolor{red}{rgb}{0.66,0.17,0.29}
+\definecolor{grey}{rgb}{0.81,0.85,0.82}
+\definecolor{black}{rgb}{0,0,0}
+
+
+
+\setbeamercolor{structure}{fg=DUpalatine}
+\setbeamercolor{titlelike}{fg=DUpalatine,bg=white}
+
+
+\setbeamercolor{title in sidebar}{fg=DUpalatine}
+\setbeamercolor{section in sidebar}{fg=DUpalatine}
+\setbeamercolor{author in sidebar}{fg=DUpalatine}
+\setbeamercolor{section in toc}{fg=black}
+
+
+% 21.
+%\hypersetup{linkbordercolor={0.1 0.4 0.31}} 
+
+\setbeamercolor*{normal text}{fg=black}
+%\colorlet{LinkColor}{DUpalatine}
+
+\hypersetup{colorlinks=true}
+\hypersetup{pdfborder={0 0 0}}
+\hypersetup{linkcolor=DUpalatine}
+\hypersetup{urlcolor=DUpalatine}
+
+
+\pgfdeclareimage[height=1.2cm]{SchoolLogo}{SchoolLogo}
+\pgfdeclareimage[height=0.2cm]{BlueskyLogo}{BlueskyLogo}
+
+\mode<presentation>
+
+
+\userightsidebartemplate{0cm}{}
+
+\mode
+<all>
+
+
+     
+  
+%   \newcommand{\gpltinline}[1]{\lstinline[language=cCCode]�#1�}
+
+  \setbeamertemplate{headline}[text line]
+  {
+    \vbox{
+      \vskip3pt
+      \beamerline{
+%        \insertsectionnavigationhorizontal{0.72\paperwidth}{}{} 
+        \hspace{0.76\paperwidth}
+        \hfill \pgfuseimage{SchoolLogo}
+      }
+      \vspace{-1.0cm}
+    }
+  }
+  
+  \setbeamertemplate{footline}[text line]
+  {
+    \vbox{
+      \insertvrule{0.5pt}{black}%
+      \vskip1.5pt
+      \tinyline{\color{DUpalatine} 
+      \pgfuseimage{BlueskyLogo}
+      \color{black}
+      @tobiasweinzierl.bsky.social \phantom{xxx} \teacher : \brieftitle
+		  \hfill \insertframenumber\ / \inserttotalframenumber 
+      }
+    }
+  }
+
+
+  \usetitlepagetemplate{
+        \vbox{}
+        \vfill
+        \vskip3.5em
+        \begin{centering}
+          \structure{\huge \lecturetitle}
+          \linebreak
+          \structure{\small \session}
+          \linebreak
+          \vspace{1.5cm}
+          \structure{\small  \collaborators}
+        \end{centering}
+        \linebreak
+        \structure{\small  \affiliation}
+        \linebreak
+        \structure{\small  \date}
+        \vfill
+  }
+  
+  % 
+  % Nur ein Parameter. Das ist dann auch der Section header 
+  %
+  \renewcommand{\frametitle}[1]{
+  \ifthenelse{\boolean{format169}}{
+   \vskip3pt \hspace{-0.65cm} \vbox{\structure{\bfseries \Large #1}} \vskip1pt
+  }{
+   \vskip3pt \hspace{-0.65cm} \vbox{\structure{\bfseries \Large #1}} \vskip10pt
+  }
+  }
+  
+  
+
+  %
+  % Ein Bild kommt links, rechts steht Inhalt
+  %
+  % @param #1 Bilddatei
+  % @param #2 Bildunterschrift (Urheberrecht) Kann auch leer Klammer sein
+  %
+  \newenvironment{split-content}[2]
+  { 
+    \ifthenelse{\boolean{format169}}{
+    \begin{minipage}[h]{0.35\textwidth}
+      \begin{center}
+        \includegraphics[width=0.8\textwidth]{#1} 
+        \linebreak
+        {
+        \footnotesize
+        #2
+        }
+      \end{center}
+    \end{minipage}
+    \begin{minipage}[h]{0.6\textwidth}
+    }
+    {
+    \begin{minipage}[h]{0.45\textwidth}
+      \begin{center}
+        \includegraphics[width=0.8\textwidth]{#1} 
+        \linebreak
+        {
+        \footnotesize
+        #2
+        }
+      \end{center}
+    \end{minipage}
+    \begin{minipage}[h]{0.5\textwidth}
+    }
+  }
+  { 
+    \end{minipage} 
+  }
+
+
+  %
+  % Citation box. Can also be used for definitions
+  %
+  % @param Source of citation
+  %
+  \newenvironment{citation-box}[1]
+  {
+    \begin{center}
+    \begin{minipage}[h]{0.8\textwidth}
+    \begin{framed}
+    {\color{DUpalatine}#1:}
+  }
+  {
+    \end{framed}
+    \end{minipage}
+    \end{center}
+  }
+
+%
+% Insert a black frame with a picture
+%
+% @param 1: Size of picture relative to page width, e.g. 0.5
+% @param 2: Filename of picture
+% @param 3: Link/name of picture source
+%
+\newcommand{\blackframe}[3]{\bgroup
+\setbeamercolor{background canvas}{bg=black}
+%\setcounter{framenumber}{\value{finalframe}}
+\begin{frame}[c,plain]{}
+  \begin{center}
+    \includegraphics[width=#1\textwidth]{#2}
+    \\
+    {\footnotesize \href{#3}{\color{white} #3}} 
+  \end{center}
+\end{frame}
+\egroup
+}
+
+
+\newcommand{\whiteframe}[3]{\bgroup
+\setbeamercolor{background canvas}{bg=white}
+%\setcounter{framenumber}{\value{finalframe}}
+\begin{frame}[c,plain]{}
+  \begin{center}
+    \includegraphics[width=#1\textwidth]{#2}
+    \\
+    {\footnotesize \href{#3}{\color{black} #3}} 
+  \end{center}
+\end{frame}
+\egroup
+}
+
+
+\newenvironment{notes}{%
+    \begin{frame}
+      \frametitle{---Notes---}
+      \vfill
+}{%
+      \vfill
+    \end{frame}
+}
+
+
+\newcommand{\outline}{
+  \ifthenelse{\boolean{insertOutlineSlides}}{
+    \begin{frame}
+     \frametitle{Outline}
+     \vfill 
+     \tableofcontents
+     \vfill
+    \end{frame}
+  }{
+  }
+}
+
+
+
+\newcommand{\abstractpage}[1]{\bgroup
+\setbeamercolor{background canvas}{bg=white}
+%\setcounter{framenumber}{\value{finalframe}}
+  \begin{frame}[c,plain]{}
+  \frametitle{\small \lecturetitle \\ \footnotesize \teacher}
+  \setlength{\parskip}{1em}
+  \footnotesize
+  #1
+  \vfill
+  \setcounter{framenumber}{0}
+\egroup
+}
+
+
+
+\lstdefinelanguage{cCCodeNormal}[]{C}{
+%  basicstyle=\tiny,
+  basicstyle=\normalsize,
+  stringstyle=\color{red},
+  keywordstyle=\color{DUpalatine},
+  commentstyle=\color{gray}\slshape,
+  morekeywords={linestyle,linetype,linewidth,linecolor,pointtype,nohidden3d,hidden3d,palette,lt,lw,lc,pt,ps,fd,fill,fs,ls},
+  framexleftmargin=1mm, framextopmargin=1mm, frame=shadowbox,
+  rulesepcolor=\color{DUpalatine}
+}
+
+
+\lstdefinelanguage{cCCodeTiny}[]{C}{
+  basicstyle=\tiny,
+  stringstyle=\color{red},
+  keywordstyle=\color{DUpalatine},
+  commentstyle=\color{gray}\slshape,
+  morekeywords={linestyle,linetype,linewidth,linecolor,pointtype,nohidden3d,hidden3d,palette,lt,lw,lc,pt,ps,fd,fill,fs,ls},
+  framexleftmargin=1mm, framextopmargin=1mm, frame=shadowbox,
+  rulesepcolor=\color{DUpalatine}
+}
+
+
+\lstdefinelanguage{cPythonCodeTiny}[]{Python}{
+  basicstyle=\tiny,
+  stringstyle=\color{red},
+  keywordstyle=\color{DUpalatine},
+  commentstyle=\color{gray}\slshape,
+  morekeywords={linestyle,linetype,linewidth,linecolor,pointtype,nohidden3d,hidden3d,palette,lt,lw,lc,pt,ps,fd,fill,fs,ls},
+  framexleftmargin=1mm, framextopmargin=1mm, frame=shadowbox,
+  rulesepcolor=\color{DUpalatine}
+}
+    
+
+\lstnewenvironment{C-code}[1][]{
+  \lstset{
+  language=cCCodeNormal,#1
+}}{}
+
+
+
+\lstnewenvironment{C-code-tiny}[1][]{
+  \lstset{
+  language=cCCodeTiny,#1
+}}{}
+
+
+\lstnewenvironment{Python-code-tiny}[1][]{
+  \lstset{
+  language=cPythonCodeTiny,#1
+}}{}
+
+
+
+\ProcessOptions

@@ -1,0 +1,58 @@
+\chapter{Core}
+\label{chapter:core analysis}
+
+% With the core analysis, we want to understand why a single core of our calculation does not deliver the performance we'd like it to contribute.
+% From the high-level analysis, we know that our code does not deliver a
+% reasonable ratio of the theoretical peak.
+% We also know, on a global scale, how much bandwidth the core draws from the
+% memory interconnect.
+% With the two quantities at hand, we can start to run down a decision tree:
+% 
+% 
+% \begin{center}
+%   \begin{tabular}{cc|p{0.3\textwidth}|p{0.3\textwidth}|}
+%     && \multicolumn{2}{c|}{Flops/s} \\
+%     && \multicolumn{1}{c|}{high} & \multicolumn{1}{c|}{low} \\
+%     \hline
+%     \multirow{2}{*}{BW used}
+%      & high && Memory use characteristics \\
+%      \hline
+%      & low & Instruction set usage 
+%       & Non-compute overhead (Section~\ref{section:core:overhead}) \emph{or}
+%       memory access characteristics (Section~\ref{section:core:memory-access-characteristics}) \\
+%      \hline
+%   \end{tabular}
+% \end{center}
+% 
+% 
+% \noindent
+% A whole tree of potential effects to study unfolds from this initial assessment
+% (Figure~\ref{figure:core:decision-tree}).
+% As so often, it is not really a tree in real life:
+% You might want to evaluate different branches simultaneously, and the yes/no
+% classification is rarely black and white with real data.
+% Finally, we note that these effects might all be very localised
+% (Section~\ref{section:tools:localisation}).
+% We hence might have to go down different branches for different functions,
+% metrics, ranks or cores.
+% 
+% 
+% \begin{figure}
+%  \begin{center}
+%   \includegraphics[width=1.0\textwidth]{core/decision-tree-core-draft.pdf}
+%  \end{center}
+%  \caption{
+%   Core analysis decision tree.
+%   \label{figure:core:decision-tree}
+%  }
+% \end{figure}
+% 
+% 
+% \begin{figure}
+%  \begin{center}
+%   \includegraphics[width=0.8\textwidth]{core/whiteboard-core.png}
+%  \end{center}
+%  \caption{
+%   Old core analysis decision tree.
+%  }
+% \end{figure}

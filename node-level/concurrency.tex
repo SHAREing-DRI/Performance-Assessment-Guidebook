@@ -1,0 +1,84 @@
+\section{Concurrency level vs.~observed parallelisam}
+\label{section:node-level:concurrency}
+
+\begin{hypothesis}
+ There is not enough work, i.e.~the concurrency level is not high enough.
+\end{hypothesis}
+
+Finding out how much work there should, in theory, be in a code is not trivial.
+We roughly distinguish two ways to conduct these studies:
+a symptomatic approach and a tool-based one.
+
+
+\subsection{Tool-based analysis}
+
+\begin{wip}
+ Not clear what the right tool is to observe this. OpenMP's tool interface might have an option.
+\end{wip}
+
+
+\subsection{Symptom analysis}
+
+Arguing about a lack of concurrency can be relatively simple or utterly complex.
+A simple occupation analysis might demonstrate that some code phases just do not yield enough work.
+Poor balancing (cf.~Section~\ref{section:node-level:balancing}) for example materialises immediately in low concurrency.
+
+
+Things are more difficult for task-based parallelisation approaches.
+If there are not enough tasks, the task granularity is not high enough.
+Here, insufficient concurrency 
+
+
+\begin{wip}
+ Not clear how this is best done. I had a code with thousands of tasks, but the dependencies were so strict that the number of ready tasks per step was actually way too small.
+ Not sure how to see this. 
+ For loops with too small grain sizes, things should be simple.
+\end{wip}
+
+
+
+
+\subsection{Evaluation}
+
+
+\begin{enumerate}[noitemsep]
+  \item[$\boxtimes$] There is simply not enough work and some cores idle.
+    \begin{itemize}[noitemsep] 
+      \item[$\Rightarrow $] Look into the balancing (Section~\ref{section:node-level:balancing}) if a code relies on classic data parallelism (parallel loops).
+      \item[$\Rightarrow $] Study the average task size and investigate whether these tasks can be split up further (Section~\ref{xxxx}).
+    \end{itemize}
+  \item[$\boxtimes$] The concurrency level unfolds hierarchically---e.g., tasks spawn further tasks or loops host other parallel loops---but the parallelism does not increase.
+    \begin{itemize}[noitemsep]
+      \item[$\Rightarrow $] Ensure that the tasks do not kick off with an extensive serial prologue.
+      \item[$\Rightarrow $] Ensure that hierarchical parallelism is properly supported (Section~\ref{section:node-level:hierarchical-decomposition}).
+    \end{itemize}
+  \item[$\boxtimes$] There are a lot of tasks, but the effective CPU usage is low.
+    \begin{itemize}[noitemsep]
+      \item[$\Rightarrow $] Study the task dependencies and evaluate the actual number of ready tasks at each time point (Section~\ref{xxxx}). 
+    \end{itemize}
+    \begin{wip}
+     We have seen such a case but only found it through intuition, i.e.~not in a systematic way. Not clear how this could have been seen.
+    \end{wip}
+  \item[$\boxtimes$] The concurrency level is high all the time. Nevertheless, the performance remains poor.
+    \begin{itemize}[noitemsep]
+      \item[$\Rightarrow $] The parallel loop segments might be too small (Section~\ref{section:node-level:loop-segments-too-small}).
+      \item[$\Rightarrow $] The tasks might be too small in a task-based parallelisation (Section~\ref{section:node-level:tasks-too-small}).
+      \item[$\Rightarrow $] Tasks might lock each other out all the time, but only for a very brief duration (e.g., short call inside a loop). So it looks as if things ran in parallel, but they do not really do (Section~\ref{section:node-level:fine-granular-task-synchronisation}).
+    \end{itemize}
+\end{enumerate}
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Study if there is always enough work in theory available at any point.
+  \item[$\boxplus$] Either employ a tasking tool or argue through observations.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Try to explain poor behaviour without having ensured that there is enough concurrency, i.e.~work available in theory.
+\end{itemize}
+
