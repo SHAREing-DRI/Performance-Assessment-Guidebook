@@ -1,5 +1,10 @@
+\chapter{Communication with code owner}
+\label{appendix:communication}
+
+There are many times throughout an assessment where direct communication may be required. For now we list the area of `Existing Optimisations', which is a tricky scenario to properly include in an assessment.
+
 \section{Existing optimisations}
-\label{section:preparation:optimisations}
+\label{section:communication:optimisations}
 
 \begin{readerguide}
  Playing around with (user-driven) optimisations can become tricky and might require the assessor to communicate with developers (if you are not the same person).
@@ -50,20 +55,3 @@ They won't ask for it prior to that.
 If possible, it is helpful to disable all of these historic optimisations.
 We can then start with the performance assessment on a green field and re-inject the optimisations one by one as we go along. 
 In an ideal world, they should make the code faster, but this has to be validated!
-
-
-\paragraph*{How it works}
-
-\begin{itemize}[noitemsep]
-  \item[$\boxplus$] Disable existing user-driven tuning options. 
-  \item[$\boxplus$] Independently validate that they actually make the code faster. 
-\end{itemize}
-
-
-\paragraph*{How it does not work}
-
-\begin{itemize}[noitemsep]
-  \item[$\boxminus$] Assume historical performance optimisation steps to pay off on current hardware. 
-  \item[$\boxminus$] Rely on domain scientists that their optimisation has been driven by measurements (formal performance analysis) and an in-depth insight into the machine. 
-\end{itemize}
-
