@@ -11,3 +11,52 @@
     \item A good relationship to your sysad.
   \end{itemize}
 \end{wip}
+
+\section{Machine details}
+
+Modern supercomputers are very complex and it is virtually impossible to
+memorise all the hardware details of a testbed given the zoo of processor types,
+generations and flavours.
+While it is possible to consult your compute centre's webpages or to consult
+your system administrator, it might be more reasonable to obtain that data
+directly from the machine.
+
+\begin{assessmentcrime}
+ Never grab the specification from the login node. Instead, ask for an
+ interactive terminal on a compute node and get the data there. Many
+ supercomputers' login nodes are slightly different to the compute nodes,
+ i.e.~slightly different make, more memory, more cores, \ldots So you might end
+ up with the wrong hardware specification if you analyse a login node.
+\end{assessmentcrime}
+
+\begin{instructions}{\linux}
+ On every Linux system, information about the CPU on the system is held in a
+ central file.
+ You can read it out by typing \texttt{cat /proc/cpuinfo} into the terminal.
+\end{instructions}
+
+
+\begin{instructions}{\likwid}
+ If you have Likwid installed, you can invoke \texttt{likwid-topology} to obtain
+ in-depth information about your CPU.
+\end{instructions}
+
+\begin{instructions}{\maqao}
+ In \maqao, you find some topology information in the menu rubric \emph{Topology}. 
+\end{instructions}
+
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Gather the exact spec of your testbed under realistic load. If this information is already available (e.g.~due to previous assessment exercises), it makes sense to reuse it.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Throw advanced tools onto your code and expect that they report the theoretical machine capabilities themselves.
+\end{itemize}
+
+\section{Software environment}
