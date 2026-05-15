@@ -1,17 +1,9 @@
 \section{Working environment}
 \label{section:preparation:environment}
   
-  
-\begin{wip} 
-  Yet has to be written, but will cover 
-  \begin{itemize}
-    \item Access to some queues with quick turnaround times (recommended);
-    \item A couple of standard assessment tools. We refer to them later (forward link). Reader recommendations: Study them as you go along.
-    \item Exclusive access to nodes.
-    \item Some higher user priviliges (advanced).
-    \item A good relationship to your sysad.
-  \end{itemize}
-\end{wip}
+The setup of a working environment can have a big impact on a software's performance. Clearly the hardware has a large impact, but so can the software environment not to mention the structure of the cluster, e.g., the wait times on partitions can impact the turnaround time for the assessment.
+
+In this section we lay out some features of the working environment that we believe are important when setting up the working environment for code compilation and benchmarking, starting with the machine. The hardware details are crucially important as we may later on wish to do comparative benchmarking on different hardware, or the code submitter may have requested a hardware platform that they have access to or are interested in.
 
 \subsection{Machine details}
 \label{subsection:preparation:machine}
@@ -47,11 +39,19 @@ directly from the machine.
  In \maqao, you find some topology information in the menu rubric \emph{Topology}. 
 \end{instructions}
 
+In the checklist below we recommend some hardware features to note:
+\begin{checklist}
+\item Number of nodes
+\item The node layout, e.g., dual socket of AMD EPYC 7702 64-Core Processors
+\item Caches (including sizes and associated cores) and memory 
+\item NUMA domains
+\end{checklist}
 
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
   \item[$\boxplus$] Gather the exact spec of your testbed under realistic load. If this information is already available (e.g.~due to previous assessment exercises), it makes sense to reuse it.
+  \item[$\boxplus$] Note down any features of the testbeds queues and partitions, including which are most likely to be used for the assessment.
 \end{itemize}
 
 
@@ -63,3 +63,27 @@ directly from the machine.
 
 \subsection{Software environment}
 \label{subsection:preparation:software-environment}
+
+The software environment, e.g., compilers, libraries, modules, etc. can have a significant impact on a code's performance. We do not yet worry about the impact that these dependencies have on the code's performance, as by this stage we are simply interested in building the code. However, as with machine details, it is very useful to have the software environment documented.
+
+\begin{instructions}{Modules}
+To grab the loaded modules and dependencies (following the code's documentation) we can simply 
+\begin{verbatim}
+module list
+\end{verbatim}
+\end{instructions}
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Following the documentation, load in relevant dependencies and note them down using the \texttt{module list} command including any version numbers.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Copy across the dependencies as they appear in the documentation.
+\end{itemize}
+
+
