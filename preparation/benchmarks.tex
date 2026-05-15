@@ -20,8 +20,7 @@ We run the risk of comparing different characteristics produced by different cod
   \item The benchmark has to be a simulation run which is representative of a real-world run.
     It might be significantly smaller and shorter, but it should reflect the core characteristics.
     If the benchmark does so is domain knowledge, i.e.~an assessor has to rely on community and expert feedback to ensure this property holds.
-  \item The benchmark may not run for too long, and it may not terminate too early. ``Good'' runs are often 3--5 minutes, so we get a good coverage of performance characteristics, but we do not wait for ages.
-%  \item The benchmark has to represent performance characteristics.
+  \item The benchmark may not run for too long, and it may not terminate too early. As a rule of thumb, the ``best case'' run (say a whole node) should take approximately a maximum of 10 minutes. By best case we may mean a parallel run, which could mean that a serial run of this benchmark takes significantly longer.
 \end{itemize}
 
 \noindent
@@ -44,7 +43,7 @@ Having a ``small'' setup that completes in reasonable time is important since so
     answer on time. Furthermore, a lot of tools gather significant amounts of
     data per second. Long-running simulations thus run the risk that our analysis
     tools fail to handle the amount of data collected.
-Training material from VI-HPS, e.g., recommends around 10 minutes, and it the precise value is up to (the patience of) the assessor.
+Training material from VI-HPS, e.g., recommends around 10 minutes, though the precise value is up to (the patience of) the assessor.
 When colleagues submit their code, they typically provide a reference configuration using more than one core.
 We will later reduce the available resources artificially to obtain insight into the code's behaviour.
 If the baseline already runs for 10 minutes and we take a quarter of the resources, such experiments quickly become infeasible.
@@ -61,7 +60,7 @@ Two more properties are important:
 
 \noindent
 If a setup is too small---notably if it fits into the local caches---we will not obtain realistic data, as critical system components that quickly develop into bottlenecks are not used.
-We provide remarks on machine properties in Section~\ref{section:preparation:machine}.
+We provide remarks on machine properties in Section~\ref{subsection:preparation:machine}.
 If a setup is too big however, we again run risk that there is not enough slack for tools to run additional statistics on a program run.
 A memory footprint of 20\%--80\% of the main memory is reasonable.
 Attempting to keep the runtime down, we typically operate closer to 20\%, as long as this is significantly more than the L3 cache and significantly more than the GPU's largest cache.  
@@ -103,7 +102,7 @@ While the ways to extract system properties are discussed in the aforementioned 
 \begin{checklist}
  \item Your benchmark compiles as a black box, i.e.~you can give it to another person together with a \texttt{README} file and there might be a few instructions that they have to copy-n-paste into their terminal, but other than that there's no other preparatory work to be completed.
  \item Your benchmark runs without any user interaction.
- \item Your benchmark finishes within less than ten minutes on a single core.\footnote{To analyse different aspects of the code, we do not need to rely on the same benchmark. For example, when conducting scaling analyses, there may be performance characteristics that are only revealed at high core counts. Hence, for some codes we may set up our benchmark to have runtimes exceeding 10~minutes at low core counts, such that the problem size is large enough to see high core count scaling effects. However, at high core counts we would expect to see this benchmark runtime sit within this 10~minute upper bound.}
+ \item Your benchmark finishes within less than ten minutes for a ``best case'' configuration.\footnote{To analyse different aspects of the code, we do not need to rely on the same benchmark. For example, when conducting scaling analyses, there may be performance characteristics that are only revealed at high core counts. Hence, for some codes we may set up our benchmark to have runtimes exceeding 10~minutes at low core counts, such that the problem size is large enough to see high core count scaling effects. However, at high core counts we would expect to see this benchmark runtime sit within this 10~minute upper bound.}
 \end{checklist}
 
 No matter how we create this setup, we have to be able to run all experiments with absolutely minimal user interaction. %(cmp.~Section~\ref{section:behaviour:automate}).
