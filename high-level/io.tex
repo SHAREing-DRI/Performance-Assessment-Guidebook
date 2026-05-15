@@ -5,21 +5,19 @@
  We consider a code not to suffer from IO constraints if it spends less than 20\% of its runtime in I/O.
 \end{summary}
 
-\begin{wip}
-    This section is also still in its early stages of development, but the key takeaway is: we gauge the `high-level' I/O performance of a benchmark by the proportion of runtime it spends in reads and writes.
-    I personally think 20\% is quite significant. It would be better again to argue over the 
-\end{wip}
-
 \subsection{Benchmark preparation}
-% there are clear questions here of how this metric conflicts with the note that we want to 'turn off I/O'
 
-When preparing the benchmark for core, intra-node, inter-node and GPU analysis, we advised turning off I/O where possible as this can make some of the measurements unreliable. However, I/O performance is crucial for some codes and in some cases necessary for the code to run. When benchmarking I/O, or benchmarking with I/O enabled, we advise using a benchmark with a typical I/O load - this should be verified by the code's developers.
+%When preparing the benchmark for core, intra-node, inter-node and GPU analysis, we advised turning off I/O where possible as this can make some of the measurements unreliable. However, I/O performance is crucial for some codes and in some cases necessary for the code to run. 
+
+When benchmarking I/O, or benchmarking with I/O enabled, we advise using a benchmark with a typical I/O load - this should be verified by the code's developers. It can tempting to reduce the I/O operations to `game' this metric, but if a code does rely on heavy and frequent I/O then this should be included in the characteristic benchmark.
 
 \subsection{Data Collection}
 
-There are relatively few tools which are easily able to collect the metric we are interested in of 'runtime spent doing I/O operations'.
+There are relatively few tools that focus on I/O performance. Hence, we are restricted in the number of tools that can collect our metric of interest, namely, the proportion of runtime spent doing I/O operations. We list below an example of how to do this with a Darshan, an I/O focused performance tool.
 
 \begin{instructions}{Darshan}
+In this example we present paths and modules as they are defined on a local system. Any user of this book would therefore have to find the relevant Darshan files on their system of choice.
+
 For a dynamic runtime analysis we setup Darshan with
 \begin{verbatim}
 export DARSHAN_DIR=/apps/developers/tools/darshan/3.3.1/1/
@@ -29,7 +27,7 @@ export DARSHAN_LOGDIR=./darshan_logs
 mpiexec -genv LD_PRELOAD ${DARSHAN_DIR}/lib/libdarshan.so
 -np 4 ./code
 \end{verbatim}
-The logging environment variable name can be different so make sure to run
+in which the \texttt{darshan\_logs} directory is user defined for hosting Darshan profile outputs. The logging environment variable name can be different so make sure to run
 \begin{verbatim}
     darshan-config --log-path
 \end{verbatim}
@@ -47,9 +45,9 @@ types of functions.
 Therefore depending on different forms of I/O --- e.g., \texttt{POSIX}, \texttt{MPIIO}, \texttt{STDIO}, \texttt{H5F}, \texttt{H5D}, \texttt{PNETCDF\_FILE}, \texttt{LUSTRE}, \texttt{DFS}, \texttt{DAOS} --- we need to sum together the read and write times.
 \end{instructions}
 
-\begin{instructions}{VTune}
- t.b.d.
-\end{instructions}
+%\begin{instructions}{VTune}
+% t.b.d.
+%\end{instructions}
 
 \subsection{Evaluation}
 
@@ -80,12 +78,15 @@ where $t_{\text{read}}$ and $t_{\text{write}}$ are the times the code spends in 
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] t.b.d.
+  \item[$\boxplus$] Run an indicative I/O workload and observe time spent in reads and writes
+  \item[$\boxplus$] Accumulate time from different forms of reads and writes into a single I/O runtime
+  \item[$\boxplus$] Observe how much of total runtime is spent in this I/O runtime
 \end{itemize}
 
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] t.b.d.
+  \item[$\boxminus$] Run your benchmark without any indicative I/O workload
+  \item[$\boxminus$] Dig into the details of the code's I/O from tools like Darshan, and begin to draw conclusions
 \end{itemize}

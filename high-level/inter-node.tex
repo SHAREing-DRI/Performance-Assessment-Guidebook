@@ -3,7 +3,7 @@
 
 \begin{summary}
  We consider a code to make efficient use of multiple nodes if it scales weakly. 
- In particular, we consider it to be scaling if recovers from inefficiencies (efficiency drops below 80\% or 60\%) significantly whenever we increase the problem size,
+ In particular, we consider it to be scaling if it recovers from inefficiencies (efficiency drops below 80\% or 60\%) significantly whenever we increase the problem size,
  i.e.~``gets back'' to (almost) 100\% or 80\% efficiency, respectively.
 \end{summary}
 
@@ -24,7 +24,7 @@ This setup's parallel efficiency will go down as we increase the number of nodes
 Once the efficiency falls under 60\%, utilisation is really poor.
 Therefore, we increase the problem size and see if we can get the efficiency up again.
 The increase should lift the efficiency significantly over 80\% again. 
-If it does, we end up with a zig zack pattern, where we test until we hit the 60\% threshold, increase the problem size (and hence lift the efficiency above 80\%) and then increase the node count again.
+If it does, we end up with a zig zag pattern, where we test until we hit the 60\% threshold, increase the problem size (and hence lift the efficiency above 80\%) and then increase the node count again.
 The code struggles to scale weakly, if the subsequent problem size increase improves the efficiency, but cannot push the efficiency above the 80\% efficiency threshold anymore.
 The code does not scale at all, if the problem size increases fail to keep the efficiency above 60\%.
 
