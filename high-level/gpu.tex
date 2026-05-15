@@ -7,15 +7,11 @@
  a code to make reasonable use of the GPUs if it achieves more than 60\%. 
 \end{summary}
 
-\begin{wip}
-    This section is still in its early stages of development, but the key takeaway is that: for a code with GPU offloading we simply want to measure the GPU work rate i.e. FLOPS/s.
-\end{wip}
-
-Similarly to the core performance, the GPU analysis examines how efficiently your code harnesses the GPU.
-Our analysis evaluates how effectively your implementation takes advantage of the extreme parallelism of the GPU's capabilities.
+Similar to the core performance, the GPU analysis examines how efficiently your code harnesses the GPU.
+Our analysis evaluates how effectively your implementation takes advantage of the extreme parallelism of the GPU.
 
 To capture GPU behaviour at this high level, we want to measure the peak performance relative to the hardware's capabilities.
-Similarly to core performance, the tools can draw us towards more detailed metrics and models, but to minimise distractions and clarify our analysis we restrict this rubric to the peak performance percentage.
+As with core performance, the tools can draw us towards more detailed metrics and models, but to minimise distractions and clarify our analysis we restrict this rubric to the proportion of peak performance.
 
 \subsection{Benchmark preparation}
 
@@ -42,17 +38,17 @@ For example, if you are working with an Nvidia H200 GPU, which supports CUDA com
 
 \subsection{Data Collection}
 
-Each manufacturer of GPUs provides their own management software suite, which is capable of collecting similar but slightly different sets of metrics. Below are some instructions for the Big 3 (Intel, AMD, and Nvidia) to extract those metrics necessary for the high-level assessment.
+Each manufacturer of GPUs provides their own management software suite, which is capable of collecting similar but slightly different sets of metrics. Below are some instructions for Nvidia hardware to extract the metrics necessary for the high-level assessment (instructions for AMD and Intel are to be included in the future).
 However, if you are using other types of accelerators or accelerators from other manufacturers the software suite required to collect these data may be significantly different or incapable of providing the recommended metric.
 
 In order to calculate the FLOPS/s, we generally need to collect metrics of the total number of floating point operations executed.
 
-\begin{instructions}{Intel VTune}
- t.b.d.
-\end{instructions}
+%\begin{instructions}{Intel VTune}
+% t.b.d.
+%\end{instructions}
 
-\begin{instructions}{AMD rocprofiler-system}
- t.b.d.
+%\begin{instructions}{AMD rocprofiler-system}
+% t.b.d.
 % rocprofv3 --pmc TOTAL_32_OPS,SQ_INSTS_VALU_INT32 -- ./<exe>
 % sqlite3 -csv -header <results.db> "SELECT dispatch_id,kernel_name,counter_name,value FROM counters_collection;"
 
@@ -68,7 +64,7 @@ In order to calculate the FLOPS/s, we generally need to collect metrics of the t
 %     
 %     -- ./code
 % \end{verbatim}
-\end{instructions}
+%\end{instructions}
 
 \begin{instructions}{Nvidia NSight}
 On Nvidia GPUs using Nvidia NSight Compute (\verb|ncu|), the metrics required are in the format
