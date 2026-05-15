@@ -7,13 +7,6 @@
  In many cases, we might be able to skip it initially.
 \end{readerguide}
 
-
-\begin{wip}
- This part is missing but we need some discussion of the $\mathcal{O}(N^2)$ vs.~$\mathcal{O}(N)$ behaviour that we see frequently.
-\end{wip}
-
-% TAF: I am not quite clear as to what is planned for this section. Are we giving an overview of algorithmic scaling (as per the wip section)?
-
 We have to know or have to be told the computational complexity of the underlying algorithms. 
 If we have a pure Monte Carlo setup, then doing 100 times more trials should last around 100 times longer.
 If we have a parabolic Partial Differential Equation (PDE) solver with explicit time stepping and a regular grid, we have to know that the problem sizes increases by a factor of $2^d$ if we half the mesh spacing. 
@@ -21,3 +14,6 @@ However, these algorithms also have to reduce the time step size, so if we measu
 Finally, if we run an Adaptive Mesh Refinement (AMR) code for a hyperbolic setup with explicit time stepping or a Smoothed-Particle Hydrodynamics (SPH) code, we need some kind of output that tells us exactly how many particles or mesh cells we have and what time step sizes we have picked. In this case, time step sizes go down linearly with mesh spacing.
 At the end of the day, we are interested in the \emph{throughput} of the system, i.e.~the time we need to update one quantity of interest.
 It is this metric that we will start from in the next steps. 
+
+
+
