@@ -16,6 +16,6 @@ In future, we will be accepting merge requests with updates to the tex source.
 
 ## Acknowledgements
 
-This work has received funding through the UKRI Digital Research Infrastructure Programme under grants UKRI1801 (SHAREing) and UKRI/ST/B000239/1 (HAI-End)
+This work has received funding through the UKRI Digital Research Infrastructure Programme under grants UKRI1801 (SHAREing) and UKRI/ST/B000293/1 (HAI-End)
 
 
