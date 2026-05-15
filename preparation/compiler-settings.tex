@@ -1,52 +1,12 @@
 \section{Compiler setup}
 \label{section:preparation:compiler-settings}
 
-Before we start, it is important to double-check whether we have used the correct
-compiler settings. It makes no sense to benchmark a code which is not producing
-tailored code for our particularly machinery (therefore it is important to
-benchmark on the right system), and it makes no sense to benchmark a code that
-is not using the latest compiler features.
+When worrying about optimisation, many modern compilers can leverage significant optimisations for us. Likely, performance analysts will receive codes that specificy build instructions that include a variety of compiler flags with some level of optimisations. It may be the case that the build instructions are old and so we could exploit further optimisations.
 
+At this stage, we keep things simple. We simply observe what we have received, either through a submission or through code documentation, and note it down. This is a crucial stage, because at this point we really see whether we are able to follow the code owners' instructions and reproducibly build the benchmark. One thing which should stand out at this stage is what parallelism is included in the build process. Are we using OpenMP flags? Are there flags for targeting device architectures for GPUs? We take note of these as these will be relevant later in the assessment.
+We will go into more details about compiler optimisations in Section~\ref{section:core:compiler-optimisations}. 
 
-First of all, we work with the the most aggressive optimisation that our
-compiler can offer. The minimum choice is to compile with \texttt{-O3},
-although some other compilers might offer further granularity. Also consider
-using \texttt{-ffast-math} which enables aggressive floating-point optimisation.
-
-
-Second, we create code that is tailored towards our particular machinery.
-The correct setting for this depends once again on your compiler. 
-With LLVM and GNU, you can use flags starting with \texttt{-mXXXX} to specify 
-machinery-specific optimisations, i.e.~you can exactly say for which processor
-generation, instruction set, \ldots~you want for the compiler to create binary code.
-If your compile node is of the same type as your test node, then simply
-use \texttt{-xhost} and the compiler will pick the highest instruction set
-available.
-The flag is called \texttt{-mhost} with GNU.
-
-
-\begin{wip}
-A question which was raised at RSECon25: when applying aggressive optimisation, do we include validation checks on the code? I.e., to ensure that the validity of the code still passess when potentially using approximations in the higher level optimisation flags.
-\end{wip}
-
-\begin{instructions}{\intelcompiler}
- With the Intel compiler, you sometimes can pick between the generic
- LLVM (community) versions of a feature and one optimised by Intel itself (with
- the latter obviously performing better on bespoke Intel architecture). For
- example, \texttt{-fopenmp} enables the general OpenMP implementation whereas
- \texttt{-fiopenmp} gives you an in-house version of the same. 
- 
- And while \texttt{-xhost} uses Intel-specific optimisations, \texttt{-mhost}
- will use LLVM's optimisation stack, i.e.~Intel has replaced some optimisation
- steps with bespoke variants, which are enabled if and only if you go down the
- \texttt{-xhost} route. Be aware that Intel's optimisation passes typically will
- be disabled if you use the Intel toolchain on other vendor's hardware,
- i.e.~you'll get unoptimised code.
-\end{instructions}
-
-
-\noindent
-Finally, we might want to add debug symbols.
+One thing we we might want to include at this stage are debug symbols.
 These instruct the compiler to insert additional information into the source
 code which tools can then later use to draw inference
 from, e.g.~which source code line a certain instruction stems from.
@@ -57,37 +17,22 @@ Therefore, we should add \texttt{-g}.
 Some compilers support more detailed information (e.g.~using \texttt{-g3}).
 It requires studying the compiler's feedback whether these flags disable
 optimisations, in which case we might have to balance insight vs.~best-case
-speed.
+speed. Often profilers require debug symbols to allow them to relate machine code to source which help when digging into the performance of the generated machine code.
 
 \begin{checklist}
  \item Your benchmark is compiled with debug symbols (\texttt{-g}).
- \item Your benchmark is compiled with the highest optimisation level (\texttt{-O3} plus a hardware-specific instruction set such as picked by \texttt{-xhost}).
 \end{checklist}
-
-
-
-
-\begin{instructions}{\maqao}
- If you run \maqao~over your code, the tool will report back to you what
- optimisations you might have missed out throughout the compilation.
- The top-level rubric \emph{Global} provides you with information on the optimisation chosen, but it also makes recommendations which options might lead to better runtime.
- 
- The nice thing about \maqao~is that the tool can handle situations where you translate different translation units with different options.
- Also, the recommendation aspect goes beyond pure reporting and is helpful.
-\end{instructions}
-
 
 
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxplus$] Use the most aggressive compiler optimisation that preserve the code semantics (aka still return valid results) and nevertheless are tailored towards your assessment machinery.
-  \item[$\boxplus$] Check what optimisations the users' build system uses by default. Often, this is a low-hanging fruit.
+  \item[$\boxplus$] Follow the proposed build instructions and document them, noting anything that faults.
+  \item[$\boxplus$] Ensure to document flags that relate to the parallelism, such as OpenMP flags.
 \end{itemize}
-
 
 \paragraph*{How it does not work}
 
 \begin{itemize}[noitemsep]
-  \item[$\boxminus$] Use a low optimisation level and machine-generic optimisations and then draw conclusions on code behaviour on a particular machine. 
+  \item[$\boxminus$] Take the build instructions and then aim to implement further compiler optimisations.
 \end{itemize}

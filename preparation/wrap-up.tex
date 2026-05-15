@@ -1,2 +1,14 @@
 \section{Wrap-up}
 \label{section:preparation:wrapup}
+
+By this point we, as the analyst, should be able to comment the following
+\begin{itemize}
+  \item What does our working environment look like? 
+  \item Can we build the code and run a test case?
+  \item Does the test case take a ``reasonable'' amount of time? Following our guidance in Section~\ref{section:preparation:benchmarks}.
+  \item Does the test case use a ``reasonable'' amount of memory? Again, following from Section~\ref{section:preparation:benchmarks}.
+\end{itemize}
+
+At this point we really have the evidence as to whether we can proceed with assessing the code. Again, we treat this pre-assessment step as a barrier of entry. If we are not able to reasonably build and run the code --- even potentially with communication with the code owner --- then we cannot make any meaningful progress with the assessment.
+
+Running through these steps we have likely begun to notice some features of the code, in particlar, what parallel model does it use? By building and/or running the test case we see whether there the code uses MPI, OpenMP, GPU offloading, or a combination. These features of the parallelism build into the next step in the assessment: the high-level assessment.
