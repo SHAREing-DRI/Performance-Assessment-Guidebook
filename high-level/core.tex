@@ -57,11 +57,9 @@ Once we have prepared our benchmark we are now ready to begin making measurement
 \item The maximum single-core, peak performance of the hardware
 \item The obtained single-core, peak performance of our executable
 \end{itemize}
-As mentioned above we can do this either by using a single-core run or by using a parallel run and taking the average of these values across the cores. 
+As mentioned above we can do this either by using a single-core run or by using a parallel run and taking the average of these values across the cores. As we are only making one observation, it is advised to use exclusive compute resources (i.e., an exclusive node here) to get the most reliable data that is not impacted by other job allocations.
 
-As we are only making one observation, it is advised to use exclusive compute resources (i.e., an exclusive node here) to get the most reliable data that is not impacted by other job allocations.
-
-% discuss affinity here?
+We also advise taking these measurements with high thread affinity, in which the software threads are pinned to physical cores. If the threads have low affinity this can damage performance hence we would ideally like to see the core performance in its `best light', i.e., ruling out a simple performance hit. An example of how to do this for the high-level core analysis is given below, but more detail on affinity and allocation of threads, etc. is laid out in Section~\ref{section:workflow:affinity}.
 
 To make these measurements, we must turn to a performance tool. Multiple performance tools are able to make these measurements, and we list below basic instructions of how to perform these measurements with some of our `go to' tools.
 
@@ -79,7 +77,7 @@ likwid-bench -t peakflops -w S0:16kB:1
 %It depends on our measurement strategy if we assess the single core bandwidth or
 %take the whole node's (here with 128 threads) throughput and re-calibrate it accordingly.
 
-This command pins the \texttt{peakflops} microbenchmark to a single core on the first socket (labelled \texttt{S0} here), to ensure maximum thread affinity. We use a convention advised by the Likwid developers in which the \texttt{peakflops} microbenchmark is performed with an input dataset half the size of the L1 cache \cite{}. For example, in the commands above we use a 16kB input which is half the size of a 32kB L1 cache (which we can find by running the \texttt{likwid-topology} command). As we scale the \texttt{peakflops} microbenchmark across a node, we scale up this data input size by the number of cores, e.g., if want to run this analysis across 128 cores we use an input of $128\times16\text{kB}$, giving
+This command pins the \texttt{peakflops} microbenchmark to a single core on the first socket (labelled \texttt{S0} here), to ensure maximum thread affinity. We use a convention advised by the Likwid developers in which the \texttt{peakflops} microbenchmark is performed with an input dataset half the size of the L1 cache. For example, in the commands above we use a 16kB input which is half the size of a 32kB L1 cache (which we can find by running the \texttt{likwid-topology} command). As we scale the \texttt{peakflops} microbenchmark across a node, we scale up this data input size by the number of cores, e.g., if want to run this analysis across 128 cores we use an input of $128\times16\text{kB}$, giving
 \begin{verbatim}
 likwid-bench -t peakflops -w N:128*16kB:128
 \end{verbatim}
@@ -99,7 +97,7 @@ likwid-perfctr -f -C 0 -g FLOPS_DP ./code
 \end{verbatim}
 
 \noindent
-which provides you with the information relevant, although the exact names of the groups might differ from system to system.
+which provides you with the information relevant, although the exact names of the groups might differ from system to system. In this example we have pinned the serial run of the code to the first physical core, and have measured the double-precision floating-point operations.
 \end{instructions}
 
 %% I suggest we move other potential tools to an appendix...? What are we wanting to touch on here: I guess the Likwid intro forces us to talk a little bit more about caches, pinning and the data collection more specifically...?
@@ -118,7 +116,7 @@ which provides you with the information relevant, although the exact names of th
 \subsection{Evaluation}
 
 Once we know the maximum performance and the obtained performance, we can compute
-their ratio, i.e., the normalised peak $C_{\text{peak}}$.
+their ratio, i.e., the normalised peak $C_{\text{core}}$.
 This metric is a little bit weird (and we will revise it later), as we typically
 normalise against the scalar peak performance.
 This is surprising given that all mainstream CPUs support vectorisation and hence
@@ -165,22 +163,22 @@ the regime of the scalar peak, this is already an overall efficient code.
  \begin{tabular}{p{0.34\textwidth}p{0.62\textwidth}}
   Peak FLOPS proportion & Description \\
   \hline
-  $C_{\text{peak}} \geq 0.8$
+  $C_{\text{core}} \geq 0.8$
    & \cellcolor{green!25} Core compute performance is good.
   \\
-  $0.8 > C_{\text{peak}} \geq 0.6$
+  $0.8 > C_{\text{core}} \geq 0.6$
    & \cellcolor{yellow!25} Core compute performance is not effectively using the hardware to its maximum potential. 
   \\
-  $0.6 > C_{\text{peak}}$
+  $0.6 > C_{\text{core}}$
    & \cellcolor{red!25} Core compute performance is poor.
  \end{tabular}
 \end{center}
 
 \noindent
-If $C_{\text{peak}} \geq 0.8$, the code uses the compute capabilities
+If $C_{\text{core}} \geq 0.8$, the code uses the compute capabilities
 (very) efficiently.
 %However, if the bandwidth $C_{\text{bw}}< 0.6$, there might still be additional space to improve the throughput and to speed up the code. 
- If $0.6 \leq C_{\text{peak}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
+ If $0.6 \leq C_{\text{core}}< 0.8$, the code does not use the compute units particularly efficiently and we have to investigate further.
  %However, if $C_{\text{bw}} \geq 0.8$, the problem might be inherently
  %memory-bound (to be checked), in which case there might be limited potential to optimise further.
 
