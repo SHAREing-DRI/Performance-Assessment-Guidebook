@@ -59,11 +59,11 @@ If the algorithm's complexity is known, and as long as we assume that the runtim
  \label{equation:inter-node:efficiency}
  E(p,n)
   = \frac{ t_{1,1}/f(1) }{ t_{p,n}/f(n) \cdot p }
-  \equiv \frac{t_{1,1}}{t_{p,n}}\cdot\frac{1}{p}\cdot\frac{f(n)}{f(1)}.
+  \equiv \frac{t_{1}}{t_{p,n}}\cdot\frac{1}{p}\cdot\frac{f(n)}{f(1)}.
 \end{equation}
 
 \noindent
-where $t_{p,n}$ is the measured time for problem size $n$ processed with $p$ nodes.
+where $t_{p,n}$ is the measured time for problem size $n$ processed with $p$ nodes, and $t_1\equiv t_{1,1}$ for convenience.
 
 
 \begin{assessmentcrime}
@@ -79,8 +79,8 @@ i.e.~how to change the simulation problem size, but also the code's complexity $
 
 \subsubsection{Amending the complexity}
 
-For some codes, the code owners can easily clarify what $g$ is.
-For others, the arising $g$ might not be a sole polynomial, in which case we have to amend \eqref{equation:inter-node:efficiency}.
+For some codes, the code owners can easily clarify what $f(n)$ is.
+For others, the arising $f(n)$ might not be a sole polynomial.
 It might also depend on factors that are difficult to fix a posteriori and need some output analysis:
 
 Time stepping codes sometimes amend the time step size dynamically.
@@ -111,7 +111,7 @@ As a rule of thumb, we can simply track the memory footprint per rank and ensure
 \subsubsection{Hybrid codes}
 
 If a code supports MPI+X with X being some kind of multithreading or has no multithreading at all, then the baseline has to be chosen such that we employ all cores of one node.
-That is, the baseline $t_{\text{inter}}(1)$ might already use more than one MPI process, as long as all of these processes are pinned to the same node.
+That is, the baseline $t_{1}$ might already use more than one MPI process, as long as all of these processes are pinned to the same node.
 
 \subsubsection{Workflow}
 
@@ -119,14 +119,14 @@ Once we have the algorithmic complexity and memory footprints under control, we 
 
 \begin{enumerate}
   \item Pick a problem size $n_1$ for one node.
-  \item Measure the time $t_{\text{inter}}(1)$.
-  \item Increase the node count $n_{\text{inter}}$ and measure the timings. This is basically strong scaling in line with Section~\ref{section:high-level:intra-node}.
+  \item Measure the time $t_1 = t_{p_1,n_1}$.
+  \item Increase the node count $p$ and measure the timing $t_{p,n_1}$. This is basically strong scaling in line with Section~\ref{section:high-level:intra-node}.
   \item Compute the computational efficiency on-the-fly in line with \eqref{equation:inter-node:efficiency}.
-  \item If the efficiency $E_{\text{inter}}(p_{\text{inter}})\leq 60\%$, increase the problem size $n_{\text{inter}}$ and continue the measurements from hereon with the increased problem size.
+  \item If the efficiency $E(p, n)\leq 60\%$, use a larger problem size $n$ and continue the measurements of $t_{p,n}$ from hereon with the increased problem size.
 \end{enumerate}
 
 \noindent
-The recipe leaves it open by how much we should increase $n_{\text{inter}}$ every time.
+The recipe leaves it open by how much we should increase $n$ every time.
 A rule of thumb is that we maximise the value such that the nodes still can handle the problem, and, at the same time, try to ensure that each compute node hosts local subproblems with roughly the same memory footprint that we obtained for $n_1$ on one node.
 
 
@@ -134,22 +134,22 @@ A rule of thumb is that we maximise the value such that the nodes still can hand
 \subsection{Evaluation}
 
 Our roadmap to determine how good the distributed-memory behaviour is, i.e.~our strategy to come up with a single number, is straightforward.
-First, we record all the $p$ for which we had to increase the problem size into a set $\mathbb{C}_{\text{critical,inter}}^{\text{60\%}}$.
+First, we record all the $p$ for which we had to increase the problem size into a set $\mathbb{C}_{\text{critical}}^{\text{60\%}}$.
 For these problem sizes, we only pick the timings/efficiencies for the bigger setup, i.e.~after we have increased the problem size.
 
 \begin{performancemetric}
  We evaluate 
  \begin{eqnarray*} 
   C_{\text{inter}}^{\text{80\%}} = | \{
-    p \in \mathbb{C}_{\text{critical,inter}}^{\text{60\%}}: \quad
-    E_{\text{inter}}( p ) \geq 80\%
+    p \in \mathbb{C}_{\text{critical}}^{\text{60\%}}: \quad
+    E(p, n) \geq 80\%
     \}
   |
   \qquad
   \text{and} \\
   C_{\text{inter}}^{\text{60\%}} = | \{
-    p \in \mathbb{C}_{\text{critical,inter}}^{\text{60\%}}: \quad
-    80\% \geq E_{\text{inter}}( p ) \geq 60\%
+    p \in \mathbb{C}_{\text{critical}}^{\text{60\%}}: \quad
+    80\% \geq E(p, n) \geq 60\%
     \}
   |,
  \end{eqnarray*}
