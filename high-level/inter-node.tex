@@ -33,36 +33,37 @@ The code does not scale at all, if the problem size increases fail to keep the e
 \subsection{Benchmark preparation}
 
 For weak scaling, it is absolutely key that we first identify a performance metric that is complexity-invariant:
-Let an algorithm's compute cost scale in $\mathcal{O}(n^g)$ with the problem size $n$.
-If $g=1$, the algorithm has linear complexity, for $g=2$ we have quadratic complexity.
-If we double $n$, the time we need for a computation on a given number of nodes $p_{\text{inter}}$ should double, but if and only if the algorithm is linear.
+Let an algorithm's compute cost scale in $\mathcal{O}(f(n))$ for the problem size $n$.
+If $f(n)=n$, the algorithm has linear complexity; if $f(n)=n^2$ we have quadratic complexity.
+If we double $n$, the time we need for a computation on a given number of nodes $p$ should double if and only if the algorithm is linear (i.e.~$f(n)=n$).
 If is quadratic, it will become four times bigger.
 As we want to compare the times (and later efficiencies) over different problem sizes, we have to calibrate accordingly.
 
+We start from the definition of speedup as $S(p) = \frac{t_1}{t_p}$, where $t_p$ is the measured time taken with $p$ nodes.
 
 \index{Speedup}
 \index{Efficiency}
 
-The challenge is that the speedup formula
+The challenge is that when we want to use the efficiency formula in weak scaling
 
 \[
- E_{\text{inter}}(p_{\text{inter}}) = \frac{ S_{\text{inter}}(p_{\text{inter}}) }{ p_{\text{inter}} }
-  = \frac{ t(1,n_1) }{ t(p_{\text{inter}},n_{\text{inter}}) \cdot p_{\text{inter}} }
+ E(p) = \frac{ S(p) }{ p }
+  = \frac{ t_1 }{ t_p \cdot p },
 \]
 
 \noindent
-contains timings determined with (potentially) two different problem sizes. 
-If the algorithm's complexity is known, and as long as we assume that the runtime constants, i.e.~all the overheads incurred, are kind of invariant regarding the problem size, the calibration is easy:
+it contains timings determined with (potentially) two different problem sizes, but assumes that the problem size is constant.
+If the algorithm's complexity is known, and as long as we assume that the runtime constants, i.e.~all the overheads incurred, are invariant with regards to the problem size, the calibration is easy:
 
 \begin{equation}
  \label{equation:inter-node:efficiency}
- E_{\text{inter}}(p_{\text{inter}})
-  = \frac{ t(1) / n_1^g }{ t(p_{\text{inter}}) / n_{\text{inter}}^g \cdot p_{\text{inter}} }.
+ E(p,n)
+  = \frac{ t_{1,1}/f(1) }{ t_{p,n}/f(n) \cdot p }
+  \equiv \frac{t_{1,1}}{t_{p,n}}\cdot\frac{1}{p}\cdot\frac{f(n)}{f(1)}.
 \end{equation}
 
 \noindent
-where the employed timings are raw timings. 
-
+where $t_{p,n}$ is the measured time for problem size $n$ processed with $p$ nodes.
 
 
 \begin{assessmentcrime}
@@ -71,7 +72,7 @@ where the employed timings are raw timings.
 
 \noindent
 When preparing a benchmark for the inter-node, weak scaling analysis, a key point for the performance analyst is that we must have some understanding of how to scale the problem size,
-i.e.~how to change the simulation problem size, but also the code's complexity $g$.
+i.e.~how to change the simulation problem size, but also the code's complexity $f(n)$.
 
 
 \subsection{Data collection}
