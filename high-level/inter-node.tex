@@ -44,7 +44,7 @@ We start from the definition of speedup as $S(p) = \frac{t_1}{t_p}$, where $t_p$
 \index{Speedup}
 \index{Efficiency}
 
-The challenge is that when we want to use the efficiency formula in weak scaling
+The challenge is that when we want to use the efficiency formula,
 
 \[
  E(p) = \frac{ S(p) }{ p }
@@ -52,7 +52,7 @@ The challenge is that when we want to use the efficiency formula in weak scaling
 \]
 
 \noindent
-it contains timings determined with (potentially) two different problem sizes, but assumes that the problem size is constant.
+for weak scaling, it contains timings determined with (potentially) two different problem sizes, but assumes that the problem size is constant; we therefore cannot compare these times directly.
 If the algorithm's complexity is known, and as long as we assume that the runtime constants, i.e.~all the overheads incurred, are invariant with regards to the problem size, the calibration is easy:
 
 \begin{equation}
