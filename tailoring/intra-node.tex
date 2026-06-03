@@ -1,2 +1,38 @@
 \section{Intra-node performance}
 \label{section:tailoring:intra-node}
+As referenced inside Section~\ref{section:high-level:intra-node}, the program is considered to be making good use of a system if it is able to use more than 80\% of its cores with more than 80\% of (strong scaling) efficiency. This metric is not workload agnostic. For instance, a program could have two benchmarks with vastly different problem sizes. Additionally, for programs with simple scaling in problem size, for example scaling a system size up resulting in a quadratic increase in compute time, the ratio of memory usage to compute cannot be assumed to relate similarly. 
+
+In order to evaluate the intra-node performance of a code therefore, choices must be made as to a reasonable range of workloads for the program to perform. The range of workloads should aim to be representative of real world behaviour of the program, and as such will require information about the program's use cases to be effective. For intra-node performance, this will often relate to program's utilising workstations, or batch parallel problems on beowulf clusters. For problems which will exclusively be run on multiple nodes due to their size or computation length, intra-node scaling can be difficult to treat. In these cases it may be necessary to examine a small number of cores on a fixed number of nodes and gradually increase the number of cores. This may be prohibitively time consuming however, and should generally only be examined where necessary for larger problems. 
+
+The range of workloads for different codes could include:
+\begin{itemize}
+		\item A large workload, with a large memory footprint
+		\item A compute heavy workload, with fixed memory
+	        \item A workload with lots of memory accesses
+		\item An I/O heavy workload 
+\end{itemize}
+
+Unlike inter-node scaling intra-node scaling generally won't exhibit super scaling behaviour (where the performance increases more than proportionally with core count). In inter-node scaling that is usually because of additional resources available across nodes, for example increasing the cache space, or i/o resources. 
+
+\subsection{Configuration}
+Where possible, the configuration of a node should be comparable to the expected hardware configurations in wider use to run the program. This may point to a reduction in the number of cores, or available memory for a node. It can be important, however, to measure the performance to a full node if possible, in order to evaluate the benefits of larger hardware for future procurement.
+
+For heterogenous computing, there is at least a three dimensional state space to examine. The number of cores per node, the number of GPU's per node, and the class of GPU can all be important variables, and the total cost for procuring and running some combination of these can be an important metric. For instance for a machine with nodes configured with different numbers of different GPU's an example configuration table could look like:
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[]
+\begin{tabular}{llllllll}
+\multirow{2}{*}{ID} & \multirow{2}{*}{Cores} & \multirow{2}{*}{GPUs} & \multirow{2}{*}{GPU Class} & \multicolumn{2}{l}{Performance Metric 1} & \multicolumn{2}{l}{Performance Metric 2} \\
+                    &                        &                       &                            & Benchmark 1         & Benchmark 2        & Benchmark 1         & Benchmark 2        \\
+                    &                        &                       &                            &                     &                    &                     &                    \\
+                    &                        &                       &                            &                     &                    &                     &                   
+\end{tabular}
+\end{table}
+
+
+\subsection{Metrics}
+Metrics for measuring intra-node performance
+
+\subsection{Pinning}
+\label{section:tailoring:intra-node:pinning}
