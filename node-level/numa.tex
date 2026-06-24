@@ -8,3 +8,73 @@
 
 % Allocate memory where you need it
 % APS can provide this indicator
+
+On modern cluster nodes, with large numbers of CPU cores, the shared memory is
+often split into distinct regions known as Non-Unified Memory Access (NUMA) or
+cache-coherent NUMA (ccNUMA) domains. These behave as shared memory systems,
+however, because they are not the same physical block of memory some accesses
+have to pass through an interconnect rather than the through the cache
+hierarchy. This incurs a performance penalty for memory accesses across NUMA
+domains. In short, we want to ensure that, as much as possible, memory accesses
+are carried within NUMA domains, rather than across them.
+
+\subsection{NUMA tools and performance counters}
+
+There are multiple ways of detecting NUMA issues but we begin with a simple
+test which can imply NUMA effects are present. The \texttt{numactl} command is
+common on Linux commands and is responsible for controlling NUMA policies on
+systems, including how memory is laid out across processes. Without digging
+into the details of \texttt{numactl} at this stage, one simple test for NUMA
+effects is listed below.
+
+\begin{instructions}{\texttt{numactl}}
+  We can run our code executable, \texttt{code}, through the \texttt{numactl} command 
+  \begin{verbatim}
+    numactl --interleave ./code
+  \end{verbatim}
+  If there is a difference in the runtime of the code with and without this prepended NUMA command, then this can imply NUMA effects are present.
+\end{instructions}
+
+If our \texttt{numactl} test implies that NUMA effects may be present, then we
+can explore further by using performance counters. 
+
+\begin{instructions}{\likwid}
+  We can once again turn to \likwid to run our executable, \texttt{code}, this time accessing NUMA performance counters with the \texttt{NUMA} performance group 
+  \begin{verbatim}
+    likwid-perfctr -g NUMA -c 0-3 ./code
+  \end{verbatim}
+  Where we have selected a pinning of the first four cores but this is just illustrative.
+\end{instructions}
+
+NUMA-related performance counters and metrics can vary a lot across systems, so
+these diagnostics should all be used to build up a picture, rather than being
+direct evidence of specific problems.
+
+\subsection{First-touch policy}
+
+Often NUMA effects stem from the lack of the so-called `first-touch policy', in
+which memory is allocated close to the processes that first `touched' it. Here,
+by `touch' we mean \emph{write to}. This could, for example, be during the
+initialisation stage of a code in which objects are being created. If these
+initialisations are done in serial, but the code is OpenMP parallel, the memory
+pages for these allocations will be mapped to the process running the
+initialisations. This will then create a performance penalty during the runtime.
+
+We do not here work through how to engineer codes to avoid NUMA effects but, in
+short, when initialising data for a parallel application it is best to
+initialise within a parallel region to improve data locality. For example, when
+creating an array in an OpenMP application, wrapping the initialisation in an
+OpenMP parallel pragma will assign the data to the local memory of the parallel
+processes. Likewise, we need to ensure that the same OpenMP schedule is used in
+the initialisation as in all other computational loops, and this can be
+achieved by using a \emph{static schedule}. We can also use \texttt{numactl} to
+allocate memory in a round-robin fashion. Similarly, on many systems NUMA
+balancing maybe switched on though again it is typically good practice to
+implement a first-touch policy
+
+This can help us assess the presence NUMA effects because we can focus our
+analysis on initialisation steps to see if a first-touch policy has been
+included. As in previous sections, if we want to be kernel specific in our
+analysis we can use the \likwid marker API to wrap loops and kernels to access
+performance counters to get further details on the NUMA effects on kernels that
+contribute significantly to runtime.
