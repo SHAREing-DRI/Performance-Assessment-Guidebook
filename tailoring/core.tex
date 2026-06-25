@@ -50,3 +50,22 @@ A question which was raised at RSECon25: when applying aggressive optimisation, 
 \begin{instructions}{\maqao}
  If you run \maqao~over your code, the tool will report back to you what
  optimisations you might have missed out throughout the compilation.
+  The top-level rubric \emph{Global} provides you with information on the optimisation chosen, but it also makes recommendations which options might lead to better runtime.
+
+ The nice thing about \maqao~is that the tool can handle situations where you translate different translation units with different options.
+ Also, the recommendation aspect goes beyond pure reporting and is helpful.
+\end{instructions}
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Use the most aggressive compiler optimisation that preserve the code semantics (aka still return valid results) and nevertheless are tailored towards your assessment machinery.
+  \item[$\boxplus$] Check what optimisations the users' build system uses by default. Often, this is a low-hanging fruit.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Use a low optimisation level and machine-generic optimisations and then draw conclusions on code behaviour on a particular machine.
+\end{itemize}
