@@ -11,22 +11,20 @@ is not using the latest compiler features.
 First of all, we work with the the most aggressive optimisation that our
 compiler can offer. The minimum choice is to compile with \texttt{-O3},
 although some other compilers might offer further granularity. Also consider
-using \texttt{-ffast-math} which enables aggressive floating-point optimisation.
+using \texttt{-ffast-math} which enables aggressive floating-point
+optimisation. Compiler documentation can be extensive, but there are often dedicated
+pages which list optimisation flags.
 
 
 Second, we create code that is tailored towards our particular machinery.
 The correct setting for this depends once again on your compiler. 
 With LLVM and GNU, you can use flags starting with \texttt{-mXXXX} to specify 
 machinery-specific optimisations, i.e.~you can exactly say for which processor
-generation, instruction set, \ldots~you want for the compiler to create binary code.
+generation, instruction set, \ldots~you want for the compiler to create binary code. Often we can tailor to the hardware with flags such as \texttt{-march=native}, with will automatically pickup the local architecture.
 If your compile node is of the same type as your test node, then simply
 use \texttt{-xhost} and the compiler will pick the highest instruction set
 available.
 The flag is called \texttt{-mhost} with GNU.
-
-\begin{wip}
-A question which was raised at RSECon25: when applying aggressive optimisation, do we include validation checks on the code? I.e., to ensure that the validity of the code still passess when potentially using approximations in the higher level optimisation flags.
-\end{wip}
 
 \begin{instructions}{\intelcompiler}
  With the Intel compiler, you sometimes can pick between the generic
@@ -56,6 +54,29 @@ A question which was raised at RSECon25: when applying aggressive optimisation, 
  Also, the recommendation aspect goes beyond pure reporting and is helpful.
 \end{instructions}
 
+Not all compiler optimisations lead to decreases in runtime. With
+tools like MAQAO it can be beneficial to \emph{experiment} with compiler
+optimisations. For example, by default the GNU compilers do not implement loop
+unrolling, and so MAQAO may initially suggest to switch on the
+\texttt{-funroll-loops} flag. However, it is not a given that this will speed
+up the code, and so we can the benchmark through MAQAO, with and without this
+flag, to see if there is noticable differences in the total runtime, and the
+runtimes of individual loops.
+
+Some optimisations can implement aggressive optimisations. Many algorithms may
+be robust to, for example, floating point approximations but it is worth
+checking. If the code comes with test cases, or has known results which can be
+checked against then it is very much advised to run these as validation checks.
+Test the code with and without these aggressive optimisations to ensure that
+these compiler flags have not noticably changed the code outcome. 
+
+We recommend, if the analyst settles on using further compiler optimisations,
+then these should be clearly documented in the performance report.  This is to
+ensure that the code owner is aware of any aggressive optimisations that the
+analyst uses, and the code owner makes any final decisions, or undertakes any
+final checks, to ensure that the optimisations have not impacted the code
+results.
+
 \paragraph*{How it works}
 
 \begin{itemize}[noitemsep]
@@ -68,4 +89,5 @@ A question which was raised at RSECon25: when applying aggressive optimisation, 
 
 \begin{itemize}[noitemsep]
   \item[$\boxminus$] Use a low optimisation level and machine-generic optimisations and then draw conclusions on code behaviour on a particular machine.
+  \item[$\boxminus$] Use aggresive mathematical approximations without validating correctness of the results.
 \end{itemize}

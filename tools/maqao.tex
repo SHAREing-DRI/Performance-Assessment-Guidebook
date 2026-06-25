@@ -7,3 +7,67 @@ While \maqao~gets more support for multithreaded and MPI runs with every new gen
 Which loops consume most runtime, vectorise poorly or are not balanced reasonably?
 That's the type of prime application area of \maqao.
 
+The high-level report is called OneView and it composes the different MAQAO
+components such as the Code Quality Analyser (CQA) and the Lightweight Profiler
+(LProf). One way of outputting the results of MAQAO is into an HTML file,
+\texttt{index.html}, which can be viewed in a browsers and views a GUI that the
+analyst can navigate. We here run through some of the ways of working with
+MAQAO to aid compiler optimisation, performance analysis of loops, and load
+balancing across threads and ranks. As with all tools, we refer the reader to
+the MAQAO documentation for further information
+\footnote{\url{https://www.maqao.org}}.
+
+\subsection{Setup}
+
+The MAQAO website offer binaries for x86 and ARM architectures that a
+performance analyst can simply download locally to a cluster. The only other
+step needed in setup is to compile the code with debug flags, \texttt{-g},
+switched on. This is common to many profilers to allow the profiler to list the
+correspondences between the binary and source code. In some cases it can be
+necessary to also use the \texttt{-grecord-gcc-switches} flag.
+
+\subsection{Generating results}
+
+To run a serial code through MAQAO we can use
+\begin{verbatim}
+maqao OV -R1 -- ./code
+\end{verbatim}
+Where we are here listing to produce a report through OneView (OV). We can also
+specify OpenMP threads through an environment variable
+\begin{verbatim}
+maqao OV -R1 --envv_OMP_NUM_THREADS=4 -- ./code
+\end{verbatim}
+or even with MPI processes as 
+\begin{verbatim}
+maqao OV -R1 --number-processes \
+--mpi_command="mpirun -n <number_processes>" -- ./code
+\end{verbatim}
+and these can also be combined to run a hybrid MPI+OpenMP application.
+
+As discussed with Score-P in Section~\ref{section:localisation:scorep},
+experiment directories are useful way of keeping track of different runs for
+different analyses. MAQAO has a model which can often require frequent reruns
+to try out different compiler optimisations or loop configurations, and so
+experiment directory names are useful for this iterative workflow. An
+experiment directory can be named via the \texttt{-xp=...} flag.
+
+Once a set of experiment directories have been generated, it can be useful to
+view a comparison of the experiments by combining them into an overview report
+\begin{verbatim}
+maqao OV --compare-reports --inputs=exp_dir1,exp_dir2,...
+\end{verbatim}
+As with the single OneView reports, this combined report can be viewed in a
+browser.
+
+Finally, if multiple experiments are planned then it can be useful to create
+configuration scripts, e.g., to produce a scaling analysis. An initial
+configuration file can be generated via
+\begin{verbatim}
+maqao OV --create-config=initial_config.json
+\end{verbatim}
+and then tailoring this configuration to the specific analyses.
+
+\subsection{Navigating and interpreting results}
+
+% here we can populate with some information on navigating information in the
+% MAQAO GUI
