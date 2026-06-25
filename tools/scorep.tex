@@ -2,12 +2,16 @@
 \label{section:localisation:scorep}
 
 We here give an overview of getting started with building profiles of parallel
-applications using Score-P which is a performance infrastructure. We here will
-look briefly at using the Score-P compiler wrappers to build instrumented
-binaries which, when executed, produce profiles that can be visualised with the
-Cube GUI. It should be noted that Score-P offers a user instrumentation API to
-target specific kernels and functions, but here we focus on using the Score-P
-compiler wrappers to instrument the entire binary.
+applications using Score-P which is a performance infrastructure
+\cite{feld2026}. We here will look briefly at using the Score-P compiler
+wrappers to build instrumented binaries which, when executed, produce profiles
+that can be visualised with the Cube GUI. This section is just a brief
+introduction some of the functionality for Score-P in performance analysis, we
+also recommend the reader to refer to the official documentation for further
+information \footnote{\url{https://score-p.org/}}. It should also be noted that
+Score-P offers a user instrumentation API to target specific kernels and
+functions, but here we focus on using the Score-P compiler wrappers to
+instrument the entire binary.
 
 An individual Score-P install is built with a specific combination of compiler
 and MPI library, meaning on clusters multiple Score-P installs are often
