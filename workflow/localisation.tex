@@ -54,17 +54,24 @@ the APIs they offer.
 
 \subsubsection{Critical path analysis}
 A critical path defines the longest path through a code's runtime that does not
-include any wait states. Typically the critical path determines the total
-runtime of the code, and activities on the critical path are called critical
-activities. 
+include any wait states \cite{bohme2012}. Typically the critical path
+determines the total runtime of the code, and activities on the critical path
+are called critical activities. 
 
-Critical path analysis is a detailed topic which we only touch on quickly here.
-Whilst many profilers breakdown an applications runtime into kernels and
-functions that contribute most to runtime, critical path analysis...
+Critical path analysis is a detailed topic which we only touch on briefly here.
+Many profilers can direct users to look at kernels by the proportion of
+runtime, though in many cases this can be misleading for a performance
+assessment [we discuss this further below in
+Section~\ref{section:workflow:localisation:take-away}]. Using critical path
+analysis is another method of directing an analysis as it focuses the analyst
+on routines that are directly corresponding to the total runtime and load
+balance of an application.
 
-Some tools which use critical path analysis are OSACA and Scalasca. For some
-information on using critical path analysis in Scalasca, see
-Chapter~\ref{chapter:tools}.
+Some tools which use critical path analysis include OSACA
+\cite{laukemann2018,laukemann2019} and Scalasca \cite{geimer2010}. For some
+information on getting started with critical path analysis in Score-P Scalasca,
+see Sections~\ref{section:localisation:scorep} and
+\ref{section:localisation:scalasca}.
 
  %% this an old VTune box from the 'Preparation' Chapter
 %\begin{instructions}{\vtune}
@@ -143,6 +150,7 @@ or by embedding certain code parts into markers such that the active code sectio
 
 
 \subsection{Take away}
+\label{section:workflow:localisation:take-away}
 
 The most frequent quantity of interest (metric) to developers is typically how much time is spent in routines and which routines or function calls are to be blamed for some behaviour.
 The routines consuming most time are called \emph{hotspots} of a code.
