@@ -1,0 +1,54 @@
+\section{Hardware Counters}
+\label{section:core:hardware-counters}
+
+Core performance is a question of how well we are exploiting the single-core
+hardware features on a chip. Thankfully hardware vendors typically include
+extra registers on the chip which record the instance of certain hardware
+related events. These added registers are known as hardware performance
+counters and can be used to diagnose performance issues of a code running on a
+specific architecture. For example, cache misses can be registered on cache
+related hardware counters and so can investigate whether a code has inefficient
+use of the cache heirarchy and is hence having to increase data traffic from
+memory. Other hardware counters can activate through branch mispredictions and
+so we can target control flow within a code that is hampering performance.
+
+One challenge of working with hardware counters is that they are not
+standardised across all chip generations and vendors. Hence, an analyst has to
+be relatively flexible when using hardware counters. 
+
+\subsection{Accessing hardware counters}
+
+There are multiple tools built for accessing hardware counters and other tools
+which can use hardware counters to integrate into other metrics for analyses.
+We do not delve in to the details here, but there are many performance tools
+such as Score-P, Scalasca and Cube which offer lots of functionality with code
+instrumentation, profiling and trace analysis that can also access hardware
+counters often through the PAPI (Performance Application Programming Interface)
+library. More information of accessing hardware counters in Score-P is given in
+Section~\ref{section:localisation:scorep}.
+
+On many Linux systems there is the \texttt{perf} which is quite a general tool
+for performance though can be relatively complex to use. However, as a quick
+aside, \texttt{perf} can be used to record metrics for Score-P. A more
+HPC-focused command line tool is the \texttt{likwid-perfctr} tool from the
+LIKWID suite. Rather than giving just simply read outs of hardware counters,
+which can be very difficult to interpret for beginners, \texttt{likwid-perfctr}
+aggregates the hardware counter results into easier to interpret metrics.
+
+With \texttt{likwid-perfctr} we have already how to gather data from
+performance groups such as \texttt{FLOPS\_DP} for double-precision floating
+point operations. 
+
+\begin{wip}
+Do we include how to gather hardware counter data with vendor tools like AMD
+	uProf and Intel's VTune?
+\end{wip}
+
+\subsection{Gathering the data}
+\begin{wip}
+Very early work here, likely to include some pointers on a simple workflow for
+	gathering multiple runs with LIKWID
+\end{wip}
+
+There can be significant variability in some hardware counters and so we advise
+doing batches of runs to aggregate statistics.
