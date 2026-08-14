@@ -31,10 +31,18 @@ However, the sheer amount of data recorded by many tools often make it necessary
 
 \subsubsection{Filtering}
 
-To filter data, most toolchains provide marker APIs.
-Alternatively, they come along with precompilers which take your code and add the filter on/off statements to it before it is passed on to the compiler.
-Some very popular tools are sketched in Chapter~\ref{chapter:tools}, including the APIs they offer.
+To filter data, most toolchains provide marker APIs.  Alternatively, they come
+along with precompilers which take your code and add the filter on/off
+statements to it before it is passed on to the compiler.
 
+Filtering becomes a very important topic in trace analyses as initial, and
+somewhat naive, trace analyses can produce incredibly large amounts of data.
+Often tracing all aspects of a code is not necessary, and if an analyst wishes
+to perform a trace analysis of a massively parallel application, then filtering
+is almost a necessity.
+
+Some very popular tools are sketched in Chapter~\ref{chapter:tools}, including
+the APIs they offer.
 
 \subsubsection{Zoom in}
 
@@ -43,6 +51,27 @@ Some very popular tools are sketched in Chapter~\ref{chapter:tools}, including t
  \vtune~offers in almost all tabs an overview over the temporal behaviour at the bottom which splits up the observations over cores.
  A right click or drawing an observation interval allows you to zoom in.  
 \end{instructions}
+
+\subsubsection{Critical path analysis}
+A critical path defines the longest path through a code's runtime that does not
+include any wait states \cite{bohme2012}. Typically the critical path
+determines the total runtime of the code, and activities on the critical path
+are called critical activities. 
+
+Critical path analysis is a detailed topic which we only touch on briefly here.
+Many profilers can direct users to look at kernels by the proportion of
+runtime, though in many cases this can be misleading for a performance
+assessment [we discuss this further below in
+Section~\ref{section:workflow:localisation:take-away}]. Using critical path
+analysis is another method of directing an analysis as it focuses the analyst
+on routines that are directly corresponding to the total runtime and load
+balance of an application.
+
+Some tools which use critical path analysis include OSACA
+\cite{laukemann2018,laukemann2019} and Scalasca \cite{geimer2010}. For some
+information on getting started with critical path analysis in Scalasca, see
+Sections~\ref{section:localisation:scorep} and
+\ref{section:localisation:scalasca}.
 
  %% this an old VTune box from the 'Preparation' Chapter
 %\begin{instructions}{\vtune}
@@ -121,6 +150,7 @@ or by embedding certain code parts into markers such that the active code sectio
 
 
 \subsection{Take away}
+\label{section:workflow:localisation:take-away}
 
 The most frequent quantity of interest (metric) to developers is typically how much time is spent in routines and which routines or function calls are to be blamed for some behaviour.
 The routines consuming most time are called \emph{hotspots} of a code.
