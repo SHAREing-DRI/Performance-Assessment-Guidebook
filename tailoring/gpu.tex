@@ -1,2 +1,95 @@
 \section{GPU performance}
 \label{section:tailoring:gpu}
+
+The primary factors concerning GPU tailoring are separated into hardware and software concerns. For the purpose of this guidebook, firmware controllable by the user is grouped into the software section. Certain configuration parameters can be thought of as either hardware or software concerns, for instance, number of in use GPUs per node. 
+
+\subsection{GPU hardware tailoring and configuration}
+Assessors of programs will have limited options regarding hardware choices for examining software. A prospective assessor will ideally have access to several GPU classes, possibly from multiple vendors. If this is not possible, it may be possible to artificially alter GPU performance characteristics to approximate different hardware classes.
+
+The number of GPU's in use for the program can be controlled using your workload manager (for example \href{https://slurm.schedmd.com}{SLURM, webpage linked here}. SLURM classes graphics processing units as Generic Resources (GRES). The number of required GPU's can be defined in terms of number per job, node, socket and task via:
+
+\begin{verbatim}
+--gres             # Generic resources required per node
+--gpus             # GPUs required per job
+--gpus-per-node    # Equivalent to the --gres option for GPUs.
+--gpus-per-socket  # Requires the job to specify a task socket.
+--gpus-per-task    # Requires the job to specify a task count.
+\end{verbatim}
+
+It is also possible to control the GPU distribution using GPU specific specifications:
+\begin{verbatim}
+--cpus-per-gpu  # Count of CPUs allocated per GPU.
+--gpu-bind      # Define how tasks are bound to GPUs.
+--gpu-freq      # Specify GPU frequency and/or GPU memory frequency.
+--mem-per-gpu   # Memory allocated per GPU.
+\end{verbatim}
+
+It is not an inherent expectation for an assesor to alter memory or GPU frequencies for these assessments. Due the high performance requirements of submitted codes, the aim is generally to fully utilise the given hardware. However, artifically limitting the GPU frequency, memory frequency, and memory allocation per GPU can be used as to approximate the performance of the software on different less performant hardware.
+
+
+The administrator of the SLURM configuration can enable tracking of GPU utilisation and memory usage for jobs, for instance, on Hamilton, the tracked statistics are presented on the \href{https://www.durham.ac.uk/research/institutes-and-centres/advanced-research-computing/hamilton-supercomputer/usage/portal/performance/}{Hamilton dashboard, documentation linked here.} These values can be used to find an optimal configuration of GPU's for a given problem size, to most effectively saturate the available resources for a given set of problems. 
+
+\begin{summary}
+	It is important to evaluate the performance of additional resources against the alternative usage of those resources. For instance, if the program can be batch parallelised, or other programs can utilise the hardware, then it may be inefficient to acquire more GPU's for one program.
+\end{summary}
+
+As stated in the high level assessment section on GPU metrics, \autoref{section:high-level:gpu}, it is generally advised to prevent the entire working memory set fitting in the GPU's cache, if that is not representative of the general use case of the program. 
+
+It is possible to share a GPU (or a series of GPU's) between processes, with each prcoess acquiring a percentage of the GPU's resources. This is considered beyond the scope of this assessment, as the scientific software being examined is usually sufficiently compute intensive that sharing a GPU is inefficient. If this is required however, the GPU configuration can be specified using CUDA Multi-Process Service management via your workload manager, using Multi-Instance GPU devices (MIG) for newer NVidia GPU's (such as the A100) separating into several GPU instances, and sharding, allowing unfenced processes to operate on the same memory on a GPU.
+
+\subsection{GPU software tailoring}
+\subsection{Frameworks and performance libraries}
+Many software packages make use of hardware abstraction layers, for increased compatibility, for maintainability, and for reducing the amount of manual duplication in the codebase. These libraries include \href{https://www.khronos.org/sycl/}{SYCL}, HIP based \href{https://rocm.docs.amd.com/en/docs-6.0.2/reference/rocmcc.html}{ROCm} and \href{https://kokkos.org/kokkos-core-wiki/}{Kokkos} and will form a part of the build process for the software in question. They usually necessitate certain additions to the build pipeline, in the form of choice of compiler and compiler options. They require material changes to the codebase, and abstract the data storage and processing, in order to compile the same source for multiple target architectures (such as CPU with OpenMP, CPU with MPI, and GPU processing).
+
+
+\subsubsection{Compiling}
+\subsubsection{Floating point accuracy}
+Aggressive GPU performance optimisation flags will trade floating point accuracy for performance for instance using fprelaxed or fpapprox flags. Flags are dependent on the compiler toolchain version, \href{https://docs.nvidia.com/dccpu/grace-perf-tuning-guide/compilers.html}{see the NVidia HPC documentation}
+
+
+
+
+
+List of flags to test (NVidia CUDA)
+\begin{itemize}
+	\item{-fast, host dependent, but often unrolls loops, specifies O2 optimisation level, prevents stack frames, and additional options dependent on CPU and compiler versions. }
+	\item{-gpu, controls gpu types, CUDA version etc}
+\end{itemize}
+
+List of flags to test (AMD ROCm)
+\begin{itemize}
+	\item{-ffast-math, allows aggressive and lossy floating point optimisations} 
+\end{itemize}
+
+
+
+List of flags to test (Kokkos, including Intel OneAPI)
+\begin{itemize}
+	\item{} 
+\end{itemize}
+
+
+%List of flags to test (SYCL)
+%\begin{itemize}
+%	\item{} 
+%\end{itemize}
+
+\footnote{Nvidia CompileIQ autotuning framework (AI based), AMD-AGI/apex}
+
+
+\subsubsection{Runtime parameters}
+
+
+
+
+
+\subsection{Measuring configuration performance}
+Now that the configuration can be explicitly defined (the hardware allocation for a program, the build chain and runtime parameters) the task is to measure the relative performance of each of a range of configurations. This measurement has several goals:
+\begin{itemize}
+	\item{To evaluate the optimal hardware configuration for a given problem, in relation to relative performance loss}
+	\item{To evaluate possible bottlenecks in hardware or software that may hamper usage of additional resources}
+	\item{To provide a baseline characteristic performance for comparison at later stages of the assessment}
+\end{itemize}
+
+
+

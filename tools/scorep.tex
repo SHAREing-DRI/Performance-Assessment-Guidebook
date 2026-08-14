@@ -1,2 +1,136 @@
 \section{Score-P} 
 \label{section:localisation:scorep}
+
+We here give an overview of getting started with building profiles of parallel
+applications using Score-P which is a performance infrastructure
+\cite{feld2026}. We here will look briefly at using the Score-P compiler
+wrappers to build instrumented binaries which, when executed, produce profiles
+that can be visualised with the Cube GUI. This section is just a brief
+introduction some of the functionality for Score-P in performance analysis, we
+also recommend the reader to refer to the official documentation for further
+information \footnote{\url{https://score-p.org/}}. It should also be noted that
+Score-P offers a user instrumentation API to target specific kernels and
+functions, but here we focus on using the Score-P compiler wrappers to
+instrument the entire binary.
+
+An individual Score-P install is built with a specific combination of compiler
+and MPI library, meaning on clusters multiple Score-P installs are often
+required. It is best to reach out to cluster support teams for help with
+getting the relevant combinations of compiler and Score-P as it might be useful
+to compare compilers during analysis.
+
+It should be noted that as with many profiling and performance tools, an
+application's runtime can increase (potentially quite significantly). Hence, it
+is always advised to run the application without any tooling to note the
+runtime and also resource usage such as maximum memory footprint.
+
+\subsection{Instrumentation}
+
+We load our installation of Score-P and then check that we have the Score-P
+compiler wrappers typically of the form \texttt{scorep-x} for a given compiler,
+\texttt{x}. If building with a build system like CMake it is best to set the
+\texttt{SCOREP\_WRAPPER=off} environment variable to stop instrumentation during
+configuration.
+
+This compilation will then have produced an instrumented binary which we can
+run in a job script as we before (making sure to load in the Score-P library),
+though there is some good practice to consider first. As with tools like MAQAO,
+Score-P will write output files to an experiment directory which will by
+default be given a long name based on the time and date. Instead, we can be
+more exact and set an experiment directory name which is more meaningful with
+the \texttt{export SCOREP\_EXPERIMENT\_DIRECTORY=...} environment variable.
+
+Once the code is finished, there will be a local experimental directory which
+will contain several files such as the files ending with \texttt{*.cubex} which
+can be visualised in the Cube GUI tool. However, we can also do some further
+post-processing with the \texttt{square -s <experiment-directory>}, and then
+visualise with the CubeGUI. For more information in using the CubeGUI please
+refer to the documentation in Ref~\cite{}. Here we are mainly focused on a
+workflow of generating data in Score-P, we discuss data interpretation
+elsewhere in the document. Next, we touch on several configurations to gather
+more low-level information during the profiling.
+
+\subsubsection{Performance counters}
+
+Many performance tools allow the user to gather information on hardware
+performance counters. With Score-P we can, for example, set the
+\begin{verbatim}
+export SCOREP_METRIC_PAPI=PAPI_TOT_INS,PAPI_FP_OPS
+\end{verbatim}
+environment variable which will gather hardware counters via PAPI, where here
+we have selected the total instructions and floating point operations. The
+availability of PAPI counters can be found by the \texttt{papi\_avail} command. 
+
+We can also use performance metrics from Linux \texttt{perf}, but we refer the
+reader to the Score-P documentation for further information.
+
+These performance counters then appear in the CubeGUI as further metrics which
+we can breakdown across the further dimensions. However, as always it can be
+easy to generate a lot of data; performance counters can be very powerful but
+it useful to have an aim in collecting them, to guide an analysis.
+
+\subsubsection{Memory}
+
+Beyond hardware performance counters, Score-P also supports memory based
+metrics through the
+\begin{verbatim}
+export SCOREP_MEMORY_RECORDING=true
+export SCOREP_MPI_MEMORY_RECORDING=true
+\end{verbatim}
+environment variables which can help detecting memory related issues such as
+memory leaks. The support for these features can vary across languages and, as
+with performance counters, it is useful to keep in mind that gathering this
+data should only be carried out if there is an aim for the analysis.
+
+\subsection{Filtering}
+
+A crucial aspect of using tools like Score-P is filtering. Running instrumented
+binaries can show large increases in runtime, and in the next section we can
+see how to use the Score-P infrastructure to produce trace analyses which can
+generate very large amounts of data. Hence, filtering is a major step in this
+workflow.
+
+To begin with we can use the \texttt{scorep-score} command to generate a
+summary of the experiment directory as below
+\begin{verbatim}
+scorep-score ./profile.cubex
+\end{verbatim}
+Running this command on the Score-P generated profile we get predictions of how
+large a trace analysis would be with the current setup and often these can be
+tens of GigaBytes or even TeraBytes. Crucially we will also see information
+regarding the total memory required by Score-P, which can be set by the
+\texttt{SCOREP\_TOTAL\_MEMORY} environment vaariable.
+
+We can also recover a more detailed
+breakdown by passing the \texttt{-r} flag to \texttt{scorep-score} which then
+shows lots of information including the number of times each function is
+called. This data is very valuable in building our filtering but first we need
+an initial filter file.
+
+We can generate an initial filter file by using the command
+\begin{verbatim}
+score-p -g ./profile.cubex
+\end{verbatim}
+Then we can factor this into our prediction for the trace analysis size with
+the \texttt{-f} flag
+\begin{verbatim}
+scorep-score -f initial-scorep.filter -r ./profile.cubex
+\end{verbatim}
+This should show a reduction in the predicted trace size, although we can
+typically do much better by using the outputs of the \texttt{scorep-score -r}
+command to iteratively add further functions and files to our filtering file.
+
+Performance counter data also adds to the size of any resulting trace analyses,
+and their effects can be included in the size predictions with the \texttt{-c}
+flag followed by the number of performance counters. For example, in this code
+snippet
+\begin{verbatim}
+iscorep-score -f scorep.filter -c 3 -r ./profile.cubex
+\end{verbatim}
+we are predicting to gather 3 performance counters.
+
+Once we decided on a filtering file, it is included with
+\texttt{SCOREP\_FILTERING\_FILE} environment variable. Now that we have built a
+filtering system with Score-P, in the next section we will demonstrate how the
+Score-P infrastructure can be used to build automated trace analyses with
+Scalasca.
