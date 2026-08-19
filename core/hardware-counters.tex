@@ -35,20 +35,26 @@ LIKWID suite. Rather than giving just simply read outs of hardware counters,
 which can be very difficult to interpret for beginners, \texttt{likwid-perfctr}
 aggregates the hardware counter results into easier to interpret metrics.
 
-With \texttt{likwid-perfctr} we have already how to gather data from
-performance groups such as \texttt{FLOPS\_DP} for double-precision floating
-point operations. 
+In Section~\ref{section:high-level:core} we saw how to use
+\texttt{likwid-perfctr} to gather data from the \texttt{FLOPS\_DP} group for
+double-precision floating point operations. The example we used gives global
+data on this set of hardware counters for the entire execution. However, this
+may be to coarse for our analysis as we zoom further into our assessment.
+LIKWID offers a \emph{marker API} which allows us to make measurements on
+specific code blocks to be more targeted in our analysis. For example, we can
+analyse specific loops for cache misses or main memory traffic as we suspect
+inefficient data accesses.
 
-\begin{wip}
-Do we include how to gather hardware counter data with vendor tools like AMD
-	uProf and Intel's VTune?
+\begin{wip} 
+In future we should include how to gather hardware counter data with vendor tools like AMD uProf and Intel's VTune?
 \end{wip}
 
 \subsection{Gathering the data}
 \begin{wip}
-Very early work here, likely to include some pointers on a simple workflow for
-	gathering multiple runs with LIKWID
+Include some pointers on a simple workflow for gathering multiple runs with LIKWID. Things to include
+  \begin{itemize}
+    \item There can be quite some variety in hardware counter so batch runs and aggregate statistics
+    \item This process might be easier to automate from ReFrame and scrape relevant data
+    \item We recommend cache flushing between runs, as polluted caches can vary hardware counter results.
+  \end{itemize}
 \end{wip}
-
-There can be significant variability in some hardware counters and so we advise
-doing batches of runs to aggregate statistics.
