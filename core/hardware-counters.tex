@@ -1,5 +1,4 @@
-\section{Hardware Counters}
-\label{section:core:hardware-counters}
+\section{Hardware Counters} \label{section:core:hardware-counters}
 
 Core performance is a question of how well we are exploiting the single-core
 hardware features on a chip. Thankfully hardware vendors typically include
@@ -7,33 +6,42 @@ extra registers on the chip which record the instance of certain hardware
 related events. These added registers are known as hardware performance
 counters and can be used to diagnose performance issues of a code running on a
 specific architecture. For example, cache misses can be registered on cache
-related hardware counters and so can investigate whether a code has inefficient
-use of the cache heirarchy and is hence having to increase data traffic from
-memory. Other hardware counters can activate through branch mispredictions and
-so we can target control flow within a code that is hampering performance.
+related hardware counters and so we can investigate whether a code has
+inefficient use of the cache heirarchy and is hence having to increase data
+traffic from memory. Other hardware counters can activate through branch
+mispredictions and so we can target control flow within a code that is
+hampering performance.
 
 One challenge of working with hardware counters is that they are not
 standardised across all chip generations and vendors. Hence, an analyst has to
-be relatively flexible when using hardware counters. 
+be relatively flexible when using hardware counters. Here we will give a brief
+introduction to accessing hardware performance counters and incorporating this
+into a simple workflow. We note, however, that whilst we are including hardware
+counters in core performance, they are more general and can be used for the
+other performance topics also.
 
 \subsection{Accessing hardware counters}
 
-There are multiple tools built for accessing hardware counters and other tools
-which can use hardware counters to integrate into other metrics for analyses.
-We do not delve in to the details here, but there are many performance tools
-such as Score-P, Scalasca and Cube which offer lots of functionality with code
+There are multiple tools built for accessing hardware counters and tools which
+can use hardware counters to integrate into other metrics for analyses.  We do
+not delve into the details here, but there are many performance tools such as
+Score-P, Scalasca and Cube which offer lots of functionality with code
 instrumentation, profiling and trace analysis that can also access hardware
 counters often through the PAPI (Performance Application Programming Interface)
 library. More information of accessing hardware counters in Score-P is given in
 Section~\ref{section:localisation:scorep}.
 
-On many Linux systems there is the \texttt{perf} which is quite a general tool
-for performance though can be relatively complex to use. However, as a quick
-aside, \texttt{perf} can be used to record metrics for Score-P. A more
+On many Linux systems there is the \texttt{perf} tool which is quite a general
+tool for performance though can be relatively complex to use. However, as a
+quick aside, \texttt{perf} can be used to record metrics for Score-P. A more
 HPC-focused command line tool is the \texttt{likwid-perfctr} tool from the
-LIKWID suite. Rather than giving just simply read outs of hardware counters,
-which can be very difficult to interpret for beginners, \texttt{likwid-perfctr}
-aggregates the hardware counter results into easier to interpret metrics.
+LIKWID suite. Rather than giving just simply read outs of hardware counters ---
+which can be very difficult to interpret for beginners ---
+\texttt{likwid-perfctr} aggregates the hardware counter results into easier to
+interpret metrics. We recommend this as an excellent tool to get started with
+accessing hardware counters, as the program interface is relatively easy to get
+started with, whilst also giving the user access to relatively detailed
+information.
 
 In Section~\ref{section:high-level:core} we saw how to use
 \texttt{likwid-perfctr} to gather data from the \texttt{FLOPS\_DP} group for
@@ -45,16 +53,29 @@ specific code blocks to be more targeted in our analysis. For example, we can
 analyse specific loops for cache misses or main memory traffic as we suspect
 inefficient data accesses.
 
-\begin{wip} 
-In future we should include how to gather hardware counter data with vendor tools like AMD uProf and Intel's VTune?
-\end{wip}
-
 \subsection{Gathering the data}
-\begin{wip}
-Include some pointers on a simple workflow for gathering multiple runs with LIKWID. Things to include
-  \begin{itemize}
-    \item There can be quite some variety in hardware counter so batch runs and aggregate statistics
-    \item This process might be easier to automate from ReFrame and scrape relevant data
-    \item We recommend cache flushing between runs, as polluted caches can vary hardware counter results.
-  \end{itemize}
-\end{wip}
+
+Having seen some examples of using the LIKWID interface to gather hardware
+performance counters, we recommend multiple runs. Hardware counter data can
+vary quite significantly from run-to-run, and so a statistical workflow is
+best. For example, running a single configuration of a benchmark say ten times
+can give us error bars. Simply wrapping the LIKWID command in a for loop is a
+simple way of automating this. Likewise, the \texttt{likwid-pin} command ships
+with flags to output data to a separate file, so we can get individual output
+files for each run and then aggregrate together the data to give us the mean,
+median, standard deviation and range. Having more the mean and median allow us
+to see any underlying skew in these data.
+
+Beyond gathering multiple runs data, it is also recommend once again to
+\emph{localise} the analysis. Global metrics --- i.e., hardware metrics on the
+whole code --- can be a useful starting point, but using LIKWID's marker API
+can allow us to be very granular in our analysis. If we have a runtime profile
+highlighting certain code blocks, then isolating these code blocks with the
+marker API can help us analyse, e.g., NUMA traffic or cache misses, etc. that
+may be particularly problematic in these compute kernels.
+
+So, in brief:
+\begin{enumerate}
+    \item multiple runs are important to observe the statistical behaviour of the hardware counter metrics, as single runs can be unreliable if there is significant skew in these data
+    \item localising the problem to kernels increases the value of hardware counter data, as we are no longer observing globalised metrics average throughout the runtime. Instead we are able to see fine-grained data on the kernel level.
+\end{enumerate}
