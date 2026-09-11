@@ -7,7 +7,7 @@ related events. These added registers are known as hardware performance
 counters and can be used to diagnose performance issues of a code running on a
 specific architecture. For example, cache misses can be registered on cache
 related hardware counters and so we can investigate whether a code has
-inefficient use of the cache heirarchy and is hence having to increase data
+inefficient use of the cache hierarchy and is hence having to increase data
 traffic from memory. Other hardware counters can activate through branch
 mispredictions and so we can target control flow within a code that is
 hampering performance.
@@ -47,7 +47,7 @@ In Section~\ref{section:high-level:core} we saw how to use
 \texttt{likwid-perfctr} to gather data from the \texttt{FLOPS\_DP} group for
 double-precision floating point operations. The example we used gives global
 data on this set of hardware counters for the entire execution. However, this
-may be to coarse for our analysis as we zoom further into our assessment.
+maybe too coarse for our analysis as we zoom further into our assessment.
 LIKWID offers a \emph{marker API} which allows us to make measurements on
 specific code blocks to be more targeted in our analysis. For example, we can
 analyse specific loops for cache misses or main memory traffic as we suspect
@@ -55,16 +55,33 @@ inefficient data accesses.
 
 \subsection{Gathering the data}
 
-Having seen some examples of using the LIKWID interface to gather hardware
-performance counters, we recommend multiple runs. Hardware counter data can
-vary quite significantly from run-to-run, and so a statistical workflow is
-best. For example, running a single configuration of a benchmark say ten times
-can give us error bars. Simply wrapping the LIKWID command in a for loop is a
-simple way of automating this. Likewise, the \texttt{likwid-pin} command ships
-with flags to output data to a separate file, so we can get individual output
-files for each run and then aggregrate together the data to give us the mean,
-median, standard deviation and range. Having more the mean and median allow us
-to see any underlying skew in these data.
+Having seen throughout this document, some examples of using the LIKWID
+interface to gather hardware performance counters, we recommend multiple runs
+as part of any benchmarking workflow. Hardware counter data can vary quite
+significantly from run-to-run, and so a statistical workflow is best. For
+example, running a single configuration of a benchmark say ten times can give
+us error bars. Simply wrapping the LIKWID command in a for loop is a simple way
+of automating this. Likewise, the \texttt{likwid-pin} command ships with flags
+to output data to a separate file, so we can get individual output files for
+each run and then aggregate together the data to give us the mean, median,
+standard deviation and range. Having both the mean and median allow us to see
+any underlying skew in these data.
+
+\begin{instructions}{\likwid}
+
+We demonstrate below a simple BASH workflow for running multiple iterations
+
+\begin{verbatim}
+for i in $(seq 1 10);
+do
+  likwid-perfctr -c N:0-3 -g L2 -o l2-data-$i.csv -O ./code
+done
+\end{verbatim}
+Breaking this down, we are extracting the L2 cache performance metrics by using the \texttt{L2} performance group, for a four-core run. We are specifying the output file path using the \texttt{-o} flag and specifying to use \texttt{csv} format using the \texttt{-O} flag. Finally, we are running this 10 times and writing each output to a separate file. We can later aggregate together these results in a single file or dataframe.
+
+Performance group names vary on different systems, so always ensure to check which are available on your system using \texttt{likwid-perctr -a}.
+\end{instructions}
+
 
 Beyond gathering multiple runs data, it is also recommend once again to
 \emph{localise} the analysis. Global metrics --- i.e., hardware metrics on the
@@ -72,10 +89,25 @@ whole code --- can be a useful starting point, but using LIKWID's marker API
 can allow us to be very granular in our analysis. If we have a runtime profile
 highlighting certain code blocks, then isolating these code blocks with the
 marker API can help us analyse, e.g., NUMA traffic or cache misses, etc. that
-may be particularly problematic in these compute kernels.
+may be particularly problematic in these compute kernels. Further information
+of the syntax of the marker API can be found in the LIKWID
+documentation\footnote{\url{https://github.com/RRZE-HPC/likwid/wiki/likwid-perfctr\#using-the-marker-api}},
+but in short regions of interest that have been found from a profiler, can then
+be marked up. Then we can run the code through \texttt{likwid-perfctr} whilst
+also passing the \texttt{-m} flag.
 
-So, in brief:
-\begin{enumerate}
-    \item multiple runs are important to observe the statistical behaviour of the hardware counter metrics, as single runs can be unreliable if there is significant skew in these data
-    \item localising the problem to kernels increases the value of hardware counter data, as we are no longer observing globalised metrics average throughout the runtime. Instead we are able to see fine-grained data on the kernel level.
-\end{enumerate}
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] When gathering low-level hardware counter data, use multiple runs to gather statistics on the data, checking if there is skew.
+  \item[$\boxplus$] Localise the problem to kernels as this increases the value of hardware counter data since we no longer observing globalised metrics average throughout the runtime. Instead we are able to see fine-grained data on the kernel level.
+
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Run the benchmark once, note down that the hardware counter metrics and immediately begin making deductions.
+  \item[$\boxminus$] Only ever gather hardware counter data globally on the whole code to make deductions about performance patterns in the code.
+\end{itemize}
