@@ -1,6 +1,16 @@
 \chapter{Core}
 \label{chapter:core analysis}
 
+\begin{wip}
+  Needs further details, e.g., do we use roofline here?
+\end{wip}
+
+By this stage we have pushed the core performance on our selected hardware to
+be optimal. We use tools such as MAQAO to find any missing compiler
+optimisations, and have assessed variability of core performance on any other
+available architectures. If core performance is still suboptimal we now need to
+investigate for implicit core inefficiencies within the code.
+
 % With the core analysis, we want to understand why a single core of our calculation does not deliver the performance we'd like it to contribute.
 % From the high-level analysis, we know that our code does not deliver a
 % reasonable ratio of the theoretical peak.
