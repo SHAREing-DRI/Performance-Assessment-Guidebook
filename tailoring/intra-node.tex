@@ -36,3 +36,7 @@ Metrics for measuring intra-node performance
 
 \subsection{Pinning}
 \label{section:tailoring:intra-node:pinning}
+
+% I think we introduce here the likwid-pin and likwid-mpirun interfaces properly. We demonstrate a workflow of: (1) look at likwid-topology and think of different ways to configure your ranks, e.g., by node? by socket? by NUMA domain? (2) Then if there are threads, how do we include them: spread or close? We can be highly explicit in this with LIKWID. (3) We run experiments and test out different ways of distributing. We might want to try testing things all packed together vs. spread out.
+
+% always check debugging information to see the placement of the threads and ranks
