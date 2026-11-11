@@ -40,3 +40,48 @@ Metrics for measuring intra-node performance
 % I think we introduce here the likwid-pin and likwid-mpirun interfaces properly. We demonstrate a workflow of: (1) look at likwid-topology and think of different ways to configure your ranks, e.g., by node? by socket? by NUMA domain? (2) Then if there are threads, how do we include them: spread or close? We can be highly explicit in this with LIKWID. (3) We run experiments and test out different ways of distributing. We might want to try testing things all packed together vs. spread out.
 
 % always check debugging information to see the placement of the threads and ranks
+
+One external dial that we can tweak to understand a code's intra-node
+performance is the affinity and placement of processes. Whether this be MPI
+ranks or threads from a multithreading library, such as OpenMP, we have
+flexibility in where these resources are placed. Some codes come with
+recommendations such as `assign 1 MPI rank per socket` but the architectures of
+individual chips is always evolving hence it worth revisiting this.
+
+We cannot be entirely exhaustive in experimenting with thread placement
+patterns, and neither is this worth while. For hybrid parallel applications,
+e.g., MPI+OpenMP, we can have a large parameter space of varying rank count vs
+thread count. To reduce this search we instead recommend a simplified workflow
+to just begin testing resource allocation for intra-node performance.
+
+\begin{checklist}
+ \item Remind yourself, from the pre-assessment, of the structure of the
+	 hardware that you are running on. In particular, the domains of the
+	 node: size of socket, NUMA domains, and even chiplets or other
+	 substructures.
+ \item Compare with your high-level assessment and plan out which
+	 configurations have not been explored.
+ \item Run strong scaling analyses of these different configurations, and
+	 calculate the high-level intra-node metric from
+	 Section~\ref{section:high-level:intra-node}. 
+ \item Note down any findings, such as better or worse performance in different
+	 configurations, in an assessment report.
+\end{checklist}
+
+This checklist might initially seem vague but we can walk through a simple
+example. Say we are tasked with analysing a MPI+OpenMP code for which we have
+been advised to use one 1 MPI rank per socket, but the submitter has specified
+they are running on a chip which happens to have many small NUMA domains. We
+would run through our high-level assessment using what the submitter
+recommends, but during this tailoring stage we believe it is worth testing two
+different cases: 1 rank per node, and 1 rank per NUMA domain. 
+
+
+\begin{instructions}{\likwid}
+	TBD
+\end{instructions}
+
+What about thread spread or close?
+
+
+
