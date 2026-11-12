@@ -74,14 +74,39 @@ been advised to use one 1 MPI rank per socket, but the submitter has specified
 they are running on a chip which happens to have many small NUMA domains. We
 would run through our high-level assessment using what the submitter
 recommends, but during this tailoring stage we believe it is worth testing two
-different cases: 1 rank per node, and 1 rank per NUMA domain. 
+different cases: 1 rank per node, and 1 rank per NUMA domain. We can see below
+how this look below using LIKWID.
 
 
 \begin{instructions}{\likwid}
-	TBD
+  To begin with grab data on the hardware via \texttt{likwid-topology} and can even include the \texttt{-g} flag to give a plain text image of the hardware such as core locations and associated cache levels. Take for example that we a dual-socket node, which 2 NUMA domains per socket with 16 cores per NUMA domain, i.e., a 64 core node.
+ 
+  Our initial high-level scaling run from the above example in which the submitter advises 1 rank per socket would look like the following
+  \begin{verbatim}
+    for i in 32 16 8 4 2 1
+    do
+      likwid-mpirun -np 2 -nperdomain S:1 -t $i -d ./code
+    done
+  \end{verbatim}
+  Here we have just wrapped our run statement in a for loop to vary the number of threads defined with the \texttt{-t} flag. As with the any standard \texttt{mpirun} or \texttt{mpiexec} commands, we define the total number of ranks with the \texttt{-np} flag. One benefit of using LIKWID here is that we are able to be explicit with a rank placement with this relatively simple interface. Recall that this is a dual-socket node so we define 2 ranks and specify 1 rank per socket with the \texttt{-nperdomain S:1} option. We could also define 1 rank per node with \texttt{-nperdomain N:1} or per NUMA domain \texttt{-nperdomain M:1}. Selecting the number of ranks per node allows us to select multiple node if we select more total ranks than the number of ranks assigned per node.
+
+  We can now simply repeat our analysis to test whether placement of ranks per NUMA domain rather than per socket is better with the following
+  \begin{verbatim}
+    for i in 16 8 4 2 1
+    do
+      likwid-mpirun -np 4 -nperdomain M:1 -t $i -d ./code
+    done
+  \end{verbatim}
+  At this point if there are differences in our observed metric --- likely total runtime --- we do not need to explain, we simply note it down as it may become clear with lower-level analyses.
+
+  Finally, note that we include the \texttt{-d} flag which prints debugging information. It is important to check the initial information printed when including this flag as it gives the placement of ranks and threads to ensure that you can confirm that LIKWID is assigning these resources as you intended.
 \end{instructions}
 
-What about thread spread or close?
-
+When considering thread placement we also have control over how closely packed
+they are: do we fill out the cores one-by-one, or do we choose to spread them
+out over the silicon? These options can impact how a code performs and can be
+controlled by environment variables but we again turn to LIKWID which has
+\emph{expressions} that allow us to be very specific of which hardware threads
+we run on.
 
 
