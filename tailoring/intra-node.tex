@@ -109,4 +109,21 @@ controlled by environment variables but we again turn to LIKWID which has
 \emph{expressions} that allow us to be very specific of which hardware threads
 we run on.
 
+From the LIKWID documentation \footnote{LIKWID expressions syntax are included in the pinning documentation: \url{https://github.com/RRZE-HPC/likwid/wiki/Likwid-Pin}} we have two
+different variants of expression syntax:
+\begin{enumerate}
+  \item \texttt{-c E:<thread domain>:<number of threads>}
+  \item \texttt{-c E:<thread domain>:<number of threads>:<chunk size>:<stride>}
+\end{enumerate}
+where thread domains can again be defined as nodes (\texttt{N}), sockets
+(\texttt{S0}), NUMA domains (\texttt{M0}), etc. With these expressions we can
+then be explicit with our thread locations meaning we can test spreading these
+threads across the chip. For example, we may want to test allocating threads
+one per NUMA domain to allow them to exploit memory bandwidth. The task of the
+performance analyst is to test these combinations.
 
+In short, performance gains can be had through affinity and placement of
+threads and ranks. We propose that LIKWID offers an interface that allows for
+the greatest control an analyst may need. The purpose then of this element of
+tailoring to a node is to test out some of these placement techniques, e.g.,
+close or spread threads, ranks assigned to NUMA domains or sockets.
