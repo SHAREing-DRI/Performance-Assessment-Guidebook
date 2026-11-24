@@ -2,3 +2,39 @@
 \label{section:tailoring:io}
 
 % again, there is not a huge amount we can test here. If the code stipulates any different I/O patterns then we can try these. Otherwise, on a particular system, we can try changing where files are read from and written to, e.g., a temporary storage on the node.
+
+If a code performs heavy I/O, and the high-level metrics demonstrate this to be
+a potential bottleneck, then we must check whether we are capturing realistic
+I/O performance before proceeding. It is easy to poorly use the available file
+systems on a machine resulting in excessive wait times. To be more explicit:
+are we using our system well enough to see the I/O perform ``in its best
+light"? 
+
+Many codes come with build and run instructions that are agnostic about where
+the source code, binaries and any data files are located. This makes sense as
+the instructions are intended to be flexible to be used on a variety of
+systems. However, for codes that are heavily I/O bound, we are not best advised
+to read and write files from home directories or equivalent. Instead, we will
+find better performance by doing our I/O on the node-local file system.
+Typically, file systems like the Network File System (NFS) will have high
+latency and low bandwidth, whereas node-local file systems --- usually SSDs on
+the node --- have low latency and high bandwidth which we can exploit for our
+I/O heavy workloads.
+
+Often node-local file systems are labelled as temperary directories (e.g.,
+\texttt{\$TEMPDIR}, \texttt{\$TMPDIR}, \texttt{\$TMP}, \ldots), and so a simple
+workflow of this so-called \emph{data staging} can be defined as:
+\begin{enumerate}
+  \item Copy data files or unpack \texttt{tar}, etc. files to the temporary directory
+  \item Run code, ensuring to set data paths to the temporary directory
+  \item Move any necessary output files from the temporary directory back to the NFS as they will otherwise be lost after job completion
+\end{enumerate}
+These workflows are particularly relevant to codes that rely on I/O of many
+small files, e.g., ML codes.
+
+The difficulty with tailoring the I/O of a code on a particular system, is that
+these features can vary system to system due to hardware or the way that the
+system is configured. Many compute centres give their users information on file
+systems and relative performance, so we always recommend consulting
+documentation for any other available features of the file system we can
+exploit.
