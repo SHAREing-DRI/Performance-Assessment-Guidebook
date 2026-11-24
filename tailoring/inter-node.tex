@@ -14,8 +14,24 @@ nodes through a scheduler like SLURM to avoid poorly performing connections.
 However, this is a highly system specific approach and so we do not consider
 this issue here.
 
-Firstly, we need to remember that we can scale up our LIKWID to a multi-node configuration...
+When we are considering inter-node we need to remember that we can scale up our
+LIKWID to a multi-node configuration to keep all of the progress we made with
+the intra-node tailoring. We do not want to view these things as entirely
+separate. From the LIKWID pinning and affinity expressions, we can specify our
+desired resource configuration for a node, but then through out SLURM script we
+can select multiple nodes. This node-level configuration is then scaled up
+across each nodes by requesting more nodes through the scheduler, and also by
+scaling up the number of MPI ranks in the \texttt{likwid-mpirun -n
+<num\_of\_ranks>} option, whilst keeping the pinning expression the same.
+LIKWID automatically can then assign these `on-node' configurations to multiple
+nodes.
 
-Secondly, \texttt{#SBATCH --contiguous} and \texttt{#SBATCH --switches=1}...
-
-Thirdly, anything from \texttt{mpirun}...?
+For applications that heavy use the network for MPI communications we have
+options from the scheduler to select nodes that will on average have lower
+latencies for communication. With \texttt{\#SBATCH --contiguous} we can select
+nodes such that they are near one another, which should be tested as some
+communication patterns can favour this. Otherwise, we also have the
+\texttt{\#SBATCH --switches=<num\_of\_switches>} option allowing us to select
+nodes that share a switch which usually have lower latencies for communication.
+For a breakdown of a system's topology we can use the \texttt{scontrol show
+topo} command.
