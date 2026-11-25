@@ -35,3 +35,8 @@ communication patterns can favour this. Otherwise, we also have the
 nodes that share a switch which usually have lower latencies for communication.
 For a breakdown of a system's topology we can use the \texttt{scontrol show
 topo} command.
+
+Being specific with these options and requesting nodes to lie within a
+particular set of switches can aid performance is the application is bounded by
+MPI communications. However, it can significantly increase queue times, and so
+this should be taken into account when trialling these options.
