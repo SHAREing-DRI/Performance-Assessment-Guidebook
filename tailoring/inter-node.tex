@@ -1,2 +1,50 @@
 \section{Inter-node performance}
 \label{section:tailoring:inter-node}
+
+At the inter-node level we are now more concerned about our use of the network.
+HPC systems can have variability of interconnect speeds between nodes, and some
+compute centres may make this data available hence users can select specific
+nodes through a scheduler like SLURM to avoid poorly performing connections.
+However, this is a highly system specific approach and so we do not consider
+this issue here.
+
+When we are considering inter-node we need to remember that we can scale up our
+LIKWID run commands to a multi-node configuration to keep all of the progress
+we made with the intra-node tailoring. We do not want to view these things as
+entirely separate. From the LIKWID pinning and affinity expressions, we can
+specify our desired resource configuration for a node, but then via our SLURM
+script we can select multiple nodes. This node-level configuration is then
+scaled up across each nodes by requesting more nodes through the scheduler, and
+also by scaling up the number of MPI ranks in the \texttt{likwid-mpirun -n
+<num\_of\_ranks>} option, whilst keeping the pinning expression the same.
+LIKWID automatically can then assign these `on-node' configurations to multiple
+nodes.
+
+For applications that heavy use the network for MPI communications we have
+options from the scheduler to select nodes that will on average have lower
+latencies for communication. With \texttt{\#SBATCH --contiguous} we can select
+nodes such that they are near one another, which should be tested as some
+communication patterns can favour this. Otherwise, we also have the
+\texttt{\#SBATCH --switches=<num\_of\_switches>} option allowing us to select
+nodes that share a switch which usually have lower latencies for communication.
+For a breakdown of a system's topology we can use the \texttt{scontrol show
+topo} command.
+
+Being specific with these options and requesting nodes to lie within a
+particular set of switches can aid performance if the application is bounded by
+MPI communications. However, it can significantly increase queue times, and so
+this should be taken into account when trialling these options.
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Observe how runtime changes when restricting compute nodes to be located close to one another.
+  \item[$\boxplus$] Use the intra-node tailored setup per node when testing multi-node runs.
+\end{itemize}
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Try exhaustively all combinations of nodes on a system to see how interconnect performance varies.
+  \item[$\boxminus$] Change the intra-node configuration when testing different multi-node setups.
+\end{itemize}

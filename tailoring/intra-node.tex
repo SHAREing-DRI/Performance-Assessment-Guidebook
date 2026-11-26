@@ -1,38 +1,167 @@
 \section{Intra-node performance}
 \label{section:tailoring:intra-node}
-As referenced inside Section~\ref{section:high-level:intra-node}, the program is considered to be making good use of a system if it is able to use more than 80\% of its cores with more than 80\% of (strong scaling) efficiency. This metric is not workload agnostic. For instance, a program could have two benchmarks with vastly different problem sizes. Additionally, for programs with simple scaling in problem size, for example scaling a system size up resulting in a quadratic increase in compute time, the ratio of memory usage to compute cannot be assumed to relate similarly. 
+%As referenced in Section~\ref{section:high-level:intra-node}, the program is
+%considered to be making good use of a system if it is able to use more than
+%80\% of its cores with more than 80\% of (strong scaling) efficiency. This
+%metric is not workload agnostic. For instance, a program could have two
+%benchmarks with vastly different problem sizes. Additionally, for programs with
+%simple scaling in problem size, for example scaling a system size up resulting
+%in a quadratic increase in compute time, the ratio of memory usage to compute
+%cannot be assumed to relate similarly. 
 
-In order to evaluate the intra-node performance of a code therefore, choices must be made as to a reasonable range of workloads for the program to perform. The range of workloads should aim to be representative of real world behaviour of the program, and as such will require information about the program's use cases to be effective. For intra-node performance, this will often relate to program's utilising workstations, or batch parallel problems on beowulf clusters. For problems which will exclusively be run on multiple nodes due to their size or computation length, intra-node scaling can be difficult to treat. In these cases it may be necessary to examine a small number of cores on a fixed number of nodes and gradually increase the number of cores. This may be prohibitively time consuming however, and should generally only be examined where necessary for larger problems. 
+%In order to evaluate the intra-node performance of a code therefore, choices
+%must be made as to a reasonable range of workloads for the program to perform.
+%The range of workloads should aim to be representative of real world behaviour
+%of the program, and as such will require information about the program's use
+%cases to be effective. For intra-node performance, this will often relate to
+%program's utilising workstations, or batch parallel problems on beowulf
+%clusters. For problems which will exclusively be run on multiple nodes due to
+%their size or computation length, intra-node scaling can be difficult to treat.
+%In these cases it may be necessary to examine a small number of cores on a
+%fixed number of nodes and gradually increase the number of cores. This may be
+%prohibitively time consuming however, and should generally only be examined
+%where necessary for larger problems. 
 
-The range of workloads for different codes could include:
-\begin{itemize}
-		\item A large workload, with a large memory footprint
-		\item A compute heavy workload, with fixed memory
-	        \item A workload with lots of memory accesses
-		\item An I/O heavy workload 
-\end{itemize}
+%The range of workloads for different codes could include:
+%\begin{itemize}
+%  \item A large workload, with a large memory footprint
+%  \item A compute heavy workload, with fixed memory
+%  \item A workload with lots of memory accesses
+%  \item An I/O heavy workload 
+%\end{itemize}
 
-Unlike inter-node scaling intra-node scaling generally won't exhibit super scaling behaviour (where the performance increases more than proportionally with core count). In inter-node scaling that is usually because of additional resources available across nodes, for example increasing the cache space, or i/o resources. 
+%Unlike inter-node scaling intra-node scaling generally won't exhibit super scaling behaviour (where the performance increases more than proportionally with core count). In inter-node scaling that is usually because of additional resources available across nodes, for example increasing the cache space, or i/o resources. 
 
-\subsection{Configuration}
-Where possible, the configuration of a node should be comparable to the expected hardware configurations in wider use to run the program. This may point to a reduction in the number of cores, or available memory for a node. It can be important, however, to measure the performance to a full node if possible, in order to evaluate the benefits of larger hardware for future procurement.
+%\subsection{Configuration}
+%Where possible, the configuration of a node should be comparable to the
+%expected hardware configurations in wider use to run the program. This may
+%point to a reduction in the number of cores, or available memory for a node. It
+%can be important, however, to measure the performance to a full node if
+%possible, in order to evaluate the benefits of larger hardware for future
+%procurement.
 
-For heterogenous computing, there is at least a three dimensional state space to examine. The number of cores per node, the number of GPU's per node, and the class of GPU can all be important variables, and the total cost for procuring and running some combination of these can be an important metric. For instance for a machine with nodes configured with different numbers of different GPU's an example configuration table could look like:
+%For heterogenous computing, there is at least a three dimensional state space
+%to examine. The number of cores per node, the number of GPU's per node, and the
+%class of GPU can all be important variables, and the total cost for procuring
+%and running some combination of these can be an important metric. For instance
+%for a machine with nodes configured with different numbers of different GPU's
+%an example configuration table could look like:
 
 % Please add the following required packages to your document preamble:
 % \usepackage{multirow}
-\begin{table}[]
-\begin{tabular}{llllllll}
-\multirow{2}{*}{ID} & \multirow{2}{*}{Cores} & \multirow{2}{*}{GPUs} & \multirow{2}{*}{GPU Class} & \multicolumn{2}{l}{Performance Metric 1} & \multicolumn{2}{l}{Performance Metric 2} \\
-                    &                        &                       &                            & Benchmark 1         & Benchmark 2        & Benchmark 1         & Benchmark 2        \\
-                    &                        &                       &                            &                     &                    &                     &                    \\
-                    &                        &                       &                            &                     &                    &                     &                   
-\end{tabular}
-\end{table}
+%\begin{table}[]
+%\begin{tabular}{llllllll}
+%\multirow{2}{*}{ID} & \multirow{2}{*}{Cores} & \multirow{2}{*}{GPUs} & \multirow{2}{*}{GPU Class} & \multicolumn{2}{l}{Performance Metric 1} & \multicolumn{2}{l}{Performance Metric 2} \\
+%                    &                        &                       &                            & Benchmark 1         & Benchmark 2        & Benchmark 1         & Benchmark 2        \\
+%                    &                        &                       &                            &                     &                    &                     &                    \\
+%                    &                        &                       &                            &                     &                    &                     &                   
+%\end{tabular}
+%\end{table}
 
+%\subsection{Metrics}
+%Metrics for measuring intra-node performance
+%% removed as we moving to just relying on the high-level metrics for now
 
-\subsection{Metrics}
-Metrics for measuring intra-node performance
+%\subsection{Pinning}
+%\label{section:tailoring:intra-node:pinning}
 
-\subsection{Pinning}
-\label{section:tailoring:intra-node:pinning}
+One external dial that we can tweak to understand a code's intra-node
+performance is the affinity and placement of processes. Whether this be MPI
+ranks or threads from a multithreading library, such as OpenMP, we have
+flexibility in where these resources are placed. Some codes come with
+recommendations such as `assign 1 MPI rank per socket' but the architectures of
+individual chips are always evolving hence it worth revisiting this.
+
+We cannot be entirely exhaustive in experimenting with thread placement
+patterns, and neither is this worth while. For hybrid parallel applications,
+e.g., MPI+OpenMP, we can have a large parameter space of varying rank count vs.
+thread count. To reduce this search we instead recommend a simplified workflow
+to begin testing resource allocation for intra-node performance.
+
+\begin{checklist}
+ \item Remind yourself, from the pre-assessment, of the structure of the
+	 hardware that you are running on. In particular, the domains of the
+	 node: size of socket, NUMA domains, and even chiplets or other
+	 substructures.
+ \item Compare with your high-level assessment and plan out which
+	 configurations have not been explored.
+ \item Run strong scaling analyses of these different configurations, and
+	 calculate the high-level intra-node metric from
+	 Section~\ref{section:high-level:intra-node}. 
+ \item Note down any findings, such as better or worse performance in different
+	 configurations, in an assessment report.
+\end{checklist}
+
+This checklist might initially seem vague but we can walk through a simple
+example. Say we are tasked with analysing a MPI+OpenMP code for which we have
+been advised to use one 1 MPI rank per socket, but the submitter has specified
+they are running on a chip which happens to have many small NUMA domains. We
+would run through our high-level assessment using what the submitter
+recommends, but during this tailoring stage we believe it is worth testing two
+different cases: 1 rank per node, and 1 rank per NUMA domain. We can see below
+how this look below using LIKWID.
+
+\begin{instructions}{\likwid}
+  To begin with we can grab data on the hardware via \texttt{likwid-topology} and can even include the \texttt{-g} flag to give a plain text image of the hardware such as core locations and associated cache levels. Take for example that we have a dual-socket node, with 2 NUMA domains per socket and 16 cores per NUMA domain, i.e., a 64 core node.
+ 
+  Our initial high-level scaling run from the above example in which the submitter advises 1 rank per socket would look like the following
+  \begin{verbatim}
+    for i in 32 16 8 4 2 1
+    do
+      likwid-mpirun -np 2 -nperdomain S:1 -t $i -d ./code
+    done
+  \end{verbatim}
+  Here we have just wrapped our run statement in a for-loop to vary the number of threads defined with the \texttt{-t} flag. As with any standard \texttt{mpirun} or \texttt{mpiexec} commands, we define the total number of ranks with the \texttt{-np} flag. One benefit of using LIKWID here is that we are able to be explicit with a rank placement with this relatively simple interface. Recall that this is a dual-socket node so we define 2 ranks and specify 1 rank per socket with the \texttt{-nperdomain S:1} option. We could also define 1 rank per node with \texttt{-nperdomain N:1} or per NUMA domain \texttt{-nperdomain M:1}. Selecting the number of ranks per node allows us to select multiple node if we select more ranks than the number of ranks assigned per node.
+
+  We can now simply repeat our analysis to test whether placement of ranks per NUMA domain rather than per socket is better with the following
+  \begin{verbatim}
+    for i in 16 8 4 2 1
+    do
+      likwid-mpirun -np 4 -nperdomain M:1 -t $i -d ./code
+    done
+  \end{verbatim}
+  At this point if there are differences in our observed metric --- likely total runtime --- we do not need to explain, we simply note it down as it may become clear with lower-level analyses.
+
+  Finally, note that we include the \texttt{-d} flag which prints debugging information. It is important to check the initial information printed when including this flag as it gives the placement of ranks and threads to ensure that you can confirm that LIKWID is assigning these resources as you intended.
+\end{instructions}
+
+When considering thread placement we also have control over how closely packed
+they are: do we fill out the cores one-by-one, or do we choose to spread them
+out over the silicon? These options can impact how a code performs and can be
+controlled by environment variables but we again turn to LIKWID which has
+\emph{expressions} that allow us to be very specific of which hardware threads
+we run on.
+
+From the LIKWID documentation\footnote{LIKWID expressions syntax are included in the pinning documentation: \url{https://github.com/RRZE-HPC/likwid/wiki/Likwid-Pin}} we have two
+different variants of expression syntax:
+\begin{enumerate}
+  \item \texttt{-c E:<thread domain>:<number of threads>}
+  \item \texttt{-c E:<thread domain>:<number of threads>:<chunk size>:<stride>}
+\end{enumerate}
+where thread domains can again be defined as nodes (\texttt{N}), sockets
+(\texttt{S0}), NUMA domains (\texttt{M0}), etc. With these expressions we can
+then be explicit with our thread locations meaning we can test spreading these
+threads across the chip. For example, we may want to test allocating threads
+one per NUMA domain to allow them to exploit memory bandwidth. The task of the
+performance analyst is to test these combinations.
+
+In short, performance gains can be had through affinity and placement of
+threads and ranks. We propose that LIKWID offers an interface that allows for
+the greatest control an analyst may need. The purpose then of this element of
+tailoring to a node is to test out some of these placement techniques, e.g.,
+close or spread threads, ranks assigned to NUMA domains or sockets.
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Test different locations of rank and thread placement relating to different domains on the hardware, such as the node, sockets, NUMA domains, chiplets, etc.
+  \item[$\boxplus$] Run experiments of pinning threads either close or spread on the chip.
+  \item[$\boxplus$] Compute high-level intra-node metrics to quantify different placement and affinity conditions.
+\end{itemize}
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Try exhaustively every combination of rank and thread placement across a node.
+  \item[$\boxminus$] Run different rank and threads placements without running scaling analyses.
+\end{itemize}

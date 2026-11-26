@@ -1,2 +1,21 @@
 \section{Wrap-up}
 \label{section:tailoring:wrap-up}
+
+The points laid out here are to account for two main scenarios: (1)
+``low-hanging fruit" in performance, e.g., gains may be found immediately by
+simply shifting input data and increasing I/O bandwidth; (2) ensuring that
+there is greater stability in our analysis before progressing. This second
+point is subtle, but whenever benchmarking we are trying to get machines to
+behave in as controlled and predictable a way as possible. In the case of
+thread and rank placement, we may see variable performance due to low thread
+affinity or inconsistent memory locations, making deeper-level analyses harder
+to rely on. 
+
+This is not intended to be fully exhaustive: there are many dials we can tune
+for a code, some can be impactful whilst others will be negligible. We have
+listed here some initial variables to consider for tailoring a code that we
+recommend testing in conjunction with the high-level metrics. For example, if
+we try out hardware-specific compiler optimisations, we advise recomputing the
+core-level metric to see if there is a significant change. In fact, we may see
+shifts in other metrics too. The key is to test these features and document what we
+see, using the metrics as a guide to track changes in performance.
