@@ -38,3 +38,17 @@ system is configured. Many compute centres give their users information on file
 systems and relative performance, so we always recommend consulting
 documentation for any other available features of the file system we can
 exploit.
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Check for documentation for different storage and file system options on a machine, looking for recommendations by the system providers.
+  \item[$\boxplus$] Compute the high-level I/O metric for the case of moving file read and writes to a local storage on the node.
+\end{itemize}
+
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Simply reduce the amount of I/O operations so the code appears less I/O bound. 
+\end{itemize}

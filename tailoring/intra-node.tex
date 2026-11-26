@@ -69,14 +69,14 @@ One external dial that we can tweak to understand a code's intra-node
 performance is the affinity and placement of processes. Whether this be MPI
 ranks or threads from a multithreading library, such as OpenMP, we have
 flexibility in where these resources are placed. Some codes come with
-recommendations such as `assign 1 MPI rank per socket` but the architectures of
-individual chips is always evolving hence it worth revisiting this.
+recommendations such as `assign 1 MPI rank per socket' but the architectures of
+individual chips are always evolving hence it worth revisiting this.
 
 We cannot be entirely exhaustive in experimenting with thread placement
 patterns, and neither is this worth while. For hybrid parallel applications,
-e.g., MPI+OpenMP, we can have a large parameter space of varying rank count vs
+e.g., MPI+OpenMP, we can have a large parameter space of varying rank count vs.
 thread count. To reduce this search we instead recommend a simplified workflow
-to just begin testing resource allocation for intra-node performance.
+to begin testing resource allocation for intra-node performance.
 
 \begin{checklist}
  \item Remind yourself, from the pre-assessment, of the structure of the
@@ -102,7 +102,7 @@ different cases: 1 rank per node, and 1 rank per NUMA domain. We can see below
 how this look below using LIKWID.
 
 \begin{instructions}{\likwid}
-  To begin with grab data on the hardware via \texttt{likwid-topology} and can even include the \texttt{-g} flag to give a plain text image of the hardware such as core locations and associated cache levels. Take for example that we a dual-socket node, which 2 NUMA domains per socket with 16 cores per NUMA domain, i.e., a 64 core node.
+  To begin with we can grab data on the hardware via \texttt{likwid-topology} and can even include the \texttt{-g} flag to give a plain text image of the hardware such as core locations and associated cache levels. Take for example that we have a dual-socket node, with 2 NUMA domains per socket and 16 cores per NUMA domain, i.e., a 64 core node.
  
   Our initial high-level scaling run from the above example in which the submitter advises 1 rank per socket would look like the following
   \begin{verbatim}
@@ -111,7 +111,7 @@ how this look below using LIKWID.
       likwid-mpirun -np 2 -nperdomain S:1 -t $i -d ./code
     done
   \end{verbatim}
-  Here we have just wrapped our run statement in a for loop to vary the number of threads defined with the \texttt{-t} flag. As with the any standard \texttt{mpirun} or \texttt{mpiexec} commands, we define the total number of ranks with the \texttt{-np} flag. One benefit of using LIKWID here is that we are able to be explicit with a rank placement with this relatively simple interface. Recall that this is a dual-socket node so we define 2 ranks and specify 1 rank per socket with the \texttt{-nperdomain S:1} option. We could also define 1 rank per node with \texttt{-nperdomain N:1} or per NUMA domain \texttt{-nperdomain M:1}. Selecting the number of ranks per node allows us to select multiple node if we select more total ranks than the number of ranks assigned per node.
+  Here we have just wrapped our run statement in a for-loop to vary the number of threads defined with the \texttt{-t} flag. As with any standard \texttt{mpirun} or \texttt{mpiexec} commands, we define the total number of ranks with the \texttt{-np} flag. One benefit of using LIKWID here is that we are able to be explicit with a rank placement with this relatively simple interface. Recall that this is a dual-socket node so we define 2 ranks and specify 1 rank per socket with the \texttt{-nperdomain S:1} option. We could also define 1 rank per node with \texttt{-nperdomain N:1} or per NUMA domain \texttt{-nperdomain M:1}. Selecting the number of ranks per node allows us to select multiple node if we select more ranks than the number of ranks assigned per node.
 
   We can now simply repeat our analysis to test whether placement of ranks per NUMA domain rather than per socket is better with the following
   \begin{verbatim}
@@ -132,7 +132,7 @@ controlled by environment variables but we again turn to LIKWID which has
 \emph{expressions} that allow us to be very specific of which hardware threads
 we run on.
 
-From the LIKWID documentation \footnote{LIKWID expressions syntax are included in the pinning documentation: \url{https://github.com/RRZE-HPC/likwid/wiki/Likwid-Pin}} we have two
+From the LIKWID documentation\footnote{LIKWID expressions syntax are included in the pinning documentation: \url{https://github.com/RRZE-HPC/likwid/wiki/Likwid-Pin}} we have two
 different variants of expression syntax:
 \begin{enumerate}
   \item \texttt{-c E:<thread domain>:<number of threads>}
@@ -150,3 +150,18 @@ threads and ranks. We propose that LIKWID offers an interface that allows for
 the greatest control an analyst may need. The purpose then of this element of
 tailoring to a node is to test out some of these placement techniques, e.g.,
 close or spread threads, ranks assigned to NUMA domains or sockets.
+
+\paragraph*{How it works}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxplus$] Test different locations of rank and thread placement relating to different domains on the hardware, such as the node, sockets, NUMA domains, chiplets, etc.
+  \item[$\boxplus$] Run experiments of pinning threads either close or spread on the chip.
+  \item[$\boxplus$] Compute high-level intra-node metrics to quantify different placement and affinity conditions.
+\end{itemize}
+
+\paragraph*{How it does not work}
+
+\begin{itemize}[noitemsep]
+  \item[$\boxminus$] Try exhaustively every combination of rank and thread placement across a node.
+  \item[$\boxminus$] Run different rank and threads placements without running scaling analyses.
+\end{itemize}
